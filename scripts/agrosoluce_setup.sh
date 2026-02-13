@@ -16,8 +16,8 @@ if [ ! -f "package.json" ]; then
     cd agrosoluce-marketplace
 fi
 
-# GitHub Token Setup
-export GITHUB_TOKEN="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"
+# GitHub Token Setup (set YOUR_GITHUB_TOKEN or use: gh auth login)
+export GITHUB_TOKEN="${GITHUB_TOKEN:-YOUR_GITHUB_TOKEN}"
 
 echo "🚀 Step 1: Initialize React + TypeScript Project"
 echo "================================================"

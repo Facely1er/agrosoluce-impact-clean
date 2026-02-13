@@ -378,8 +378,8 @@ npm install -D prettier eslint-config-prettier
 
 ### **GitHub Repository Token**
 ```bash
-# Use provided GitHub token
-export GITHUB_TOKEN="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"
+# Set your GitHub token (create at https://github.com/settings/tokens)
+export GITHUB_TOKEN="YOUR_GITHUB_TOKEN"
 
 # Verify access
 gh auth status
