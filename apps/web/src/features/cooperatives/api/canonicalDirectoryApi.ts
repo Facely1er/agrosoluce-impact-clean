@@ -31,13 +31,14 @@ function transformStaticCooperative(raw: any): CanonicalCooperativeDirectory {
   };
 }
 
+/** Load all cooperatives from static JSON (no cap — supports 2000+ records) */
 async function getCanonicalDirectoryRecordsStaticFallback(): Promise<CanonicalCooperativeDirectory[]> {
   try {
     const res = await fetch(getStaticDataUrl('cooperatives_cote_ivoire.json'));
     if (!res.ok) return [];
     const json = await res.json();
     const list = Array.isArray(json.cooperatives) ? json.cooperatives : [];
-    return list.slice(0, STATIC_FALLBACK_MAX).map(transformStaticCooperative);
+    return list.map(transformStaticCooperative);
   } catch {
     return [];
   }

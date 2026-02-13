@@ -13,6 +13,7 @@ import {
 import { computeHealthIndex, PHARMACIES } from '@agrosoluce/data-insights';
 import type { PharmacyId } from '@agrosoluce/types';
 import { TrendingUp, AlertCircle } from 'lucide-react';
+import { getStaticDataUrl } from '@/lib/staticDataUrl';
 
 interface ProcessedPeriod {
   pharmacyId: PharmacyId;
@@ -32,7 +33,7 @@ export function HealthIndexTrendChart({ pharmacyIds }: HealthIndexTrendChartProp
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/data/vrac/processed.json')
+    fetch(getStaticDataUrl('data/vrac/processed.json'))
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to load VRAC data'))))
       .then(setData)
       .catch((e) => setError(e.message))

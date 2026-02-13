@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { computeHealthIndex, PHARMACIES } from '@agrosoluce/data-insights';
 import type { PharmacyId } from '@agrosoluce/types';
 import { MapPin, Download, TrendingUp, AlertCircle } from 'lucide-react';
+import { getStaticDataUrl } from '@/lib/staticDataUrl';
 import {
   ANALYTICS_DATA_RANGE,
   HEALTH_INDEX_METHODOLOGY,
@@ -32,7 +33,7 @@ export function RegionalHealthComparison() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/data/vrac/processed.json')
+    fetch(getStaticDataUrl('data/vrac/processed.json'))
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to load VRAC data'))))
       .then(setData)
       .catch((e) => setError(e.message))
