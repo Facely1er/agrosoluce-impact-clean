@@ -1,12 +1,13 @@
 // API functions for Canonical Cooperative Directory
-// Table lives in agrosoluce schema. Uses client default schema.
+// Table lives in agrosoluce schema. We use .schema('agrosoluce') so it works regardless of client default.
 import { supabase } from '@/lib/supabase/client';
+import { getStaticDataUrl } from '@/lib/staticDataUrl';
 import { formatCooperativeName } from '@/lib/utils/cooperativeUtils';
 import type { CanonicalCooperativeDirectory, RecordStatus, EudrCommodity } from '@/types';
 
-/** Static fallback: load from public JSON when Supabase is not configured or returns no data */
-const STATIC_DIRECTORY_URL = '/cooperatives_cote_ivoire.json';
-const STATIC_FALLBACK_MAX = 2000;
+const SCHEMA = 'agrosoluce';
+/** Supabase/PostgREST default max rows per request; we paginate to fetch all */
+const PAGE_SIZE = 1000;
 
 function transformStaticCooperative(raw: any): CanonicalCooperativeDirectory {
   const name = formatCooperativeName(raw.name);
@@ -32,7 +33,7 @@ function transformStaticCooperative(raw: any): CanonicalCooperativeDirectory {
 
 async function getCanonicalDirectoryRecordsStaticFallback(): Promise<CanonicalCooperativeDirectory[]> {
   try {
-    const res = await fetch(STATIC_DIRECTORY_URL);
+    const res = await fetch(getStaticDataUrl('cooperatives_cote_ivoire.json'));
     if (!res.ok) return [];
     const json = await res.json();
     const list = Array.isArray(json.cooperatives) ? json.cooperatives : [];
@@ -55,18 +56,31 @@ export async function getCanonicalDirectoryRecords(): Promise<{
   }
 
   try {
-    const { data, error } = await supabase
-      .from('canonical_cooperative_directory')
-      .select('*')
-      .order('name', { ascending: true });
+    const allRows: any[] = [];
+    let offset = 0;
+    let hasMore = true;
 
-    if (error) {
-      console.error('Error fetching canonical directory records:', error);
-      const fallback = await getCanonicalDirectoryRecordsStaticFallback();
-      return { data: fallback.length > 0 ? fallback : null, error: fallback.length > 0 ? null : new Error(error.message) };
+    while (hasMore) {
+      const { data, error } = await supabase
+        .schema(SCHEMA)
+        .from('canonical_cooperative_directory')
+        .select('*')
+        .order('name', { ascending: true })
+        .range(offset, offset + PAGE_SIZE - 1);
+
+      if (error) {
+        console.error('Error fetching canonical directory records:', error);
+        const fallback = await getCanonicalDirectoryRecordsStaticFallback();
+        return { data: fallback.length > 0 ? fallback : null, error: fallback.length > 0 ? null : new Error(error.message) };
+      }
+
+      const chunk = data || [];
+      allRows.push(...chunk);
+      hasMore = chunk.length === PAGE_SIZE;
+      offset += PAGE_SIZE;
     }
 
-    const transformed = (data || []).map(transformCanonicalRecord);
+    const transformed = allRows.map(transformCanonicalRecord);
     if (transformed.length === 0) {
       const fallback = await getCanonicalDirectoryRecordsStaticFallback();
       if (fallback.length > 0) return { data: fallback, error: null };
@@ -94,19 +108,32 @@ export async function getCanonicalDirectoryRecordsByStatus(
   }
 
   try {
-    const { data, error } = await supabase
-      .from('canonical_cooperative_directory')
-      .select('*')
-      .eq('record_status', status)
-      .order('name', { ascending: true });
+    const allRows: any[] = [];
+    let offset = 0;
+    let hasMore = true;
 
-    if (error) {
-      console.error('Error fetching canonical directory records by status:', error);
-      const fallback = await getCanonicalDirectoryRecordsStaticFallback();
-      return { data: fallback.length > 0 ? fallback : null, error: fallback.length > 0 ? null : new Error(error.message) };
+    while (hasMore) {
+      const { data, error } = await supabase
+        .schema(SCHEMA)
+        .from('canonical_cooperative_directory')
+        .select('*')
+        .eq('record_status', status)
+        .order('name', { ascending: true })
+        .range(offset, offset + PAGE_SIZE - 1);
+
+      if (error) {
+        console.error('Error fetching canonical directory records by status:', error);
+        const fallback = await getCanonicalDirectoryRecordsStaticFallback();
+        return { data: fallback.length > 0 ? fallback : null, error: fallback.length > 0 ? null : new Error(error.message) };
+      }
+
+      const chunk = data || [];
+      allRows.push(...chunk);
+      hasMore = chunk.length === PAGE_SIZE;
+      offset += PAGE_SIZE;
     }
 
-    const transformed = (data || []).map(transformCanonicalRecord);
+    const transformed = allRows.map(transformCanonicalRecord);
     if (transformed.length === 0) {
       const fallback = await getCanonicalDirectoryRecordsStaticFallback();
       if (fallback.length > 0) return { data: fallback, error: null };
@@ -134,6 +161,7 @@ export async function getCanonicalDirectoryRecordsByCountry(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .eq('country', country)
@@ -167,6 +195,7 @@ export async function getCanonicalDirectoryRecordsByPrimaryCrop(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .eq('primary_crop', primaryCrop)
@@ -200,6 +229,7 @@ export async function getCanonicalDirectoryRecordById(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .eq('coop_id', coopId)
@@ -236,6 +266,7 @@ export async function searchCanonicalDirectoryRecords(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .ilike('name', `%${query}%`)
@@ -269,6 +300,7 @@ export async function createCanonicalDirectoryRecord(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .insert({
         name: record.name,
@@ -313,6 +345,7 @@ export async function updateCanonicalDirectoryRecord(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .update(updates)
       .eq('coop_id', coopId)
@@ -350,6 +383,7 @@ export async function deleteCanonicalDirectoryRecord(
 
   try {
     const { error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .delete()
       .eq('coop_id', coopId);
@@ -381,6 +415,7 @@ export async function getCanonicalDirectoryRecordsByPilotId(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .eq('pilot_id', pilotId)

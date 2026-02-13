@@ -21,7 +21,11 @@
     "preview:mobile": "npm run preview --workspace apps/mobile",
     "vrac:process": "tsx scripts/vrac/processVracData.ts",
     "vrac:process:enrich": "tsx scripts/vrac/processVracData.ts --enrich",
-    "hwi:calculate": "tsx scripts/hwi/calculateHWI.ts"
+    "hwi:calculate": "tsx scripts/hwi/calculateHWI.ts",
+    "vrac:migrate": "tsx scripts/vrac/migrateVracToSupabase.ts",
+    "migration:generate": "tsx scripts/run-migrations.ts --generate",
+    "migration:check": "tsx scripts/run-migrations.ts --check",
+    "migration:run": "tsx scripts/run-migrations.ts --run"
   },
   "devDependencies": {
     "@agrosoluce/data-insights": "file:packages/data-insights",

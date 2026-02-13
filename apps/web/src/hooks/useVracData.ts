@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { vracService } from '@/services/vrac/vracService';
+import { getStaticDataUrl } from '@/lib/staticDataUrl';
 import { applyEnrichments } from '@agrosoluce/data-insights';
 import type { PharmacyProfile, RegionalHealthIndex } from '@agrosoluce/types';
 
@@ -60,7 +61,7 @@ export function useVracData(): UseVracDataResult {
       setSource('database');
     } catch {
       try {
-        const res = await fetch('/data/vrac/enriched.json');
+        const res = await fetch(getStaticDataUrl('data/vrac/enriched.json'));
         if (res.ok) {
           const { enrichedPeriods } = await res.json();
           setPharmacies(PHARMACY_LABELS);
@@ -89,7 +90,7 @@ export function useVracData(): UseVracDataResult {
         }
       } catch {
         try {
-          const res = await fetch('/data/vrac/processed.json');
+          const res = await fetch(getStaticDataUrl('data/vrac/processed.json'));
           if (res.ok) {
             const { periods } = await res.json();
             setPharmacies(PHARMACY_LABELS);

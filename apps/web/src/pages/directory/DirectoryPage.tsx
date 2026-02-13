@@ -6,8 +6,10 @@ import {
   getCanonicalDirectoryRecordsByStatus,
 } from '@/features/cooperatives/api/canonicalDirectoryApi';
 import CanonicalDirectoryCard from '@/features/cooperatives/components/CanonicalDirectoryCard';
-import CanonicalDirectoryMap from '@/features/cooperatives/components/CanonicalDirectoryMap';
+import CanonicalDirectoryMap, { type RegionHealthInfo } from '@/features/cooperatives/components/CanonicalDirectoryMap';
+import DirectoryVisualizationDashboard from '@/features/cooperatives/components/DirectoryVisualizationDashboard';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import { useVracData } from '@/hooks/useVracData';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import type { EudrCommodity } from '@/types';
 import type { CoverageBand } from '@/types';
@@ -61,13 +63,42 @@ function getCommoditiesFromRecord(record: CanonicalCooperativeDirectory): EudrCo
   return [];
 }
 
+const VRAC_REGION_TO_DISPLAY: Record<string, string> = {
+  gontougo: 'Gontougo',
+  la_me: 'La Mé',
+  abidjan: 'Abidjan',
+};
+
 export default function DirectoryPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [records, setRecords] = useState<CanonicalCooperativeDirectory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
+  const { healthIndex } = useVracData();
+
+  const regionHealth = useMemo((): Record<string, RegionHealthInfo> | undefined => {
+    if (!healthIndex.length) return undefined;
+    const byRegion: Record<string, { shares: number[]; antibiotic?: number[]; risks: ('low' | 'medium' | 'high')[] }> = {};
+    for (const h of healthIndex) {
+      const regionKey = (h as { regionId?: string; regionLabel?: string }).regionId || ((h as { regionLabel?: string }).regionLabel && (h as { regionLabel?: string }).regionLabel?.replace(/\s*\(.*\)$/, '').trim()) || '';
+      const displayName = VRAC_REGION_TO_DISPLAY[regionKey.toLowerCase()] || regionKey || ((h as { regionLabel?: string }).regionLabel?.split(' ')[0]);
+      if (!displayName) continue;
+      if (!byRegion[displayName]) byRegion[displayName] = { shares: [], antibiotic: [], risks: [] };
+      byRegion[displayName].shares.push((h as { antimalarialShare: number }).antimalarialShare * 100);
+      if ((h as { antibioticShare?: number }).antibioticShare != null) (byRegion[displayName].antibiotic ??= []).push((h as { antibioticShare: number }).antibioticShare * 100);
+      if ((h as { harvestAlignedRisk?: 'low' | 'medium' | 'high' }).harvestAlignedRisk) byRegion[displayName].risks.push((h as { harvestAlignedRisk: 'low' | 'medium' | 'high' }).harvestAlignedRisk);
+    }
+    const out: Record<string, RegionHealthInfo> = {};
+    for (const [name, data] of Object.entries(byRegion)) {
+      const avgShare = data.shares.length ? data.shares.reduce((a, b) => a + b, 0) / data.shares.length : 0;
+      const avgAntibiotic = data.antibiotic?.length ? data.antibiotic.reduce((a, b) => a + b, 0) / data.antibiotic.length : undefined;
+      const worstRisk = data.risks.includes('high') ? 'high' : data.risks.includes('medium') ? 'medium' : data.risks[0];
+      out[name] = { antimalarialSharePct: avgShare, antibioticSharePct: avgAntibiotic, harvestRisk: worstRisk };
+    }
+    return Object.keys(out).length ? out : undefined;
+  }, [healthIndex]);
+
   // Context-first filter controls (product-first, region-aware, coverage-aware)
   // Default: Cocoa, CI (Côte d'Ivoire), All regions, All coverage levels
   // Check URL params for region filter from map clicks
@@ -258,6 +289,11 @@ export default function DirectoryPage() {
       commodities: uniqueCommodities,
     };
   }, [records]);
+
+  const handleRegionClick = (region: string) => {
+    setSelectedRegion(region);
+    setViewMode('grid');
+  };
 
   const clearFilters = () => {
     // Reset to first available commodity (or 'cocoa' if available, otherwise first in list)
@@ -539,8 +575,25 @@ export default function DirectoryPage() {
 
               {/* Results display */}
               {viewMode === 'map' ? (
-                <div className="bg-white rounded-lg overflow-hidden">
-                  <CanonicalDirectoryMap records={filteredRecords.filter(coop => !workspaceOnly || coop.coop_id)} />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                  <div className="lg:col-span-2 rounded-xl overflow-hidden border border-gray-200 shadow-lg bg-white">
+                    <CanonicalDirectoryMap
+                      records={filteredRecords.filter(coop => !workspaceOnly || coop.coop_id)}
+                      onRegionClick={handleRegionClick}
+                      height="min(72vh, 760px)"
+                      displayMode="both"
+                      regionHealth={regionHealth}
+                    />
+                  </div>
+                  <div className="lg:col-span-1 overflow-y-auto max-h-[min(72vh,760px)]">
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-4 sticky top-4">
+                      <h2 className="text-lg font-semibold text-gray-900 mb-3">Visualization dashboard</h2>
+                      <DirectoryVisualizationDashboard
+                        records={filteredRecords.filter(coop => !workspaceOnly || coop.coop_id)}
+                        onRegionClick={handleRegionClick}
+                      />
+                    </div>
+                  </div>
                 </div>
               ) : viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

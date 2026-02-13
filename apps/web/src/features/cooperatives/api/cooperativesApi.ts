@@ -4,8 +4,11 @@
 import { supabase } from '@/lib/supabase/client';
 import type { Cooperative } from '@/types';
 
+/** Supabase/PostgREST default max rows per request; we paginate to fetch all */
+const PAGE_SIZE = 1000;
+
 /**
- * Fetch all cooperatives from database
+ * Fetch all cooperatives from database (paginates to avoid 1000-row limit)
  * Falls back to JSON if Supabase is not configured
  */
 export async function getCooperatives(): Promise<{
@@ -18,18 +21,30 @@ export async function getCooperatives(): Promise<{
   }
 
   try {
-    const { data, error } = await supabase
-      .from('cooperatives')
-      .select('*')
-      .order('name', { ascending: true });
+    const allRows: any[] = [];
+    let offset = 0;
+    let hasMore = true;
 
-    if (error) {
-      console.error('Error fetching cooperatives:', error);
-      return { data: null, error: new Error(error.message) };
+    while (hasMore) {
+      const { data, error } = await supabase
+        .from('cooperatives')
+        .select('*')
+        .order('name', { ascending: true })
+        .range(offset, offset + PAGE_SIZE - 1);
+
+      if (error) {
+        console.error('Error fetching cooperatives:', error);
+        return { data: null, error: new Error(error.message) };
+      }
+
+      const chunk = data || [];
+      allRows.push(...chunk);
+      hasMore = chunk.length === PAGE_SIZE;
+      offset += PAGE_SIZE;
     }
 
     // Transform database fields to match frontend expectations
-    const transformed = (data || []).map((coop: any) => ({
+    const transformed = allRows.map((coop: any) => ({
       ...coop,
       // Map database fields to legacy fields for compatibility
       departement: coop.department,

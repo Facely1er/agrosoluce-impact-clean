@@ -26,6 +26,12 @@ export interface Translations {
     main: string;
     theme: string;
     language: string;
+    /** Dropdown menu titles */
+    dataAndDirectory: string;
+    healthAndAnalytics: string;
+    partnersAndPrograms: string;
+    aggregatedDashboard: string;
+    hwi: string;
   };
   
   // Common
@@ -898,6 +904,11 @@ export const translations: Record<Language, Translations> = {
       main: 'Main',
       theme: 'Theme',
       language: 'Language',
+      dataAndDirectory: 'Data & Directory',
+      healthAndAnalytics: 'Health & Analytics',
+      partnersAndPrograms: 'Partners & Programs',
+      aggregatedDashboard: 'Aggregated Dashboard',
+      hwi: 'Household Welfare Index',
     },
     common: {
       loading: 'Loading...',
@@ -1779,6 +1790,11 @@ export const translations: Record<Language, Translations> = {
       main: 'Principal',
       theme: 'Thème',
       language: 'Langue',
+      dataAndDirectory: 'Données & Répertoire',
+      healthAndAnalytics: 'Santé & Analytiques',
+      partnersAndPrograms: 'Partenaires & Programmes',
+      aggregatedDashboard: 'Tableau de bord agrégé',
+      hwi: 'Indice de Bien-être des Ménages',
     },
     common: {
       loading: 'Chargement...',

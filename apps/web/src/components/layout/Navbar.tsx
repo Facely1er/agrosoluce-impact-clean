@@ -1,9 +1,45 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
-import { Home, MapPin, UsersRound, Briefcase, User, Shield, Menu, X, Globe, Info, Handshake, Sun, Moon, Activity, TrendingUp, Target, BarChart3 } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import {
+  Home,
+  MapPin,
+  UsersRound,
+  Briefcase,
+  Menu,
+  X,
+  Globe,
+  Sun,
+  Moon,
+  Activity,
+  TrendingUp,
+  Target,
+  BarChart3,
+  Handshake,
+  Shield,
+  Info,
+  ChevronDown,
+  Layers,
+  Heart,
+} from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 import type { Language } from '@/lib/i18n/translations';
+
+type DropdownId = 'data' | 'health' | 'partners' | null;
+
+interface NavItem {
+  to: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  exact?: boolean;
+}
+
+interface NavDropdown {
+  id: DropdownId;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  items: NavItem[];
+}
 
 export default function Navbar() {
   const location = useLocation();
@@ -11,33 +47,68 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<DropdownId>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isActive = (path: string) => location.pathname === path;
-  const isActivePath = (path: string) => location.pathname.startsWith(path);
+  const isActive = (path: string, exact?: boolean) =>
+    exact ? location.pathname === path : location.pathname.startsWith(path);
+  const isActiveInList = (items: NavItem[]) =>
+    items.some((item) => isActive(item.to, item.exact ?? false));
 
   const toggleLanguage = (lang: Language) => {
     setLanguage(lang);
     setLangMenuOpen(false);
   };
 
-  const navLinks: Array<{
-    to: string;
-    icon: React.ComponentType<{ className?: string }>;
-    label: string;
-    exact: boolean;
-    secondary?: boolean;
-  }> = [
-    { to: '/', icon: Home, label: t.nav.home, exact: true },
-    { to: '/map', icon: MapPin, label: t.nav.map, exact: false },
-    { to: '/directory', icon: UsersRound, label: t.nav.directory, exact: false },
-    { to: '/health-impact', icon: Activity, label: t.nav.healthImpact, exact: false },
-    { to: '/vrac', icon: TrendingUp, label: t.nav.healthIntelligence, exact: false },
-    { to: '/analytics', icon: BarChart3, label: t.nav.analytics, exact: false },
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const dropdowns: NavDropdown[] = [
+    {
+      id: 'data',
+      label: t.nav.dataAndDirectory,
+      icon: UsersRound,
+      items: [
+        { to: '/map', icon: MapPin, label: t.nav.map },
+        { to: '/directory', icon: UsersRound, label: t.nav.directory },
+        { to: '/directory/aggregate', icon: Layers, label: t.nav.aggregatedDashboard },
+        { to: '/cooperatives', icon: UsersRound, label: t.nav.cooperatives },
+      ],
+    },
+    {
+      id: 'health',
+      label: t.nav.healthAndAnalytics,
+      icon: Activity,
+      items: [
+        { to: '/health-impact', icon: Activity, label: t.nav.healthImpact },
+        { to: '/vrac', icon: TrendingUp, label: t.nav.healthIntelligence },
+        { to: '/analytics', icon: BarChart3, label: t.nav.analytics },
+        { to: '/hwi', icon: Heart, label: t.nav.hwi },
+      ],
+    },
+    {
+      id: 'partners',
+      label: t.nav.partnersAndPrograms,
+      icon: Handshake,
+      items: [
+        { to: '/buyer', icon: Briefcase, label: t.nav.buyers },
+        { to: '/partners', icon: Handshake, label: t.nav.partners },
+        { to: '/pilot', icon: Target, label: t.nav.pilotPrograms },
+      ],
+    },
+  ];
+
+  const singleLinks: NavItem[] = [
+    { to: '/monitoring', icon: Shield, label: t.nav.complianceTools, exact: false },
     { to: '/about', icon: Info, label: t.nav.about, exact: false },
-    { to: '/buyer', icon: Briefcase, label: t.nav.buyers, exact: false, secondary: true },
-    { to: '/partners', icon: Handshake, label: t.nav.partners, exact: false, secondary: true },
-    { to: '/monitoring', icon: Shield, label: t.nav.complianceTools, exact: false, secondary: true },
-    { to: '/pilot', icon: Target, label: t.nav.pilotPrograms, exact: false, secondary: true },
   ];
 
   return (
@@ -45,30 +116,108 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity group"
           >
-            <img 
-              src="/agrosoluce.png" 
-              alt="AgroSoluce Logo" 
+            <img
+              src="/agrosoluce.png"
+              alt="AgroSoluce Logo"
               className="h-14 w-auto transition-transform group-hover:scale-105"
             />
             <div>
-              <h2 className="text-primary-600 dark:text-primary-400 font-bold text-lg leading-tight">AgroSoluce™</h2>
-              <p className="text-xs text-gray-700 dark:text-gray-300 leading-tight">{t.footer.sourceIntelligence}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">{t.footer.byErmits}</p>
+              <h2 className="text-primary-600 dark:text-primary-400 font-bold text-lg leading-tight">
+                AgroSoluce™
+              </h2>
+              <p className="text-xs text-gray-700 dark:text-gray-300 leading-tight">
+                {t.footer.sourceIntelligence}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">
+                {t.footer.byErmits}
+              </p>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.filter(link => !link.secondary).map(({ to, icon: Icon, label, exact }) => {
-              const active = exact ? isActive(to) : isActivePath(to);
+          <div ref={dropdownRef} className="hidden md:flex items-center gap-1">
+            {/* Home */}
+            <Link
+              to="/"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                isActive('/', true)
+                  ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 shadow-sm'
+                  : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+              }`}
+            >
+              <Home className="h-4 w-4" />
+              <span>{t.nav.home}</span>
+            </Link>
+
+            {/* Dropdowns */}
+            {dropdowns.map((dropdown) => {
+              const Icon = dropdown.icon;
+              const isOpen = openDropdown === dropdown.id;
+              const hasActive = isActiveInList(dropdown.items);
+              return (
+                <div
+                  key={dropdown.id}
+                  className="relative group"
+                  onMouseEnter={() => setOpenDropdown(dropdown.id)}
+                  onMouseLeave={() => setOpenDropdown(null)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(isOpen ? null : dropdown.id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      hasActive || isOpen
+                        ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 shadow-sm'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                    aria-haspopup="true"
+                    {...(isOpen ? { 'aria-expanded': true as const } : { 'aria-expanded': false as const })}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{dropdown.label}</span>
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  <div
+                    className={`absolute left-0 mt-1 min-w-[220px] bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 transition-all duration-200 ${
+                      isOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+                    }`}
+                  >
+                    {dropdown.items.map((item) => {
+                      const ItemIcon = item.icon;
+                      const active = isActive(item.to, item.exact ?? false);
+                      return (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
+                            active
+                              ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          <ItemIcon className="h-4 w-4 flex-shrink-0" />
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Single links: Compliance, About */}
+            {singleLinks.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.to, item.exact ?? false);
               return (
                 <Link
-                  key={to}
-                  to={to}
+                  key={item.to}
+                  to={item.to}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     active
                       ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 shadow-sm'
@@ -76,38 +225,11 @@ export default function Navbar() {
                   }`}
                 >
                   <Icon className="h-4 w-4" />
-                  <span>{label}</span>
+                  <span>{item.label}</span>
                 </Link>
               );
             })}
-            
-            {/* Secondary menu dropdown */}
-            <div className="relative group ml-2">
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200">
-                <UsersRound className="h-4 w-4" />
-                <span>{t.nav.more}</span>
-              </button>
-              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                {navLinks.filter(link => link.secondary).map(({ to, icon: Icon, label, exact }) => {
-                  const active = exact ? isActive(to) : isActivePath(to);
-                  return (
-                    <Link
-                      key={to}
-                      to={to}
-                      className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
-                        active
-                          ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-            
+
             {/* Theme Toggle */}
             <div className="relative ml-2">
               <button
@@ -123,7 +245,7 @@ export default function Navbar() {
                 )}
               </button>
             </div>
-            
+
             {/* Language Switcher */}
             <div className="relative ml-2">
               <button
@@ -134,18 +256,20 @@ export default function Navbar() {
                 <Globe className="h-4 w-4" />
                 <span className="uppercase font-semibold">{language}</span>
               </button>
-              
+
               {langMenuOpen && (
                 <>
-                  <div 
-                    className="fixed inset-0 z-10" 
+                  <div
+                    className="fixed inset-0 z-10"
                     onClick={() => setLangMenuOpen(false)}
                   />
                   <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-20">
                     <button
                       onClick={() => toggleLanguage('en')}
                       className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                        language === 'en' ? 'text-primary-600 dark:text-primary-400 font-semibold bg-primary-50 dark:bg-primary-900/30' : 'text-gray-700 dark:text-gray-300'
+                        language === 'en'
+                          ? 'text-primary-600 dark:text-primary-400 font-semibold bg-primary-50 dark:bg-primary-900/30'
+                          : 'text-gray-700 dark:text-gray-300'
                       }`}
                     >
                       🇬🇧 English
@@ -153,7 +277,9 @@ export default function Navbar() {
                     <button
                       onClick={() => toggleLanguage('fr')}
                       className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                        language === 'fr' ? 'text-primary-600 dark:text-primary-400 font-semibold bg-primary-50 dark:bg-primary-900/30' : 'text-gray-700 dark:text-gray-300'
+                        language === 'fr'
+                          ? 'text-primary-600 dark:text-primary-400 font-semibold bg-primary-50 dark:bg-primary-900/30'
+                          : 'text-gray-700 dark:text-gray-300'
                       }`}
                     >
                       🇫🇷 Français
@@ -181,15 +307,54 @@ export default function Navbar() {
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-2">
-            {/* Primary Links */}
-            <div className="px-2 py-2">
-              <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4 mb-2">{t.nav.main}</div>
-              {navLinks.filter(link => !link.secondary).map(({ to, icon: Icon, label, exact }) => {
-                const active = exact ? isActive(to) : isActivePath(to);
+            <Link
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium ${
+                isActive('/', true)
+                  ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
+                  : 'text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              <Home className="h-5 w-5" />
+              {t.nav.home}
+            </Link>
+
+            {dropdowns.map((dropdown) => (
+              <div key={dropdown.id} className="px-2 py-1">
+                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4 py-2">
+                  {dropdown.label}
+                </div>
+                {dropdown.items.map((item) => {
+                  const ItemIcon = item.icon;
+                  const active = isActive(item.to, item.exact ?? false);
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                        active
+                          ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      <ItemIcon className="h-5 w-5 flex-shrink-0" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            ))}
+
+            <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2">
+              {singleLinks.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.to, item.exact ?? false);
                 return (
                   <Link
-                    key={to}
-                    to={to}
+                    key={item.to}
+                    to={item.to}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       active
@@ -197,36 +362,13 @@ export default function Navbar() {
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span>{label}</span>
+                    <Icon className="h-5 w-5 flex-shrink-0" />
+                    <span>{item.label}</span>
                   </Link>
                 );
               })}
             </div>
-            
-            {/* Secondary Links */}
-            <div className="px-2 py-2 border-t border-gray-200 dark:border-gray-700 mt-2">
-              <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4 mb-2">{t.nav.more}</div>
-              {navLinks.filter(link => link.secondary).map(({ to, icon: Icon, label, exact }) => {
-                const active = exact ? isActive(to) : isActivePath(to);
-                return (
-                  <Link
-                    key={to}
-                    to={to}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                      active
-                        ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span>{label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-            
+
             {/* Mobile Theme Toggle */}
             <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 mt-2">
               <div className="flex items-center justify-between">
@@ -246,7 +388,7 @@ export default function Navbar() {
                 </button>
               </div>
             </div>
-            
+
             {/* Mobile Language Switcher */}
             <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 mt-2">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -282,4 +424,3 @@ export default function Navbar() {
     </nav>
   );
 }
-

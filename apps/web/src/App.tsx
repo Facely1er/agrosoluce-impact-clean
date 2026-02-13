@@ -21,6 +21,7 @@ const CooperativeDashboard = lazy(() => import('./pages/cooperative/CooperativeD
 const FarmersFirstDashboard = lazy(() => import('./pages/cooperative/FarmersFirstDashboard'));
 const DirectoryPage = lazy(() => import('./pages/directory/DirectoryPage'));
 const DirectoryDetailPage = lazy(() => import('./pages/directory/DirectoryDetailPage'));
+const AggregatedDashboardPage = lazy(() => import('./pages/directory/AggregatedDashboardPage'));
 const CooperativeWorkspace = lazy(() => import('./pages/workspace/CooperativeWorkspace'));
 const PilotListingPage = lazy(() => import('./pages/pilot/PilotListingPage'));
 const PilotDashboardPage = lazy(() => import('./pages/pilot/PilotDashboardPage'));
@@ -73,6 +74,7 @@ function App() {
             <Route path="/cooperatives" element={<CooperativeDirectory />} />
             <Route path="/cooperatives/:id" element={<CooperativeProfile />} />
             <Route path="/directory" element={<DirectoryPage />} />
+            <Route path="/directory/aggregate" element={<AggregatedDashboardPage />} />
             <Route path="/directory/:coop_id" element={<DirectoryDetailPage />} />
             <Route path="/map" element={<MapPage />} />
             <Route path="/health-impact" element={<HealthImpactOverview />} />

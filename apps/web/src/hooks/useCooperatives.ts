@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Cooperative } from '@/types';
 import { enrichCooperatives } from '@/lib/utils/cooperativeUtils';
+import { getStaticDataUrl } from '@/lib/staticDataUrl';
 import { getCooperatives } from '@/features/cooperatives/api/cooperativesApi';
 
 /**
@@ -40,7 +41,7 @@ export function useCooperatives() {
       }
 
       try {
-        const response = await fetch('/cooperatives_cote_ivoire.json');
+        const response = await fetch(getStaticDataUrl('cooperatives_cote_ivoire.json'));
         if (!response.ok) {
           throw new Error('Failed to load cooperatives data from JSON');
         }

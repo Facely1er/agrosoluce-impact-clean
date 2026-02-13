@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Sprout, FileText } from 'lucide-react';
+import { MapPin, Sprout, FileText, Globe } from 'lucide-react';
+import { getGeoContextForRecord } from '@/lib/utils/geoContextUtils';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import { EUDR_COMMODITIES_IN_SCOPE } from '@/types';
 
@@ -47,6 +48,7 @@ export default function CanonicalDirectoryCard({ record }: CanonicalDirectoryCar
     : (record.primary_crop || null);
   const countryCode = record.countryCode || (record.country && record.country.length === 2 ? record.country : 'CI') || 'CI';
   const region = record.regionName || record.region || '';
+  const geoContext = getGeoContextForRecord(record);
 
   return (
     <Link
@@ -102,6 +104,12 @@ export default function CanonicalDirectoryCard({ record }: CanonicalDirectoryCar
         {record.coverageBand && (
           <div className="text-xs text-gray-500">
             Documentation coverage: {record.coverageBand.charAt(0).toUpperCase() + record.coverageBand.slice(1)}
+          </div>
+        )}
+        {geoContext.deforestationRisk !== 'unknown' && (
+          <div className="flex items-center gap-2 text-xs text-gray-600">
+            <Globe className="h-3.5 w-3.5 text-emerald-600" />
+            <span>Deforestation risk: <strong>{geoContext.deforestationLabel}</strong></span>
           </div>
         )}
         {record.source_registry && (
