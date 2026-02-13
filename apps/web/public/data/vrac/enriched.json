@@ -1,0 +1,36 @@
+{
+  "enrichedPeriods": [
+    {
+      "pharmacyId": "prolife",
+      "periodLabel": "Aug–Dec 2025",
+      "year": 2025,
+      "periodStart": "2025-08-01",
+      "periodEnd": "2025-12-10",
+      "totalQuantity": 17498,
+      "healthIndex": {
+        "antimalarialQuantity": 1290,
+        "antimalarialShare": 0.074,
+        "totalQuantity": 17498
+      },
+      "regionId": "gontougo",
+      "regionLabel": "Gontougo (cocoa)",
+      "isCocoaRegion": true
+    },
+    {
+      "pharmacyId": "tanda",
+      "periodLabel": "Aug–Dec 2025",
+      "year": 2025,
+      "periodStart": "2025-08-01",
+      "periodEnd": "2025-12-10",
+      "totalQuantity": 9217,
+      "healthIndex": {
+        "antimalarialQuantity": 271,
+        "antimalarialShare": 0.029,
+        "totalQuantity": 9217
+      },
+      "regionId": "gontougo",
+      "regionLabel": "Gontougo (cocoa)",
+      "isCocoaRegion": true
+    }
+  ]
+}

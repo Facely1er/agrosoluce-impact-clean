@@ -21,7 +21,7 @@ export function useCooperatives() {
       // Try Supabase first
       const { data: dbData, error: dbError } = await getCooperatives();
 
-      if (dbData && !dbError) {
+      if (dbData && dbData.length > 0 && !dbError) {
         // Successfully loaded from database
         const enriched = enrichCooperatives(dbData);
         setCooperatives(enriched);
@@ -30,9 +30,11 @@ export function useCooperatives() {
         return;
       }
 
-      // Fallback to JSON if Supabase fails or is not configured
+      // Fallback to JSON if Supabase not configured, failed, or returned no rows
       if (dbError && dbError.message === 'Supabase not configured') {
         console.log('Supabase not configured, falling back to JSON');
+      } else if (dbData && dbData.length === 0) {
+        console.log('Database has no cooperatives yet, falling back to JSON');
       } else {
         console.warn('Failed to load from database, falling back to JSON:', dbError);
       }

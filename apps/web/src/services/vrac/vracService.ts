@@ -1,10 +1,9 @@
 /**
  * VRAC Service - API layer for pharmacy surveillance data
- * 
- * Provides type-safe access to VRAC data stored in Supabase
+ * Uses Supabase when configured; callers (e.g. useVracData) fall back to static JSON on error or 401.
  */
 
-import { getSupabaseClient } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import type { PharmacyProfile, RegionalHealthIndex } from '@agrosoluce/types';
 
 export interface ProductSaleRecord {
@@ -58,8 +57,7 @@ export const vracService = {
    * Fetch all pharmacy profiles
    */
   async getPharmacyProfiles(): Promise<PharmacyProfile[]> {
-    const supabase = getSupabaseClient();
-    
+    if (!supabase) throw new Error('Supabase not configured');
     const { data, error } = await supabase
       .from('pharmacy_profiles')
       .select('*')
@@ -87,8 +85,7 @@ export const vracService = {
     pharmacyId?: string;
     year?: number;
   }): Promise<RegionalHealthIndex[]> {
-    const supabase = getSupabaseClient();
-    
+    if (!supabase) throw new Error('Supabase not configured');
     let query = supabase
       .from('vrac_regional_health_index')
       .select('*');
@@ -124,8 +121,7 @@ export const vracService = {
    * Fetch period aggregates with optional filters
    */
   async getPeriodAggregates(pharmacyId?: string, year?: number): Promise<PeriodAggregate[]> {
-    const supabase = getSupabaseClient();
-    
+    if (!supabase) throw new Error('Supabase not configured');
     let query = supabase
       .from('vrac_period_aggregates')
       .select('*');
@@ -153,8 +149,7 @@ export const vracService = {
    * Fetch detailed product sales for a specific pharmacy and year
    */
   async getProductSales(pharmacyId: string, year: number): Promise<ProductSaleRecord[]> {
-    const supabase = getSupabaseClient();
-    
+    if (!supabase) throw new Error('Supabase not configured');
     const { data, error } = await supabase
       .from('vrac_product_sales')
       .select('*')
@@ -174,8 +169,7 @@ export const vracService = {
    * Fetch product sales for all pharmacies in a specific year
    */
   async getProductSalesByYear(year: number): Promise<ProductSaleRecord[]> {
-    const supabase = getSupabaseClient();
-    
+    if (!supabase) throw new Error('Supabase not configured');
     const { data, error } = await supabase
       .from('vrac_product_sales')
       .select('*')
@@ -195,8 +189,7 @@ export const vracService = {
    * Get available years from the health index
    */
   async getAvailableYears(): Promise<number[]> {
-    const supabase = getSupabaseClient();
-    
+    if (!supabase) throw new Error('Supabase not configured');
     const { data, error } = await supabase
       .from('vrac_regional_health_index')
       .select('year')

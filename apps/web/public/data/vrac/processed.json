@@ -1,0 +1,29 @@
+{
+  "periods": [
+    {
+      "pharmacyId": "prolife",
+      "periodLabel": "Aug–Dec 2025",
+      "year": 2025,
+      "periodStart": "2025-08-01",
+      "periodEnd": "2025-12-10",
+      "products": [
+        { "code": "8076190", "designation": "ARTEFAN 80/480 CP ETUI B/6", "quantitySold": 728 },
+        { "code": "8163121D", "designation": "PARACETAMOL CRE 500 B/12X100", "quantitySold": 2561 },
+        { "code": "2296105D", "designation": "AMOXICIL CREACIL 500 GEL100X12", "quantitySold": 1528 }
+      ],
+      "totalQuantity": 4817
+    },
+    {
+      "pharmacyId": "tanda",
+      "periodLabel": "Aug–Dec 2025",
+      "year": 2025,
+      "periodStart": "2025-08-01",
+      "periodEnd": "2025-12-10",
+      "products": [
+        { "code": "8081802D", "designation": "LITACOLD CP B/20X4", "quantitySold": 1498 },
+        { "code": "1656731D", "designation": "PARACETAMOL CRE 500 BL/100X10", "quantitySold": 1258 }
+      ],
+      "totalQuantity": 2756
+    }
+  ]
+}
