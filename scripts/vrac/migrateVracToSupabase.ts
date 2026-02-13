@@ -17,7 +17,7 @@ import { processBatchHWI } from '../../packages/data-insights/src/pipeline/proce
 import * as dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
-if (!process.env.VITE_SUPABASE_URL) {
+if (!process.env.VITE_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
   dotenv.config({ path: path.resolve(process.cwd(), 'apps/web/.env') });
 }
 
@@ -54,18 +54,24 @@ interface PharmacyProfile {
   region_label: string;
 }
 
-// Initialize Supabase client
+// Initialize Supabase client (prefer service_role key so migration can INSERT)
 function createSupabaseClient(): SupabaseClient {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const anonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+  const supabaseKey = serviceKey || anonKey;
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error(
-      'Missing Supabase credentials. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY (or SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY) environment variables.'
+      'Missing Supabase credentials. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY. For migrations (INSERT), also set SUPABASE_SERVICE_ROLE_KEY in .env (get it from Supabase Dashboard → Project Settings → API).'
     );
   }
 
-  console.log(`Connecting to Supabase: ${supabaseUrl.substring(0, 30)}...`);
+  if (!serviceKey) {
+    console.warn('⚠️  SUPABASE_SERVICE_ROLE_KEY not set. Migration may fail with "permission denied" for INSERT. Add it to .env and run again.');
+  }
+
+  console.log(`Connecting to Supabase: ${supabaseUrl.substring(0, 30)}... (using ${serviceKey ? 'service_role' : 'anon'} key)`);
   
   return createClient(supabaseUrl, supabaseKey, {
     auth: {

@@ -38,7 +38,20 @@ CREATE POLICY "Allow anon read"
 
 The script **`docs/deployment/sql/grant-hwi-anon-access.sql`** creates `agrosoluce.get_alert_distribution(target_year integer)` and grants EXECUTE to `anon`. If you prefer not to create it, the app will compute distribution from latest scores when `v_hwi_latest` is readable.
 
-## 4. Running the VRAC migration (`npm run vrac:migrate`)
+## 4. Schema access for migrations (service_role)
+
+If `npm run vrac:migrate` fails with **"permission denied for schema agrosoluce"**, run in the Supabase **SQL Editor**:
+
+**`docs/deployment/sql/grant-schema-service-role.sql`**
+
+```sql
+GRANT USAGE ON SCHEMA agrosoluce TO service_role;
+GRANT CREATE ON SCHEMA agrosoluce TO service_role;
+```
+
+Ensure the `agrosoluce` schema and base tables exist (e.g. run `packages/database/migrations/001_initial_schema_setup.sql` and any migrations that create `pharmacy_profiles`, `vrac_product_sales`, `vrac_periods`, `household_welfare_index`).
+
+## 5. Running the VRAC migration (`npm run vrac:migrate`)
 
 The migration **inserts** data (pharmacy profiles, VRAC periods, HWI scores). The **anon** key usually has no INSERT rights, so the script will fail with “permission denied” if you only set the anon key.
 
@@ -60,14 +73,14 @@ The script loads `.env` from the repo root, or from `apps/web/.env` if the root 
 
 **Security:** Do not commit the service_role key or use it in the browser. Use it only in local or CI scripts that need to write to the database.
 
-## 5. Readiness / compliance view (Analytics)
+## 6. Readiness / compliance view (Analytics)
 
 The analytics and child-labor dashboards use the view **`agrosoluce.cooperative_readiness_status`**. If you see "Could not find the table … cooperative_compliance_status" or "… cooperative_readiness_status", the view does not exist yet.
 
 - Run the schema migrations in **`packages/database/migrations/`** (in order), or at least **`020_rename_compliance_to_readiness.sql`** (and any earlier migrations it depends on), in the Supabase SQL Editor against the `agrosoluce` schema.
 - That migration creates the view `cooperative_readiness_status` and grants `SELECT` to `anon`.
 
-## 6. After migration
+## 7. After migration
 
 - The app will still use the **anon** key; ensure RLS allows **SELECT** on the tables/views the app reads (step 2).
 - If you see “Database has no cooperatives yet, falling back to JSON”, the cooperatives table is empty; the app will use static JSON until you run a cooperatives migration or seed.

@@ -228,11 +228,18 @@ export default function HouseholdWelfareIndex() {
             ) : (
               <>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Run the VRAC migration to calculate HWI scores.
+                  Run the VRAC migration to calculate and load HWI scores into the database.
                 </p>
-                <code className="text-sm bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded">
+                <ol className="text-sm text-gray-600 dark:text-gray-400 list-decimal list-inside space-y-1 mb-4">
+                  <li>Add <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> to <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">.env</code> (Supabase Dashboard → Project Settings → API).</li>
+                  <li>From the repo root, run:</li>
+                </ol>
+                <code className="text-sm bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded block w-fit">
                   npm run vrac:migrate
                 </code>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-3">
+                  See <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">docs/deployment/SUPABASE_SETUP.md</code> for details.
+                </p>
               </>
             )}
           </div>

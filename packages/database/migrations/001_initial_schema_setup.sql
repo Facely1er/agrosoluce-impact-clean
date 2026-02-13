@@ -12,6 +12,7 @@ CREATE SCHEMA IF NOT EXISTS agrosoluce;
 -- Grant necessary permissions on the schema
 GRANT USAGE ON SCHEMA agrosoluce TO authenticated;
 GRANT USAGE ON SCHEMA agrosoluce TO anon;
+GRANT USAGE ON SCHEMA agrosoluce TO service_role;
 
 -- =============================================
 -- MIGRATION METADATA
