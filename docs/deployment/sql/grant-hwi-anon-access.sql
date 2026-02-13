@@ -3,6 +3,9 @@
 -- Run this in Supabase SQL Editor to fix 401 "permission denied for view"
 -- and 400 for get_alert_distribution. Schema must be agrosoluce and objects
 -- must exist (e.g. after running vrac:migrate or your schema migrations).
+--
+-- If the Supabase linter flags "Security Definer View" on v_hwi_* views,
+-- run docs/deployment/sql/fix-hwi-views-security-invoker.sql first.
 -- =============================================================================
 
 -- 1) Grant SELECT to anon on HWI table and views (fixes 401)

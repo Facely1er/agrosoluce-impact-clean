@@ -10,7 +10,7 @@ In **Supabase Dashboard** → **Project Settings** → **API**:
 
 The web app uses the **anon** key. To avoid **401** (“permission denied for view”) on HWI and cooperatives:
 
-**Quick fix for HWI:** Run the script **`docs/deployment/sql/grant-hwi-anon-access.sql`** in the Supabase **SQL Editor**. It grants `SELECT` to `anon` on `household_welfare_index`, `v_hwi_latest`, and `v_hwi_active_alerts`, and creates the optional `get_alert_distribution` RPC (so you don’t get 400). The table and views must already exist (e.g. after `npm run vrac:migrate` or your schema migrations).
+**Quick fix for HWI:** Run **`docs/deployment/sql/grant-hwi-anon-access.sql`** in the Supabase **SQL Editor**. If the database linter reports "Security Definer View" on `v_hwi_latest` or `v_hwi_active_alerts`, run **`docs/deployment/sql/fix-hwi-views-security-invoker.sql`** first (it sets `security_invoker = on` on those views). It grants `SELECT` to `anon` on `household_welfare_index`, `v_hwi_latest`, and `v_hwi_active_alerts`, and creates the optional `get_alert_distribution` RPC (so you don’t get 400). The table and views must already exist (e.g. after `npm run vrac:migrate` or your schema migrations).
 
 For other tables/views the app reads:
 
