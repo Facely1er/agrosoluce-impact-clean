@@ -15,6 +15,20 @@ function warnIfNotConfigured(): void {
   }
 }
 
+/** Treat API errors (401 RLS, 400 missing RPC/view, etc.) as empty data and log once. */
+let hwiAccessWarned = false;
+function warnAccessAndReturnEmpty<T>(err: unknown, empty: T): T {
+  if (!hwiAccessWarned) {
+    hwiAccessWarned = true;
+    const msg = err && typeof err === 'object' && 'message' in err ? (err as { message: string }).message : String(err);
+    console.warn(
+      'HWI: database access issue (RLS policies or missing views/RPC). Showing empty data. Details:',
+      msg
+    );
+  }
+  return empty;
+}
+
 export interface HWIScore {
   id: string;
   pharmacy_id: string;
@@ -108,11 +122,7 @@ export async function getHWIScores(filters?: HWIFilters): Promise<HWIScore[]> {
 
   const { data, error } = await query;
 
-  if (error) {
-    console.error('Error fetching HWI scores:', error);
-    throw error;
-  }
-
+  if (error) return warnAccessAndReturnEmpty(error, [] as HWIScore[]);
   return data || [];
 }
 
@@ -129,11 +139,7 @@ export async function getLatestHWIScores(): Promise<HWIScoreWithPharmacy[]> {
     .select('*')
     .order('hwi_score', { ascending: false });
 
-  if (error) {
-    console.error('Error fetching latest HWI scores:', error);
-    throw error;
-  }
-
+  if (error) return warnAccessAndReturnEmpty(error, [] as HWIScoreWithPharmacy[]);
   return data || [];
 }
 
@@ -149,11 +155,7 @@ export async function getActiveAlerts(): Promise<HWIScoreWithPharmacy[]> {
     .from('v_hwi_active_alerts')
     .select('*');
 
-  if (error) {
-    console.error('Error fetching active alerts:', error);
-    throw error;
-  }
-
+  if (error) return warnAccessAndReturnEmpty(error, [] as HWIScoreWithPharmacy[]);
   return data || [];
 }
 
@@ -183,11 +185,7 @@ export async function getHWITimeSeries(filters?: {
 
   const { data, error } = await query;
 
-  if (error) {
-    console.error('Error fetching HWI time series:', error);
-    throw error;
-  }
-
+  if (error) return warnAccessAndReturnEmpty(error, [] as HWIScore[]);
   return data || [];
 }
 
@@ -221,11 +219,7 @@ export async function getCategoryAggregates(filters?: {
 
   const { data, error } = await query;
 
-  if (error) {
-    console.error('Error fetching category aggregates:', error);
-    throw error;
-  }
-
+  if (error) return warnAccessAndReturnEmpty(error, [] as CategoryAggregate[]);
   return data || [];
 }
 
@@ -245,18 +239,15 @@ export async function getHWISummary(
     target_year: year || null,
   });
 
-  if (error) {
-    console.error('Error fetching HWI summary:', error);
-    throw error;
-  }
-
+  if (error) return warnAccessAndReturnEmpty(error, [] as any[]);
   return data || [];
 }
 
 /**
- * Get alert distribution
+ * Get alert distribution (counts by alert_level with percentage).
+ * Falls back to computing from latest scores if RPC is missing or returns 400.
  */
-export async function getAlertDistribution(year?: number): Promise<any[]> {
+export async function getAlertDistribution(year?: number): Promise<{ alert_level: string; count: number; percentage: number }[]> {
   if (!isSupabaseConfigured() || !supabase) {
     warnIfNotConfigured();
     return [];
@@ -265,12 +256,24 @@ export async function getAlertDistribution(year?: number): Promise<any[]> {
     target_year: year || null,
   });
 
-  if (error) {
-    console.error('Error fetching alert distribution:', error);
-    throw error;
-  }
+  if (!error && data && Array.isArray(data) && data.length > 0) return data as { alert_level: string; count: number; percentage: number }[];
 
-  return data || [];
+  if (error) warnAccessAndReturnEmpty(error, []);
+
+  // Fallback: compute from latest scores when RPC is missing or fails
+  const scores = await getLatestHWIScores();
+  if (scores.length === 0) return [];
+
+  const total = scores.length;
+  const counts: Record<string, number> = { green: 0, yellow: 0, red: 0, black: 0 };
+  for (const s of scores) {
+    if (s.alert_level in counts) counts[s.alert_level]++;
+  }
+  return (['green', 'yellow', 'red', 'black'] as const).map((alert_level) => ({
+    alert_level,
+    count: counts[alert_level],
+    percentage: total ? Math.round((counts[alert_level] / total) * 100) : 0,
+  }));
 }
 
 /**
@@ -299,11 +302,7 @@ export async function getTimeSeriesByDepartement(filters?: {
 
   const { data, error } = await query;
 
-  if (error) {
-    console.error('Error fetching timeseries by departement:', error);
-    throw error;
-  }
-
+  if (error) return warnAccessAndReturnEmpty(error, [] as any[]);
   return data || [];
 }
 
@@ -333,11 +332,7 @@ export async function getCategoryTrends(filters?: {
 
   const { data, error } = await query;
 
-  if (error) {
-    console.error('Error fetching category trends:', error);
-    throw error;
-  }
-
+  if (error) return warnAccessAndReturnEmpty(error, [] as any[]);
   return data || [];
 }
 
