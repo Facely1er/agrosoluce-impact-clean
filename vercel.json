@@ -5,7 +5,46 @@
   "outputDirectory": "apps/web/build",
   "framework": "vite",
   "rewrites": [
-    { "source": "/favicon.ico", "destination": "/agrosoluce.png" },
+    {
+      "source": "/favicon.ico",
+      "destination": "/agrosoluce.png"
+    },
+    {
+      "source": "/hwi",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/analytics",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/vrac",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/health-impact",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/map",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/directory",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/cooperatives",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/monitoring",
+      "destination": "/index.html"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
@@ -73,4 +112,3 @@
     "NODE_ENV": "production"
   }
 }
-
