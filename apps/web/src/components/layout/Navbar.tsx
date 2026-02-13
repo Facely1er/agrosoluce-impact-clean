@@ -71,6 +71,18 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const dropdowns: NavDropdown[] = [
     {
       id: 'data',
@@ -294,7 +306,8 @@ export default function Navbar() {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label="Toggle menu"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (
               <X className="h-6 w-6" />
@@ -306,7 +319,15 @@ export default function Navbar() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-2">
+          <>
+            {/* Backdrop: tap outside to close */}
+            <div
+              className="md:hidden fixed inset-0 bg-black/30 z-40 top-16"
+              onClick={() => setMobileMenuOpen(false)}
+              onKeyDown={(e) => e.key === 'Escape' && setMobileMenuOpen(false)}
+              aria-hidden
+            />
+            <div className="md:hidden relative z-50 border-t border-gray-200 dark:border-gray-700 py-2 bg-white dark:bg-gray-900">
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
@@ -356,11 +377,11 @@ export default function Navbar() {
                     key={item.to}
                     to={item.to}
                     onClick={() => setMobileMenuOpen(false)}
-className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    active
-                      ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                  }`}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      active
+                        ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
                   >
                     <Icon className="h-5 w-5 flex-shrink-0" />
                     <span>{item.label}</span>
@@ -381,7 +402,10 @@ className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium t
                   <span>{t.nav.theme}</span>
                 </div>
                 <button
-                  onClick={toggleTheme}
+                  onClick={() => {
+                    toggleTheme();
+                    setMobileMenuOpen(false);
+                  }}
                   className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   {theme === 'light' ? 'Dark' : 'Light'}
@@ -397,7 +421,10 @@ className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium t
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => toggleLanguage('en')}
+                  onClick={() => {
+                    toggleLanguage('en');
+                    setMobileMenuOpen(false);
+                  }}
                   className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     language === 'en'
                       ? 'bg-primary-600 dark:bg-primary-500 text-white'
@@ -407,7 +434,10 @@ className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium t
                   🇬🇧 EN
                 </button>
                 <button
-                  onClick={() => toggleLanguage('fr')}
+                  onClick={() => {
+                    toggleLanguage('fr');
+                    setMobileMenuOpen(false);
+                  }}
                   className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     language === 'fr'
                       ? 'bg-primary-600 dark:bg-primary-500 text-white'
@@ -419,6 +449,7 @@ className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium t
               </div>
             </div>
           </div>
+          </>
         )}
       </div>
     </nav>

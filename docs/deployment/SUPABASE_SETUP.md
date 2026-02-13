@@ -59,7 +59,14 @@ The script loads `.env` from the repo root, or from `apps/web/.env` if the root 
 
 **Security:** Do not commit the service_role key or use it in the browser. Use it only in local or CI scripts that need to write to the database.
 
-## 5. After migration
+## 5. Readiness / compliance view (Analytics)
+
+The analytics and child-labor dashboards use the view **`agrosoluce.cooperative_readiness_status`**. If you see "Could not find the table … cooperative_compliance_status" or "… cooperative_readiness_status", the view does not exist yet.
+
+- Run the schema migrations in **`packages/database/migrations/`** (in order), or at least **`020_rename_compliance_to_readiness.sql`** (and any earlier migrations it depends on), in the Supabase SQL Editor against the `agrosoluce` schema.
+- That migration creates the view `cooperative_readiness_status` and grants `SELECT` to `anon`.
+
+## 6. After migration
 
 - The app will still use the **anon** key; ensure RLS allows **SELECT** on the tables/views the app reads (step 2).
 - If you see “Database has no cooperatives yet, falling back to JSON”, the cooperatives table is empty; the app will use static JSON until you run a cooperatives migration or seed.
