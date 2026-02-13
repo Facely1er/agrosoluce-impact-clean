@@ -1,12 +1,19 @@
 /**
  * HWI Service - API layer for accessing Household Welfare Index data
  * 
- * Provides functions to fetch, filter, and export HWI scores from Supabase
+ * Provides functions to fetch, filter, and export HWI scores from Supabase.
+ * When Supabase is not configured, returns empty data so the app can show a graceful empty state.
  */
 
-import { supabase } from '../../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
-const SUPABASE_NOT_CONFIGURED = 'Supabase is not configured. HWI data requires a database connection. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.';
+let hwiConfigWarned = false;
+function warnIfNotConfigured(): void {
+  if (!hwiConfigWarned && !isSupabaseConfigured()) {
+    hwiConfigWarned = true;
+    console.warn('Supabase not configured, HWI data unavailable. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for database features.');
+  }
+}
 
 export interface HWIScore {
   id: string;
@@ -63,7 +70,10 @@ export interface HWIFilters {
  * Get HWI scores with optional filters
  */
 export async function getHWIScores(filters?: HWIFilters): Promise<HWIScore[]> {
-  if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
+  if (!isSupabaseConfigured() || !supabase) {
+    warnIfNotConfigured();
+    return [];
+  }
   let query = supabase
     .from('household_welfare_index')
     .select('*')
@@ -110,7 +120,10 @@ export async function getHWIScores(filters?: HWIFilters): Promise<HWIScore[]> {
  * Get latest HWI scores for each pharmacy
  */
 export async function getLatestHWIScores(): Promise<HWIScoreWithPharmacy[]> {
-  if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
+  if (!isSupabaseConfigured() || !supabase) {
+    warnIfNotConfigured();
+    return [];
+  }
   const { data, error } = await supabase
     .from('v_hwi_latest')
     .select('*')
@@ -128,7 +141,10 @@ export async function getLatestHWIScores(): Promise<HWIScoreWithPharmacy[]> {
  * Get active alerts (non-green alert levels)
  */
 export async function getActiveAlerts(): Promise<HWIScoreWithPharmacy[]> {
-  if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
+  if (!isSupabaseConfigured() || !supabase) {
+    warnIfNotConfigured();
+    return [];
+  }
   const { data, error } = await supabase
     .from('v_hwi_active_alerts')
     .select('*');
@@ -148,7 +164,10 @@ export async function getHWITimeSeries(filters?: {
   departement?: string;
   pharmacyId?: string;
 }): Promise<HWIScore[]> {
-  if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
+  if (!isSupabaseConfigured() || !supabase) {
+    warnIfNotConfigured();
+    return [];
+  }
   let query = supabase
     .from('household_welfare_index')
     .select('*')
@@ -180,7 +199,10 @@ export async function getCategoryAggregates(filters?: {
   pharmacyId?: string;
   category?: string;
 }): Promise<CategoryAggregate[]> {
-  if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
+  if (!isSupabaseConfigured() || !supabase) {
+    warnIfNotConfigured();
+    return [];
+  }
   let query = supabase
     .from('vrac_category_aggregates')
     .select('*')
@@ -214,7 +236,10 @@ export async function getHWISummary(
   departement?: string,
   year?: number
 ): Promise<any[]> {
-  if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
+  if (!isSupabaseConfigured() || !supabase) {
+    warnIfNotConfigured();
+    return [];
+  }
   const { data, error } = await supabase.rpc('get_hwi_summary', {
     dept_name: departement || null,
     target_year: year || null,
@@ -232,7 +257,10 @@ export async function getHWISummary(
  * Get alert distribution
  */
 export async function getAlertDistribution(year?: number): Promise<any[]> {
-  if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
+  if (!isSupabaseConfigured() || !supabase) {
+    warnIfNotConfigured();
+    return [];
+  }
   const { data, error } = await supabase.rpc('get_alert_distribution', {
     target_year: year || null,
   });
@@ -252,7 +280,10 @@ export async function getTimeSeriesByDepartement(filters?: {
   departement?: string;
   year?: number;
 }): Promise<any[]> {
-  if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
+  if (!isSupabaseConfigured() || !supabase) {
+    warnIfNotConfigured();
+    return [];
+  }
   let query = supabase
     .from('v_hwi_timeseries_by_dept')
     .select('*')
@@ -283,7 +314,10 @@ export async function getCategoryTrends(filters?: {
   category?: string;
   year?: number;
 }): Promise<any[]> {
-  if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
+  if (!isSupabaseConfigured() || !supabase) {
+    warnIfNotConfigured();
+    return [];
+  }
   let query = supabase
     .from('v_category_trends')
     .select('*')

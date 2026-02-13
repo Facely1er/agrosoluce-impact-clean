@@ -18,6 +18,7 @@ import {
   HWIScoreWithPharmacy 
 } from '../../services/hwi/hwiService';
 import { generateSummaryStats } from '../../utils/data/hwiDataUtils';
+import { isSupabaseConfigured } from '../../lib/supabase';
 
 export default function HouseholdWelfareIndex() {
   const [latestScores, setLatestScores] = useState<HWIScoreWithPharmacy[]>([]);
@@ -215,12 +216,25 @@ export default function HouseholdWelfareIndex() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               No HWI Data Available
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Run the VRAC migration to calculate HWI scores.
-            </p>
-            <code className="text-sm bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded">
-              npm run vrac:migrate
-            </code>
+            {!isSupabaseConfigured() ? (
+              <>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  HWI data requires a database connection. Set <code className="text-sm bg-gray-100 dark:bg-gray-700 px-1 rounded">VITE_SUPABASE_URL</code> and <code className="text-sm bg-gray-100 dark:bg-gray-700 px-1 rounded">VITE_SUPABASE_ANON_KEY</code> in your environment (e.g. <code className="text-sm bg-gray-100 dark:bg-gray-700 px-1 rounded">.env</code>), then restart the app.
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-500">
+                  See <code className="bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">apps/web/.env.example</code> for a template.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Run the VRAC migration to calculate HWI scores.
+                </p>
+                <code className="text-sm bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded">
+                  npm run vrac:migrate
+                </code>
+              </>
+            )}
           </div>
         )}
       </div>
