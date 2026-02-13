@@ -5,107 +5,50 @@
   "outputDirectory": "apps/web/build",
   "framework": "vite",
   "rewrites": [
-    {
-      "source": "/favicon.ico",
-      "destination": "/agrosoluce.png"
-    },
-    {
-      "source": "/hwi",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/analytics",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/vrac",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/health-impact",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/map",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/directory",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/cooperatives",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/about",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/monitoring",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/favicon.ico", "destination": "/agrosoluce.png" },
+    { "source": "/hwi", "destination": "/index.html" },
+    { "source": "/analytics", "destination": "/index.html" },
+    { "source": "/vrac", "destination": "/index.html" },
+    { "source": "/health", "destination": "/index.html" },
+    { "source": "/health-impact", "destination": "/index.html" },
+    { "source": "/map", "destination": "/index.html" },
+    { "source": "/directory", "destination": "/index.html" },
+    { "source": "/cooperatives", "destination": "/index.html" },
+    { "source": "/about", "destination": "/index.html" },
+    { "source": "/monitoring", "destination": "/index.html" },
+    { "source": "/buyer", "destination": "/index.html" },
+    { "source": "/buyers", "destination": "/index.html" },
+    { "source": "/partners", "destination": "/index.html" },
+    { "source": "/ngos", "destination": "/index.html" },
+    { "source": "/pilot", "destination": "/index.html" },
+    { "source": "/framework-demo", "destination": "/index.html" },
+    { "source": "/what-we-do", "destination": "/index.html" },
+    { "source": "/who-its-for", "destination": "/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=()"
-        },
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=31536000; includeSubDomains"
-        }
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" }
       ]
     },
     {
       "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     },
     {
       "source": "/(.*).js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     },
     {
       "source": "/(.*).css",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     }
   ],
   "env": {

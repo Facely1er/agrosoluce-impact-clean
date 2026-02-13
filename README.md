@@ -47,6 +47,8 @@ VITE_SUPABASE_SCHEMA=agrosoluce
 
 **Vercel (or other host):** Add the same variables in the project’s **Environment Variables** (e.g. Vercel → Project → Settings → Environment Variables) for the environments you use (Production / Preview). Then **redeploy** so the build sees them; without these, database features are disabled and the app runs with static/fallback data.
 
+**Logo:** Add `apps/web/public/agrosoluce.png` for navbar/footer branding and favicon (see `apps/web/public/README.md`). The app works without it using an inline favicon.
+
 ---
 
 ## 📁 Repository Structure
