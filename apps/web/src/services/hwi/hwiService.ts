@@ -126,8 +126,21 @@ export async function getHWIScores(filters?: HWIFilters): Promise<HWIScore[]> {
   return data || [];
 }
 
+/** Pick latest row per pharmacy from HWI rows (sorted by year desc, period_label desc). */
+function latestPerPharmacy(rows: HWIScore[]): HWIScore[] {
+  const seen = new Set<string>();
+  const out: HWIScore[] = [];
+  for (const row of rows) {
+    if (seen.has(row.pharmacy_id)) continue;
+    seen.add(row.pharmacy_id);
+    out.push(row);
+  }
+  return out;
+}
+
 /**
- * Get latest HWI scores for each pharmacy
+ * Get latest HWI scores for each pharmacy.
+ * Tries v_hwi_latest first; on 401/permission denied, falls back to household_welfare_index.
  */
 export async function getLatestHWIScores(): Promise<HWIScoreWithPharmacy[]> {
   if (!isSupabaseConfigured() || !supabase) {
@@ -139,12 +152,24 @@ export async function getLatestHWIScores(): Promise<HWIScoreWithPharmacy[]> {
     .select('*')
     .order('hwi_score', { ascending: false });
 
-  if (error) return warnAccessAndReturnEmpty(error, [] as HWIScoreWithPharmacy[]);
-  return data || [];
+  if (!error && data && data.length > 0) return data as HWIScoreWithPharmacy[];
+
+  if (error) warnAccessAndReturnEmpty(error, [] as HWIScoreWithPharmacy[]);
+
+  const fromTable = await supabase
+    .from('household_welfare_index')
+    .select('*')
+    .order('year', { ascending: false })
+    .order('period_label', { ascending: false });
+  if (fromTable.error || !fromTable.data?.length) return [];
+  const latest = latestPerPharmacy(fromTable.data as HWIScore[]);
+  latest.sort((a, b) => b.hwi_score - a.hwi_score);
+  return latest as HWIScoreWithPharmacy[];
 }
 
 /**
- * Get active alerts (non-green alert levels)
+ * Get active alerts (non-green alert levels).
+ * Tries v_hwi_active_alerts first; on 401, falls back to household_welfare_index filtered by alert_level.
  */
 export async function getActiveAlerts(): Promise<HWIScoreWithPharmacy[]> {
   if (!isSupabaseConfigured() || !supabase) {
@@ -155,8 +180,19 @@ export async function getActiveAlerts(): Promise<HWIScoreWithPharmacy[]> {
     .from('v_hwi_active_alerts')
     .select('*');
 
-  if (error) return warnAccessAndReturnEmpty(error, [] as HWIScoreWithPharmacy[]);
-  return data || [];
+  if (!error && data) return data as HWIScoreWithPharmacy[];
+
+  if (error) warnAccessAndReturnEmpty(error, [] as HWIScoreWithPharmacy[]);
+
+  const fromTable = await supabase
+    .from('household_welfare_index')
+    .select('*')
+    .in('alert_level', ['yellow', 'red', 'black'])
+    .order('year', { ascending: false })
+    .order('period_label', { ascending: false });
+  if (fromTable.error || !fromTable.data?.length) return [];
+  const latest = latestPerPharmacy(fromTable.data as HWIScore[]);
+  return latest as HWIScoreWithPharmacy[];
 }
 
 /**
