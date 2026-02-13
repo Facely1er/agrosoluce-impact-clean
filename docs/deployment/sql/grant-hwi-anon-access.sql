@@ -16,24 +16,24 @@ GRANT SELECT ON agrosoluce.v_hwi_active_alerts TO anon;
 -- GRANT SELECT ON agrosoluce.v_category_trends TO anon;
 
 -- 2) Optional RPC: get_alert_distribution (fixes 400 when app calls it)
--- Returns alert_level, count, percentage for the app. If you skip this,
--- the app will compute distribution from v_hwi_latest when that works.
+-- Returns alert_level, alert_count, percentage. (We use alert_count to avoid
+-- SQL ambiguity with the aggregate count(). The app maps alert_count -> count.)
 CREATE OR REPLACE FUNCTION agrosoluce.get_alert_distribution(target_year integer DEFAULT NULL)
-RETURNS TABLE(alert_level text, count bigint, percentage numeric)
+RETURNS TABLE(alert_level text, alert_count bigint, percentage numeric)
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
 SET search_path = agrosoluce
 AS $$
   WITH base AS (
-    SELECT h.alert_level, count(*) AS cnt
+    SELECT h.alert_level, count(*) AS n
     FROM agrosoluce.household_welfare_index h
     WHERE (target_year IS NULL OR h.year = target_year)
     GROUP BY h.alert_level
   ),
-  total AS (SELECT nullif(sum(cnt), 0)::numeric AS t FROM base)
-  SELECT b.alert_level::text, b.cnt::bigint,
-    round((b.cnt::numeric / (SELECT t FROM total)) * 100, 0)::numeric
+  total AS (SELECT nullif(sum(n), 0)::numeric AS t FROM base)
+  SELECT b.alert_level::text, b.n::bigint AS alert_count,
+    round((b.n::numeric / (SELECT t FROM total)) * 100, 0)::numeric AS percentage
   FROM base b;
 $$;
 

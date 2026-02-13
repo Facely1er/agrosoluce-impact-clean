@@ -256,7 +256,13 @@ export async function getAlertDistribution(year?: number): Promise<{ alert_level
     target_year: year || null,
   });
 
-  if (!error && data && Array.isArray(data) && data.length > 0) return data as { alert_level: string; count: number; percentage: number }[];
+  if (!error && data && Array.isArray(data) && data.length > 0) {
+    return (data as { alert_level: string; count?: number; alert_count?: number; percentage: number }[]).map((row) => ({
+      alert_level: row.alert_level,
+      count: row.count ?? row.alert_count ?? 0,
+      percentage: row.percentage ?? 0,
+    }));
+  }
 
   if (error) warnAccessAndReturnEmpty(error, []);
 
