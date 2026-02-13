@@ -114,11 +114,11 @@ export default function Navbar() {
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity group"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity group shrink-0"
           >
             <img
               src="/agrosoluce.png"
@@ -139,11 +139,11 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div ref={dropdownRef} className="hidden md:flex items-center gap-1">
+          <div ref={dropdownRef} className="hidden md:flex items-center gap-0.5 shrink min-w-0">
             {/* Home */}
             <Link
               to="/"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive('/', true)
                   ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 shadow-sm'
                   : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -168,7 +168,7 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => setOpenDropdown(isOpen ? null : dropdown.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       hasActive || isOpen
                         ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 shadow-sm'
                         : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -218,7 +218,7 @@ export default function Navbar() {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     active
                       ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 shadow-sm'
                       : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -231,7 +231,7 @@ export default function Navbar() {
             })}
 
             {/* Theme Toggle */}
-            <div className="relative ml-2">
+            <div className="relative ml-1">
               <button
                 onClick={toggleTheme}
                 className="flex items-center justify-center w-10 h-10 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
@@ -247,7 +247,7 @@ export default function Navbar() {
             </div>
 
             {/* Language Switcher */}
-            <div className="relative ml-2">
+            <div className="relative ml-1">
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"

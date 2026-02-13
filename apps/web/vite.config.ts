@@ -2,8 +2,23 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+/** Rewrite /favicon.ico to logo PNG so browsers get no 404. */
+function faviconRewrite() {
+  return {
+    name: 'favicon-rewrite',
+    configureServer(server: { middlewares: { use: (fn: (req: any, res: any, next: () => void) => void) => void } }) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url === '/favicon.ico' || req.url === '/favicon.ico?') {
+          req.url = '/agrosoluce.png';
+        }
+        next();
+      });
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), faviconRewrite()],
   publicDir: 'public',
   resolve: {
     alias: {

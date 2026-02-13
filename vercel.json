@@ -5,6 +5,7 @@
   "outputDirectory": "apps/web/build",
   "framework": "vite",
   "rewrites": [
+    { "source": "/favicon.ico", "destination": "/agrosoluce.png" },
     {
       "source": "/(.*)",
       "destination": "/index.html"
