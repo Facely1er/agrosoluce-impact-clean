@@ -173,9 +173,9 @@ export default function AnalyticsDashboardPage() {
     (async () => {
       try {
         const { data: statuses, error } = await supabase
-          .from('cooperative_compliance_status')
+          .from('cooperative_readiness_status')
           .select('*')
-          .order('compliance_score', { ascending: false });
+          .order('readiness_score', { ascending: false });
         if (error) throw error;
         const list = statuses || [];
         const total = list.length;
@@ -193,7 +193,12 @@ export default function AnalyticsDashboardPage() {
         });
         setComplianceError(null);
       } catch (e: any) {
-        setComplianceError(e?.message || 'Failed to load compliance data');
+        const msg = e?.message ?? '';
+        setComplianceError(
+          msg.includes('schema cache') || msg.includes('could not find the table')
+            ? 'Readiness table not set up. Run database migrations (see docs/deployment/SUPABASE_SETUP.md).'
+            : (msg || 'Failed to load compliance data')
+        );
         setCompliance(null);
       }
     })();

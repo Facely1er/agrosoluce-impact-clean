@@ -118,7 +118,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity group shrink-0"
+            className="flex items-center gap-1.5 hover:opacity-80 transition-opacity group shrink-0"
           >
             <img
               src="/agrosoluce.png"
@@ -143,7 +143,7 @@ export default function Navbar() {
             {/* Home */}
             <Link
               to="/"
-              className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive('/', true)
                   ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 shadow-sm'
                   : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -168,7 +168,7 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => setOpenDropdown(isOpen ? null : dropdown.id)}
-                    className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       hasActive || isOpen
                         ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 shadow-sm'
                         : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -194,7 +194,7 @@ export default function Navbar() {
                         <Link
                           key={item.to}
                           to={item.to}
-                          className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
+                          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
                             active
                               ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
                               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -218,7 +218,7 @@ export default function Navbar() {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     active
                       ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 shadow-sm'
                       : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -310,7 +310,7 @@ export default function Navbar() {
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium ${
                 isActive('/', true)
                   ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
                   : 'text-gray-700 dark:text-gray-300'
@@ -333,7 +333,7 @@ export default function Navbar() {
                       key={item.to}
                       to={item.to}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         active
                           ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -356,11 +356,11 @@ export default function Navbar() {
                     key={item.to}
                     to={item.to}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                      active
-                        ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                    }`}
+className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    active
+                      ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                  }`}
                   >
                     <Icon className="h-5 w-5 flex-shrink-0" />
                     <span>{item.label}</span>

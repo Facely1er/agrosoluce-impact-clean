@@ -71,9 +71,9 @@ const ChildLaborDashboard: React.FC<ChildLaborDashboardProps> = ({
 
       // Fetch readiness statistics (self-assessment data)
       const { data: statuses, error } = await supabase
-        .from('cooperative_compliance_status') // Database table name unchanged for now
+        .from('cooperative_readiness_status')
         .select('*')
-        .order('compliance_score', { ascending: false }); // Database column name unchanged for now
+        .order('readiness_score', { ascending: false });
 
       if (error) throw error;
 

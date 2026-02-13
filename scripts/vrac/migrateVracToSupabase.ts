@@ -13,10 +13,13 @@ import { getProductCategory } from '../../apps/web/src/data/vrac/productTaxonomy
 import { classifyMedication } from '../../packages/data-insights/src/classification/medicationTaxonomy';
 import { processBatchHWI } from '../../packages/data-insights/src/pipeline/processHWI';
 
-// Load environment variables
+// Load environment variables (root first, then apps/web for monorepo)
 import * as dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+if (!process.env.VITE_SUPABASE_URL) {
+  dotenv.config({ path: path.resolve(process.cwd(), 'apps/web/.env') });
+}
 
 const PROCESSED_JSON_PATH = path.resolve(process.cwd(), 'apps/web/public/data/vrac/processed.json');
 
