@@ -49,16 +49,14 @@ const LoadingSpinner = () => (
 );
 
 function App() {
-  // Check Supabase configuration on app startup
+  // In development only: warn if Supabase env vars are missing (so devs add .env or set in host)
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
+    if (import.meta.env.DEV && !isSupabaseConfigured()) {
       const configStatus = getSupabaseConfigStatus();
       console.warn(
         '⚠️ AgroSoluce: Supabase is not configured.\n' +
-        `Configuration: URL=${configStatus.urlConfigured ? '✓' : '✗'}, ` +
-        `Key=${configStatus.keyConfigured ? '✓' : '✗'}\n` +
-        'Database features will not be available. ' +
-        'Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.'
+        `Configuration: URL=${configStatus.urlConfigured ? '✓' : '✗'}, Key=${configStatus.keyConfigured ? '✓' : '✗'}\n` +
+        'Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env (local) or in your host (e.g. Vercel → Settings → Environment Variables), then restart or redeploy.'
       );
     }
   }, []);

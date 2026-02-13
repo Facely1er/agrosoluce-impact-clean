@@ -9,9 +9,9 @@ import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 let hwiConfigWarned = false;
 function warnIfNotConfigured(): void {
-  if (!hwiConfigWarned && !isSupabaseConfigured()) {
+  if (import.meta.env.DEV && !hwiConfigWarned && !isSupabaseConfigured()) {
     hwiConfigWarned = true;
-    console.warn('Supabase not configured, HWI data unavailable. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for database features.');
+    console.warn('Supabase not configured, HWI data unavailable. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env or in your host env.');
   }
 }
 
