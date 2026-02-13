@@ -10,7 +10,7 @@ In **Supabase Dashboard** → **Project Settings** → **API**:
 
 The web app uses the **anon** key. To avoid **401** (“permission denied for view”) on HWI and cooperatives:
 
-**Quick fix for HWI:** Run **`docs/deployment/sql/grant-hwi-anon-access.sql`** in the Supabase **SQL Editor**. If the database linter reports "Security Definer View" on `v_hwi_latest` or `v_hwi_active_alerts`, run **`docs/deployment/sql/fix-hwi-views-security-invoker.sql`** first (it sets `security_invoker = on` on those views). It grants `SELECT` to `anon` on `household_welfare_index`, `v_hwi_latest`, and `v_hwi_active_alerts`, and creates the optional `get_alert_distribution` RPC (so you don’t get 400). The table and views must already exist (e.g. after `npm run vrac:migrate` or your schema migrations).
+**Quick fix for HWI, VRAC, and readiness:** Run **`docs/deployment/sql/grant-hwi-anon-access.sql`** in the Supabase **SQL Editor**. If the database linter reports "Security Definer View" on `v_hwi_latest` or `v_hwi_active_alerts`, run **`docs/deployment/sql/fix-hwi-views-security-invoker.sql`** first (it sets `security_invoker = on` on those views). It grants `SELECT` to `anon` on `household_welfare_index`, `v_hwi_latest`, and `v_hwi_active_alerts`, and creates the optional `get_alert_distribution` RPC (so you don’t get 400). The script also grants `pharmacy_profiles`, `vrac_regional_health_index`, and `cooperative_readiness_status` (comment out those GRANT lines if those relations do not exist yet). The table and views must already exist (e.g. after `npm run vrac:migrate` or your schema migrations).
 
 For other tables/views the app reads:
 
@@ -37,6 +37,8 @@ CREATE POLICY "Allow anon read"
 ## 3. Optional: RPC for alert distribution
 
 The script **`docs/deployment/sql/grant-hwi-anon-access.sql`** creates `agrosoluce.get_alert_distribution(target_year integer)` and grants EXECUTE to `anon`. If you prefer not to create it, the app will compute distribution from latest scores when `v_hwi_latest` is readable.
+
+**If you get 400** with error *"column reference \"count\" is ambiguous"* on `get_alert_distribution`, run **`docs/deployment/sql/fix-get-alert-distribution-400.sql`** in the Supabase SQL Editor (or re-run **`docs/deployment/sql/grant-hwi-anon-access.sql`**).
 
 ## 4. Schema access for migrations (service_role)
 

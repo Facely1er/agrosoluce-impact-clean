@@ -6,6 +6,7 @@ import { getRegionCoordinates } from '@/lib/utils/cooperativeUtils';
 import { aggregateGeoContext } from '@/lib/utils/geoContextUtils';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import { EUDR_COMMODITIES_IN_SCOPE } from '@/types';
+import styles from './CanonicalDirectoryMap.module.css';
 
 // Fix Leaflet default icon paths for Vite
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -67,12 +68,6 @@ function MapUpdater({ records }: { records: CanonicalCooperativeDirectory[] }) {
   return null;
 }
 
-function getHealthStyle(antimalarialSharePct: number): { bg: string; label: string } {
-  if (antimalarialSharePct >= 15) return { bg: '#dc2626', label: 'High (≥15%)' };
-  if (antimalarialSharePct >= 8) return { bg: '#ca8a04', label: 'Medium (8–15%)' };
-  return { bg: '#16a34a', label: 'Lower (<8%)' };
-}
-
 export default function CanonicalDirectoryMap({
   records,
   regionHealth,
@@ -114,16 +109,8 @@ export default function CanonicalDirectoryMap({
         
         {Object.entries(regionData).map(([region, data]) => {
           const coords = getRegionCoordinates(region);
-          
-          // Determine marker color based on count
-          let color = '#60A5FA'; // Blue for 1-19
-          if (data.count >= 100) {
-            color = '#22C55E'; // Green for 100+
-          } else if (data.count >= 50) {
-            color = '#F97316'; // Orange for 50-99
-          } else if (data.count >= 20) {
-            color = '#EAB308'; // Yellow for 20-49
-          }
+          const markerTier =
+            data.count >= 100 ? 'markerTier4' : data.count >= 50 ? 'markerTier3' : data.count >= 20 ? 'markerTier2' : 'markerTier1';
 
           // Get commodities for this region
           const commodities = new Set<string>();
@@ -143,32 +130,28 @@ export default function CanonicalDirectoryMap({
           return (
             <Marker key={region} position={coords} icon={L.divIcon({
               className: 'custom-marker',
-              html: `<div style="background-color: ${color}; width: 32px; height: 32px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 11px; cursor: pointer;">${data.count}</div>`,
+              html: `<div class="${styles.markerBubble} ${styles[markerTier]}">${data.count}</div>`,
               iconSize: [32, 32],
               iconAnchor: [16, 16]
             })}>
               <Popup>
-                <div style={{ minWidth: '220px', padding: '8px' }}>
-                  <h3 style={{ fontWeight: 'bold', color: '#F97316', marginBottom: '8px', fontSize: '14px' }}>
-                    {region}
-                  </h3>
-                  <div style={{ marginBottom: '8px' }}>
-                    <strong style={{ fontSize: '16px', color: '#22C55E' }}>
-                      {data.count}
-                    </strong>
-                    <span style={{ fontSize: '14px', color: '#666' }}>
+                <div className={styles.popupRoot}>
+                  <h3 className={styles.popupTitle}>{region}</h3>
+                  <div className={styles.popupCountWrap}>
+                    <strong className={styles.popupCountNum}>{data.count}</strong>
+                    <span className={styles.popupCountLabel}>
                       {' '}coopérative{data.count > 1 ? 's' : ''}
                     </span>
                   </div>
                   {commodityLabels && (
-                    <div style={{ fontSize: '12px', color: '#666', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #eee' }}>
+                    <div className={styles.commoditiesBlock}>
                       <strong>Commodities:</strong> {commodityLabels}
                     </div>
                   )}
                   {health != null && (
-                    <div style={{ fontSize: '12px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #eee' }}>
-                      <strong style={{ color: '#0ea5e9' }}>Health (VRAC)</strong>
-                      <div style={{ marginTop: '4px', color: '#374151' }}>
+                    <div className={styles.healthBlock}>
+                      <strong className={styles.healthTitle}>Health (VRAC)</strong>
+                      <div className={styles.healthContent}>
                         <span>Antimalarial share: <strong>{health.antimalarialSharePct.toFixed(1)}%</strong></span>
                         {health.antibioticSharePct != null && (
                           <div>Antibiotic share: <strong>{health.antibioticSharePct.toFixed(1)}%</strong></div>
@@ -180,29 +163,19 @@ export default function CanonicalDirectoryMap({
                     </div>
                   )}
                   {geoContext != null && (
-                    <div style={{ fontSize: '12px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #eee' }}>
-                      <strong style={{ color: '#059669' }}>Geo context</strong>
-                      <div style={{ marginTop: '4px', color: '#374151' }}>
+                    <div className={styles.geoBlock}>
+                      <strong className={styles.geoTitle}>Geo context</strong>
+                      <div className={styles.geoContent}>
                         <span>Country: {geoContext.countryName}</span>
                         <div>Deforestation risk: <strong>{geoContext.deforestationLabel}</strong></div>
                       </div>
                     </div>
                   )}
-                  <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid #eee' }}>
+                  <div className={styles.popupActions}>
                     <a
                       href={onRegionClick ? undefined : `/directory?region=${encodeURIComponent(region)}`}
                       onClick={onRegionClick ? (e) => { e.preventDefault(); onRegionClick(region); } : undefined}
-                      style={{ 
-                        display: 'inline-block', 
-                        padding: '6px 12px', 
-                        backgroundColor: '#F97316', 
-                        color: 'white', 
-                        borderRadius: '4px', 
-                        textDecoration: 'none',
-                        fontSize: '12px',
-                        fontWeight: '500',
-                        cursor: 'pointer'
-                      }}
+                      className={styles.popupLink}
                     >
                       View cooperatives →
                     </a>
@@ -242,15 +215,15 @@ export default function CanonicalDirectoryMap({
               <p className="text-[10px] text-gray-500 mb-2">Antimalarial share by region</p>
               <div className="space-y-1.5 text-xs">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full border border-white shadow" style={{ backgroundColor: getHealthStyle(15).bg }}></div>
+                  <div className={`${styles.healthDot} ${styles.healthDotHigh}`} />
                   <span>High (≥15%)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full border border-white shadow" style={{ backgroundColor: getHealthStyle(10).bg }}></div>
+                  <div className={`${styles.healthDot} ${styles.healthDotMedium}`} />
                   <span>Medium (8–15%)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full border border-white shadow" style={{ backgroundColor: getHealthStyle(5).bg }}></div>
+                  <div className={`${styles.healthDot} ${styles.healthDotLower}`} />
                   <span>Lower (&lt;8%)</span>
                 </div>
               </div>
