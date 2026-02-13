@@ -38,13 +38,14 @@ npm run preview
 
 ### Environment Setup
 
-1. Copy `docs/deployment/ENV_TEMPLATE.txt` to `.env` in the root directory
-2. Add your Supabase credentials:
-   ```
-   VITE_SUPABASE_URL=your_supabase_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   VITE_SUPABASE_SCHEMA=agrosoluce
-   ```
+**Local:** Create `apps/web/.env` (or copy from `apps/web/.env.example`) and set:
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_SCHEMA=agrosoluce
+```
+
+**Vercel (or other host):** Add the same variables in the project’s **Environment Variables** (e.g. Vercel → Project → Settings → Environment Variables) for the environments you use (Production / Preview). Then **redeploy** so the build sees them; without these, database features are disabled and the app runs with static/fallback data.
 
 ---
 
