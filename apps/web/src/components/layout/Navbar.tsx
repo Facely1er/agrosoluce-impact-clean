@@ -83,6 +83,16 @@ export default function Navbar() {
     };
   }, [mobileMenuOpen]);
 
+  // Close mobile menu on Escape
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [mobileMenuOpen]);
+
   const dropdowns: NavDropdown[] = [
     {
       id: 'data',
@@ -324,10 +334,9 @@ export default function Navbar() {
             <div
               className="md:hidden fixed inset-0 bg-black/30 z-40 top-16"
               onClick={() => setMobileMenuOpen(false)}
-              onKeyDown={(e) => e.key === 'Escape' && setMobileMenuOpen(false)}
               aria-hidden
             />
-            <div className="md:hidden relative z-50 border-t border-gray-200 dark:border-gray-700 py-2 bg-white dark:bg-gray-900">
+            <div className="md:hidden relative z-50 border-t border-gray-200 dark:border-gray-700 py-2 bg-white dark:bg-gray-900 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
