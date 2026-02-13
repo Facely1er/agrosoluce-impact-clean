@@ -8,34 +8,35 @@ In **Supabase Dashboard** → **Project Settings** → **API**:
 
 ## 2. App access (anon key)
 
-The web app uses the **anon** key. To avoid **401** on HWI and cooperatives:
+The web app uses the **anon** key. To avoid **401** (“permission denied for view”) on HWI and cooperatives:
 
-- In the **agrosoluce** schema, add **RLS policies** so the `anon` role can **SELECT** on:
-  - `household_welfare_index`
-  - `v_hwi_latest` (view)
-  - `v_hwi_active_alerts` (view)
-  - `pharmacy_profiles`, `vrac_periods`, and any other tables/views the app reads.
+**Quick fix for HWI:** Run the script **`docs/deployment/sql/grant-hwi-anon-access.sql`** in the Supabase **SQL Editor**. It grants `SELECT` to `anon` on `household_welfare_index`, `v_hwi_latest`, and `v_hwi_active_alerts`, and creates the optional `get_alert_distribution` RPC (so you don’t get 400). The table and views must already exist (e.g. after `npm run vrac:migrate` or your schema migrations).
 
-Example policy (Postgres):
+For other tables/views the app reads:
+
+- Either **GRANT SELECT** to `anon` on each view/table in the `agrosoluce` schema, or
+- If you use RLS on tables, add a policy that allows `anon` to SELECT.
+
+Example grant (Postgres):
 
 ```sql
--- Example: allow anon to read HWI table (run in SQL Editor)
+GRANT SELECT ON agrosoluce.household_welfare_index TO anon;
+GRANT SELECT ON agrosoluce.v_hwi_latest TO anon;
+GRANT SELECT ON agrosoluce.v_hwi_active_alerts TO anon;
+```
+
+Example RLS policy (only if the table has RLS enabled):
+
+```sql
 ALTER TABLE agrosoluce.household_welfare_index ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow anon read"
   ON agrosoluce.household_welfare_index FOR SELECT
   TO anon USING (true);
 ```
 
-Repeat for other tables/views the app uses, or use a single policy per table/view with `USING (true)` for read-only access.
-
 ## 3. Optional: RPC for alert distribution
 
-If you want the server to compute alert distribution:
-
-- Create the function `agrosoluce.get_alert_distribution(target_year integer)` in the SQL Editor.
-- Grant **EXECUTE** to `anon` (or the role your app uses).
-
-If the RPC is missing, the app computes distribution from latest scores when possible.
+The script **`docs/deployment/sql/grant-hwi-anon-access.sql`** creates `agrosoluce.get_alert_distribution(target_year integer)` and grants EXECUTE to `anon`. If you prefer not to create it, the app will compute distribution from latest scores when `v_hwi_latest` is readable.
 
 ## 4. Running the VRAC migration (`npm run vrac:migrate`)
 
