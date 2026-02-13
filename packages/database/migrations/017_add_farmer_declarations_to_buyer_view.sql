@@ -17,7 +17,7 @@ ON CONFLICT (migration_name) DO NOTHING;
 -- =============================================
 
 -- Update the buyer_facing_summary view to include aggregate farmer declaration information
-CREATE OR REPLACE VIEW agrosoluce.buyer_facing_summary AS
+CREATE OR REPLACE VIEW agrosoluce.buyer_facing_summary WITH (security_invoker = on) AS
 SELECT 
     c.id,
     c.name,

@@ -206,7 +206,7 @@ CREATE INDEX IF NOT EXISTS idx_readiness_checklist_last_checked ON agrosoluce.re
 -- =============================================
 
 -- Computed view showing what buyers see
-CREATE OR REPLACE VIEW agrosoluce.buyer_facing_summary AS
+CREATE OR REPLACE VIEW agrosoluce.buyer_facing_summary WITH (security_invoker = on) AS
 SELECT 
     c.id,
     c.name,
@@ -294,7 +294,7 @@ GROUP BY
 -- =============================================
 
 -- Executive overview metrics for dashboard home
-CREATE OR REPLACE VIEW agrosoluce.dashboard_executive_overview AS
+CREATE OR REPLACE VIEW agrosoluce.dashboard_executive_overview WITH (security_invoker = on) AS
 SELECT 
     c.id AS cooperative_id,
     c.name,

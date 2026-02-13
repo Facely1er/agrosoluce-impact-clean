@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS agrosoluce.certification_standards (
 -- =============================================
 
 -- Enriched cooperative view with calculated metrics
-CREATE OR REPLACE VIEW agrosoluce.enriched_cooperatives AS
+CREATE OR REPLACE VIEW agrosoluce.enriched_cooperatives WITH (security_invoker = on) AS
 SELECT 
     c.*,
     COUNT(DISTINCT f.id) AS total_farmers,
@@ -145,7 +145,7 @@ LEFT JOIN agrosoluce.geographic_data gd ON
 GROUP BY c.id, mp.price_per_ton_usd, gd.climate_zone, gd.agricultural_potential_score;
 
 -- Enriched farmer view with cooperative context
-CREATE OR REPLACE VIEW agrosoluce.enriched_farmers AS
+CREATE OR REPLACE VIEW agrosoluce.enriched_farmers WITH (security_invoker = on) AS
 SELECT 
     f.*,
     c.name AS cooperative_name,

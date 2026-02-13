@@ -138,7 +138,7 @@ DROP VIEW IF EXISTS agrosoluce.cooperative_compliance_status CASCADE;
 DROP TABLE IF EXISTS agrosoluce.cooperative_compliance_status CASCADE;
 
 -- Create the new view with readiness terminology
-CREATE OR REPLACE VIEW agrosoluce.cooperative_readiness_status AS
+CREATE OR REPLACE VIEW agrosoluce.cooperative_readiness_status WITH (security_invoker = on) AS
 SELECT 
   c.id AS cooperative_id,
   c.name AS cooperative_name,
