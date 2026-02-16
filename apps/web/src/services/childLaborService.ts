@@ -391,27 +391,32 @@ export class ChildLaborService {
 
   /**
    * Get cooperative readiness status (self-assessment data)
-   * Note: This returns self-assessment data, not compliance determinations
+   * Note: This returns self-assessment data, not compliance determinations.
+   * Returns [] when Supabase is not configured or the request fails (no-backend / demo mode).
    */
   static async getComplianceStatus(
     cooperativeId?: string
   ): Promise<CooperativeComplianceStatus[]> {
     if (!supabase) {
-      throw new Error('Supabase client not initialized');
+      return [];
     }
 
-    let query = supabase.from('cooperative_readiness_status').select('*');
+    try {
+      let query = supabase.from('cooperative_readiness_status').select('*');
 
-    if (cooperativeId) {
-      query = query.eq('cooperative_id', cooperativeId);
+      if (cooperativeId) {
+        query = query.eq('cooperative_id', cooperativeId);
+      }
+
+      const { data, error } = await query.order('readiness_score', {
+        ascending: false,
+      });
+
+      if (error) return [];
+      return data ?? [];
+    } catch {
+      return [];
     }
-
-    const { data, error } = await query      .order('readiness_score', {
-      ascending: false,
-    });
-
-    if (error) throw new Error(error.message);
-    return data;
   }
 
   // ========================================
@@ -419,43 +424,47 @@ export class ChildLaborService {
   // ========================================
 
   /**
-   * Get dashboard statistics
+   * Get dashboard statistics.
+   * Returns null when Supabase is not configured or the request fails (no-backend / demo mode).
    */
   static async getDashboardStats() {
     if (!supabase) {
-      throw new Error('Supabase client not initialized');
+      return null;
     }
 
-    // Try new function first, fallback to old for backward compatibility
-    let { data, error } = await supabase.rpc('get_readiness_dashboard_stats');
-    if (error) {
-      // Fallback to old function name if new one doesn't exist yet
-      const fallback = await supabase.rpc('get_compliance_dashboard_stats');
-      data = fallback.data;
-      error = fallback.error;
+    try {
+      let { data, error } = await supabase.rpc('get_readiness_dashboard_stats');
+      if (error) {
+        const fallback = await supabase.rpc('get_compliance_dashboard_stats');
+        data = fallback.data;
+        error = fallback.error;
+      }
+      if (error) return null;
+      return data;
+    } catch {
+      return null;
     }
-
-    if (error) throw new Error(error.message);
-    return data;
   }
 
   /**
-   * Get regional compliance breakdown
+   * Get regional compliance breakdown.
+   * Returns [] when Supabase is not configured or the request fails (no-backend / demo mode).
    */
   static async getRegionalCompliance() {
     if (!supabase) {
-      throw new Error('Supabase client not initialized');
+      return [];
     }
 
-    const { data, error } = await supabase
-      .from('cooperative_readiness_status')
-      .select('region, readiness_score, compliance_score, child_labor_violations');
+    try {
+      const { data, error } = await supabase
+        .from('cooperative_readiness_status')
+        .select('region, readiness_score, compliance_score, child_labor_violations');
 
-    if (error) throw new Error(error.message);
+      if (error) return [];
 
-    // Group by region
-    const regionMap = new Map();
-    data.forEach((row) => {
+      const rows = data ?? [];
+      const regionMap = new Map();
+      rows.forEach((row: any) => {
       if (!regionMap.has(row.region)) {
         regionMap.set(row.region, {
           region: row.region,
@@ -471,12 +480,15 @@ export class ChildLaborService {
       region.violations += row.child_labor_violations || 0;
     });
 
-    return Array.from(regionMap.values()).map((r) => ({
+    return Array.from(regionMap.values()).map((r: any) => ({
       region: r.region,
       averageScore: r.count > 0 ? r.totalScore / r.count : 0,
       cooperatives: r.count,
       totalViolations: r.violations,
     }));
+    } catch {
+      return [];
+    }
   }
 
   // ========================================

@@ -32,6 +32,92 @@ export interface Translations {
     partnersAndPrograms: string;
     aggregatedDashboard: string;
     hwi: string;
+    changeLanguage: string;
+    english: string;
+    french: string;
+    enShort: string;
+    frShort: string;
+    closeMenu: string;
+    openMenu: string;
+    themeDark: string;
+    themeLight: string;
+    frameworkDemo: string;
+  };
+
+  // Not found (404)
+  notFound: {
+    title: string;
+    description: string;
+    goHome: string;
+    browseDirectory: string;
+  };
+
+  // Monitoring / Compliance Tools landing
+  monitoring: {
+    breadcrumb: string;
+    badge: string;
+    title: string;
+    subtitle: string;
+    intro: string;
+    platformNote: string;
+    viewDashboard: string;
+    newAssessment: string;
+    documentationTracking: string;
+    documentationTrackingDesc: string;
+    farmerEngagement: string;
+    farmerEngagementDesc: string;
+    progressMonitoring: string;
+    progressMonitoringDesc: string;
+    riskAssessment: string;
+    riskAssessmentDesc: string;
+    certificationTracking: string;
+    certificationTrackingDesc: string;
+    regionalAnalysis: string;
+    regionalAnalysisDesc: string;
+    whatYouCanMonitor: string;
+    documentationCoverageRate: string;
+    averageReadinessScore: string;
+  };
+
+  // Health Impact Overview page
+  healthImpactOverview: {
+    breadcrumb: string;
+    badge: string;
+    heroTitle: string;
+    heroSubtitle: string;
+    conceptTitle: string;
+    conceptP1: string;
+    conceptP2: string;
+    keyInsight: string;
+    keyInsightText: string;
+    dataSourceTitle: string;
+    vracBullet1: string;
+    vracBullet2: string;
+    vracBullet3: string;
+    vracBullet4: string;
+    caseStudyTitle: string;
+    antimalarialSurge: string;
+    productionDecline: string;
+    cocoaHarvest: string;
+    weekLag: string;
+    healthToProduction: string;
+    caseStudyBody: string;
+    viewRegionalMap: string;
+    healthIntelligenceDashboard: string;
+    platformFeatures: string;
+    businessValue: string;
+    forCommodityTraders: string;
+    forCommodityTradersDesc: string;
+    forProcessors: string;
+    forProcessorsDesc: string;
+    keyFeatures: {
+      regionalMap: { title: string; description: string; linkText: string };
+      regionalHealth: { title: string; description: string; linkText: string };
+      cooperativeWorkspaces: { title: string; description: string; linkText: string };
+      timeLag: { title: string; description: string; linkText: string };
+      academicResearch: { title: string; description: string; linkText: string };
+    };
+    partnerships: { name: string; description: string }[];
   };
   
   // Common
@@ -909,6 +995,90 @@ export const translations: Record<Language, Translations> = {
       partnersAndPrograms: 'Partners & Programs',
       aggregatedDashboard: 'Aggregated Dashboard',
       hwi: 'Household Welfare Index',
+      changeLanguage: 'Change language',
+      english: '🇬🇧 English',
+      french: '🇫🇷 Français',
+      enShort: '🇬🇧 EN',
+      frShort: '🇫🇷 FR',
+      closeMenu: 'Close menu',
+      openMenu: 'Open menu',
+      themeDark: 'Dark',
+      themeLight: 'Light',
+      frameworkDemo: 'Framework Demo',
+    },
+    notFound: {
+      title: 'Page Not Found',
+      description: "The page you're looking for doesn't exist or has been moved.",
+      goHome: 'Go Home',
+      browseDirectory: 'Browse Directory',
+    },
+    monitoring: {
+      breadcrumb: 'Monitoring',
+      badge: 'Compliance & Monitoring',
+      title: 'Child Labor Monitoring & Compliance',
+      subtitle: 'Track documentation, self-assessments, and improvement efforts across agricultural cooperatives',
+      intro: 'AgroSoluce™ supports learning, monitoring, and improvement — not marketing narratives. Our monitoring platform helps cooperatives, buyers, and partners track child labor prevention efforts, documentation coverage, and compliance readiness across supply chains.',
+      platformNote: 'AgroSoluce™ supports learning, monitoring, and improvement — not marketing narratives.',
+      viewDashboard: 'View Dashboard',
+      newAssessment: 'New Assessment',
+      documentationTracking: 'Documentation Tracking',
+      documentationTrackingDesc: 'Monitor documentation coverage rates, track self-assessment scores, and identify gaps in compliance readiness across cooperatives.',
+      farmerEngagement: 'Farmer Engagement',
+      farmerEngagementDesc: 'Track farmer-level activities at cooperative scale, including training participation, declarations, and baseline indicators.',
+      progressMonitoring: 'Progress Monitoring',
+      progressMonitoringDesc: 'Track progress over time with readiness scores, violation trends, and improvement plans.',
+      riskAssessment: 'Risk Assessment',
+      riskAssessmentDesc: 'Identify and prioritize child labor risks at the cooperative and community level.',
+      certificationTracking: 'Certification Tracking',
+      certificationTrackingDesc: 'Monitor certification status and alignment with due diligence requirements.',
+      regionalAnalysis: 'Regional Analysis',
+      regionalAnalysisDesc: 'Compare readiness and compliance metrics across regions and commodities.',
+      whatYouCanMonitor: 'What You Can Monitor',
+      documentationCoverageRate: 'Documentation Coverage Rate',
+      averageReadinessScore: 'Average Readiness Score',
+    },
+    healthImpactOverview: {
+      breadcrumb: 'Health & Impact',
+      badge: 'Health-Agriculture Impact Analysis',
+      heroTitle: 'Health and Agricultural Productivity',
+      heroSubtitle: 'Pharmacy surveillance (VRAC) in cocoa regions provides a workforce health proxy; a 3–4 week lag to harvest impact is documented in research. Use it alongside satellite and production data for impact analysis.',
+      conceptTitle: 'Understanding the Health-Agriculture Correlation',
+      conceptP1: 'Agricultural productivity in cocoa-growing regions is fundamentally tied to workforce health. When malaria surges affect farmers and their families, harvest efficiency drops dramatically.',
+      conceptP2: 'Satellite monitoring tracks forest cover and land use; workforce health factors that affect production capacity are observed via complementary data such as pharmacy surveillance.',
+      keyInsight: 'Key Insight',
+      keyInsightText: 'Malaria reduces harvest efficiency by 40-60% during acute episodes. VRAC pharmacy data detects these surges weeks before they impact production.',
+      dataSourceTitle: 'The Data Source',
+      vracBullet1: 'VRAC (Veille Régionale Anti-Contrefaçon) - Pharmacy surveillance network',
+      vracBullet2: 'Tracks antimalarial sales across cocoa-producing regions',
+      vracBullet3: 'Real-time proxy for workforce health burden',
+      vracBullet4: 'Complements satellite and weather data',
+      caseStudyTitle: 'Case Study: Gontougo Malaria Surge',
+      antimalarialSurge: 'Antimalarial Surge',
+      productionDecline: 'Production Decline',
+      cocoaHarvest: 'Cocoa harvest',
+      weekLag: 'Week Lag',
+      healthToProduction: 'Health → Production',
+      caseStudyBody: 'The Gontougo region experienced a dramatic malaria surge between August and December 2024, with antimalarial sales spiking to 10 times normal levels. Three to four weeks later, cocoa production declined by 24% — a clear demonstration of how workforce health directly impacts agricultural output.',
+      viewRegionalMap: 'View Regional Map',
+      healthIntelligenceDashboard: 'Health Intelligence Dashboard',
+      platformFeatures: 'Platform Features',
+      businessValue: 'Business Value',
+      forCommodityTraders: 'For Commodity Traders',
+      forCommodityTradersDesc: 'Early warning signals for supply disruptions, enabling proactive hedging and logistics planning.',
+      forProcessors: 'For Processors',
+      forProcessorsDesc: 'Production impact visibility to align procurement and capacity planning with health trends.',
+      keyFeatures: {
+        regionalMap: { title: 'Regional Map', description: 'Cooperatives and health by region: map view with health layers and heatmap', linkText: 'Explore Map' },
+        regionalHealth: { title: 'Regional Health Index', description: 'Track antimalarial share by pharmacy and period across cocoa-growing regions', linkText: 'View Health Intelligence' },
+        cooperativeWorkspaces: { title: 'Cooperative Workspaces', description: 'Health data integrated with production metrics for individual cooperatives', linkText: 'Browse Cooperatives' },
+        timeLag: { title: 'Time-Lag Analysis', description: 'Correlation between malaria surges and harvest efficiency decline', linkText: 'View time-lag analysis' },
+        academicResearch: { title: 'Academic Research', description: 'Validated by studies on cocoa farmers in Côte d\'Ivoire and Nigeria', linkText: 'View Research' },
+      },
+      partnerships: [
+        { name: 'Marcus Weather', description: 'Weather + workforce health integration' },
+        { name: 'Satelligence', description: 'Satellite + health monitoring' },
+        { name: 'EarthDaily Agro', description: 'Yield models + labor productivity' },
+      ],
     },
     common: {
       loading: 'Loading...',
@@ -1795,6 +1965,90 @@ export const translations: Record<Language, Translations> = {
       partnersAndPrograms: 'Partenaires & Programmes',
       aggregatedDashboard: 'Tableau de bord agrégé',
       hwi: 'Indice de Bien-être des Ménages',
+      changeLanguage: 'Changer de langue',
+      english: '🇬🇧 English',
+      french: '🇫🇷 Français',
+      enShort: '🇬🇧 EN',
+      frShort: '🇫🇷 FR',
+      closeMenu: 'Fermer le menu',
+      openMenu: 'Ouvrir le menu',
+      themeDark: 'Sombre',
+      themeLight: 'Clair',
+      frameworkDemo: 'Démo Cadre',
+    },
+    notFound: {
+      title: 'Page introuvable',
+      description: 'La page que vous recherchez n\'existe pas ou a été déplacée.',
+      goHome: 'Retour à l\'accueil',
+      browseDirectory: 'Parcourir le répertoire',
+    },
+    monitoring: {
+      breadcrumb: 'Suivi',
+      badge: 'Conformité & Suivi',
+      title: 'Suivi du travail des enfants et conformité',
+      subtitle: 'Suivre la documentation, les auto-évaluations et les efforts d\'amélioration des coopératives agricoles',
+      intro: 'AgroSoluce™ favorise l\'apprentissage, le suivi et l\'amélioration — pas les récits marketing. Notre plateforme aide les coopératives, acheteurs et partenaires à suivre les efforts de prévention du travail des enfants, la couverture documentaire et la préparation à la conformité.',
+      platformNote: 'AgroSoluce™ favorise l\'apprentissage, le suivi et l\'amélioration.',
+      viewDashboard: 'Voir le tableau de bord',
+      newAssessment: 'Nouvelle évaluation',
+      documentationTracking: 'Suivi de la documentation',
+      documentationTrackingDesc: 'Suivre les taux de couverture documentaire, les scores d\'auto-évaluation et identifier les lacunes de conformité.',
+      farmerEngagement: 'Engagement des agriculteurs',
+      farmerEngagementDesc: 'Suivre les activités au niveau des agriculteurs à l\'échelle des coopératives : formation, déclarations, indicateurs de base.',
+      progressMonitoring: 'Suivi des progrès',
+      progressMonitoringDesc: 'Suivre l\'évolution des scores de préparation, des tendances des violations et des plans d\'amélioration.',
+      riskAssessment: 'Évaluation des risques',
+      riskAssessmentDesc: 'Identifier et prioriser les risques de travail des enfants au niveau coopérative et communautaire.',
+      certificationTracking: 'Suivi des certifications',
+      certificationTrackingDesc: 'Suivre le statut des certifications et l\'alignement avec les exigences de diligence raisonnable.',
+      regionalAnalysis: 'Analyse régionale',
+      regionalAnalysisDesc: 'Comparer la préparation et la conformité entre régions et filières.',
+      whatYouCanMonitor: 'Ce que vous pouvez suivre',
+      documentationCoverageRate: 'Taux de couverture documentaire',
+      averageReadinessScore: 'Score de préparation moyen',
+    },
+    healthImpactOverview: {
+      breadcrumb: 'Santé & Impact',
+      badge: 'Analyse Impact Santé–Agriculture',
+      heroTitle: 'Santé et productivité agricole',
+      heroSubtitle: 'La surveillance pharmaceutique (VRAC) dans les régions cacaoyères fournit un indicateur de santé de la main-d\'œuvre ; un décalage de 3 à 4 semaines sur l\'impact des récoltes est documenté. À utiliser avec les données satellite et de production.',
+      conceptTitle: 'Comprendre la corrélation santé–agriculture',
+      conceptP1: 'La productivité agricole dans les régions cacaoyères est fondamentalement liée à la santé de la main-d\'œuvre. Lorsque le paludisme affecte les agriculteurs et leurs familles, l\'efficacité des récoltes chute.',
+      conceptP2: 'Le suivi satellite couvre la couverture forestière et l\'usage des sols ; les facteurs de santé affectant la capacité de production sont observés via des données complémentaires comme la surveillance pharmaceutique.',
+      keyInsight: 'Point clé',
+      keyInsightText: 'Le paludisme réduit l\'efficacité des récoltes de 40 à 60 % pendant les épisodes aigus. Les données VRAC détectent ces pics des semaines avant l\'impact sur la production.',
+      dataSourceTitle: 'Source des données',
+      vracBullet1: 'VRAC (Veille Régionale Anti-Contrefaçon) — Réseau de surveillance pharmaceutique',
+      vracBullet2: 'Suivi des ventes d\'antipaludéens dans les régions cacaoyères',
+      vracBullet3: 'Indicateur en temps réel du fardeau sanitaire',
+      vracBullet4: 'Complète les données satellite et météo',
+      caseStudyTitle: 'Étude de cas : Pic paludisme Gontougo',
+      antimalarialSurge: 'Pic antipaludéens',
+      productionDecline: 'Baisse de production',
+      cocoaHarvest: 'Récolte cacao',
+      weekLag: 'Décalage (semaines)',
+      healthToProduction: 'Santé → Production',
+      caseStudyBody: 'La région de Gontougo a connu un pic de paludisme entre août et décembre 2024, avec des ventes d\'antipaludéens multipliées par 10. Trois à quatre semaines plus tard, la production de cacao a baissé de 24 % — démontrant l\'impact direct de la santé sur la production agricole.',
+      viewRegionalMap: 'Voir la carte régionale',
+      healthIntelligenceDashboard: 'Tableau de bord Intelligence Santé',
+      platformFeatures: 'Fonctionnalités de la plateforme',
+      businessValue: 'Valeur pour l\'entreprise',
+      forCommodityTraders: 'Pour les négociants',
+      forCommodityTradersDesc: 'Signaux d\'alerte pour les perturbations d\'approvisionnement et la planification logistique.',
+      forProcessors: 'Pour les transformateurs',
+      forProcessorsDesc: 'Visibilité de l\'impact production pour aligner approvisionnement et capacité sur les tendances sanitaires.',
+      keyFeatures: {
+        regionalMap: { title: 'Carte régionale', description: 'Cooperatives et santé par région : carte avec couches santé et heatmap', linkText: 'Explorer la carte' },
+        regionalHealth: { title: 'Indice santé régional', description: 'Suivi de la part antipaludéens par pharmacie et période', linkText: 'Voir l\'intelligence santé' },
+        cooperativeWorkspaces: { title: 'Espaces coopératives', description: 'Données santé intégrées aux indicateurs de production', linkText: 'Parcourir les coopératives' },
+        timeLag: { title: 'Analyse décalage', description: 'Corrélation entre pics de paludisme et baisse d\'efficacité des récoltes', linkText: 'Voir l\'analyse' },
+        academicResearch: { title: 'Recherche académique', description: 'Validé par des études sur les producteurs de cacao en Côte d\'Ivoire et au Nigeria', linkText: 'Voir la recherche' },
+      },
+      partnerships: [
+        { name: 'Marcus Weather', description: 'Météo et santé de la main-d\'œuvre' },
+        { name: 'Satelligence', description: 'Satellite et suivi sanitaire' },
+        { name: 'EarthDaily Agro', description: 'Modèles de rendement et productivité du travail' },
+      ],
     },
     common: {
       loading: 'Chargement...',

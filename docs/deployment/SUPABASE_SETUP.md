@@ -1,5 +1,9 @@
 # Supabase setup for AgroSoluce
 
+## If you see 404 "Could not find the table 'public.cooperatives' (or similar)"
+
+The app uses the **agrosoluce** schema, not **public**. You must run migrations and expose the schema. See **[PRODUCTION_SUPABASE_404_FIX.md](./PRODUCTION_SUPABASE_404_FIX.md)** for step-by-step instructions.
+
 ## 1. Expose the schema
 
 In **Supabase Dashboard** → **Project Settings** → **API**:
@@ -86,3 +90,10 @@ The analytics and child-labor dashboards use the view **`agrosoluce.cooperative_
 
 - The app will still use the **anon** key; ensure RLS allows **SELECT** on the tables/views the app reads (step 2).
 - If you see “Database has no cooperatives yet, falling back to JSON”, the cooperatives table is empty; the app will use static JSON until you run a cooperatives migration or seed.
+
+## 8. Production checklist (e.g. 15-AgroSoluce / Vercel)
+
+- **Exposed schemas:** Project Settings → API → add **agrosoluce**.
+- **Migrations:** Run `packages/database/migrations/ALL_MIGRATIONS.sql` (or migrations 001–020 in order) in the Supabase SQL Editor.
+- **Env at build time:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`; optionally `VITE_SUPABASE_SCHEMA=agrosoluce` (default in code is already `agrosoluce`).
+- If you still see 404 on `/rest/v1/cooperatives` or other tables, follow [PRODUCTION_SUPABASE_404_FIX.md](./PRODUCTION_SUPABASE_404_FIX.md).

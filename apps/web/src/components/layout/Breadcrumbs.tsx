@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 interface BreadcrumbItem {
   label: string;
@@ -11,29 +12,50 @@ interface BreadcrumbsProps {
   className?: string;
 }
 
+const PATH_SEGMENT_TO_NAV_KEY: Partial<Record<string, keyof import('@/lib/i18n/translations').Translations['nav']>> = {
+  directory: 'directory',
+  map: 'map',
+  cooperatives: 'cooperatives',
+  'health-impact': 'healthImpact',
+  vrac: 'healthIntelligence',
+  analytics: 'analytics',
+  hwi: 'hwi',
+  monitoring: 'compliance',
+  about: 'about',
+  buyer: 'buyers',
+  partners: 'partners',
+  pilot: 'pilotPrograms',
+  workspace: 'cooperativeSpace',
+  aggregate: 'aggregatedDashboard',
+  'framework-demo': 'frameworkDemo',
+  cooperative: 'cooperativeSpace',
+  ngos: 'partners',
+};
+
 export default function Breadcrumbs({ items, className = '' }: BreadcrumbsProps) {
   const location = useLocation();
-  
+  const { t } = useI18n();
+
   // Auto-generate breadcrumbs from pathname if items not provided
   const generateBreadcrumbs = (): BreadcrumbItem[] => {
     const pathSegments = location.pathname.split('/').filter(Boolean);
-    const breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/' }];
+    const breadcrumbs: BreadcrumbItem[] = [{ label: t.nav.home, path: '/' }];
     
     let currentPath = '';
     pathSegments.forEach((segment, index) => {
       currentPath += `/${segment}`;
-      
-      // Format segment for display
-      const label = segment
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      
+
       // Don't add breadcrumb for the last segment if it's an ID
       if (index === pathSegments.length - 1 && /^\d+$/.test(segment)) {
         return;
       }
-      
+
+      const navKey = PATH_SEGMENT_TO_NAV_KEY[segment];
+      const label = navKey ? t.nav[navKey] : segment
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+
       breadcrumbs.push({
         label,
         path: index === pathSegments.length - 1 ? undefined : currentPath,

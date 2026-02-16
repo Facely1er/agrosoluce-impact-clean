@@ -31,8 +31,29 @@ export interface FarmersFirstSummary {
   impactDataPoints: number; // Number of progress snapshots available
 }
 
+/** Empty summary for no-backend / demo mode */
+function emptySummary(coopId: string): FarmersFirstSummary {
+  return {
+    cooperativeId: coopId,
+    totalFarmers: 0,
+    farmersOnboarded: 0,
+    onboardingCoveragePercentage: 0,
+    totalDeclarations: 0,
+    farmersWithDeclarations: 0,
+    declarationsCoveragePercentage: 0,
+    totalTrainingSessions: 0,
+    completedTrainingSessions: 0,
+    trainingCoveragePercentage: 0,
+    hasBaseline: false,
+    hasProgressData: false,
+    latestProgressMonth: null,
+    impactDataPoints: 0,
+  };
+}
+
 /**
- * Get comprehensive Farmers First summary for a cooperative
+ * Get comprehensive Farmers First summary for a cooperative.
+ * Returns empty summary when Supabase is not configured or requests fail (no-backend / demo mode).
  */
 export async function getFarmersFirstSummary(
   coopId: string
@@ -41,7 +62,7 @@ export async function getFarmersFirstSummary(
   error: Error | null;
 }> {
   if (!supabase) {
-    return { data: null, error: new Error('Supabase not configured') };
+    return { data: emptySummary(coopId), error: null };
   }
 
   try {
@@ -135,9 +156,8 @@ export async function getFarmersFirstSummary(
 
     return { data: summary, error: null };
   } catch (err) {
-    const error = err instanceof Error ? err : new Error('Unknown error');
-    console.error('Error generating Farmers First summary:', error);
-    return { data: null, error };
+    console.error('Error generating Farmers First summary:', err);
+    return { data: emptySummary(coopId), error: null };
   }
 }
 

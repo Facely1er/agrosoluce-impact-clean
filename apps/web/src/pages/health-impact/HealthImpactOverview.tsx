@@ -21,58 +21,14 @@ import { FrameworkComplianceBadge } from '@/components/framework';
 
 export default function HealthImpactOverview() {
   const { t } = useI18n();
+  const h = t.healthImpactOverview;
 
   const keyFeatures = [
-    {
-      icon: MapPin,
-      title: 'Regional Map',
-      description: 'Cooperatives and health by region: map view with health layers and heatmap',
-      link: '/map',
-      linkText: 'Explore Map',
-    },
-    {
-      icon: Activity,
-      title: 'Regional Health Index',
-      description: 'Track antimalarial share by pharmacy and period across cocoa-growing regions',
-      link: '/vrac',
-      linkText: 'View Health Intelligence',
-    },
-    {
-      icon: Users,
-      title: 'Cooperative Workspaces',
-      description: 'Health data integrated with production metrics for individual cooperatives',
-      link: '/directory',
-      linkText: 'Browse Cooperatives',
-    },
-    {
-      icon: LineChart,
-      title: 'Time-Lag Analysis',
-      description: 'Correlation between malaria surges and harvest efficiency decline',
-      link: '/vrac',
-      linkText: 'View time-lag analysis',
-    },
-    {
-      icon: BookOpen,
-      title: 'Academic Research',
-      description: 'Validated by studies on cocoa farmers in Côte d\'Ivoire and Nigeria',
-      link: '/regulatory-references',
-      linkText: 'View Research',
-    },
-  ];
-
-  const partnerships = [
-    {
-      name: 'Marcus Weather',
-      description: 'Weather + workforce health integration',
-    },
-    {
-      name: 'Satelligence',
-      description: 'Satellite + health monitoring',
-    },
-    {
-      name: 'EarthDaily Agro',
-      description: 'Yield models + labor productivity',
-    },
+    { icon: MapPin, ...h.keyFeatures.regionalMap, link: '/map' },
+    { icon: Activity, ...h.keyFeatures.regionalHealth, link: '/vrac' },
+    { icon: Users, ...h.keyFeatures.cooperativeWorkspaces, link: '/directory' },
+    { icon: LineChart, ...h.keyFeatures.timeLag, link: '/vrac' },
+    { icon: BookOpen, ...h.keyFeatures.academicResearch, link: '/regulatory-references' },
   ];
 
   return (
@@ -80,8 +36,8 @@ export default function HealthImpactOverview() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Health & Impact' }
+          { label: t.nav.home, path: '/' },
+          { label: h.breadcrumb }
         ]} />
 
         {/* Hero Section */}
@@ -89,7 +45,7 @@ export default function HealthImpactOverview() {
           <div className="flex flex-col items-center gap-4 mb-6">
             <Badge variant="primary" size="lg" className="bg-health-100 text-health-700 border-health-300">
               <Activity className="h-4 w-4 mr-2" />
-              Health-Agriculture Impact Analysis
+              {h.badge}
             </Badge>
             <FrameworkComplianceBadge
               version="1.0"
@@ -98,10 +54,10 @@ export default function HealthImpactOverview() {
             />
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-gray-900 dark:text-white">
-            Health and Agricultural Productivity
+            {h.heroTitle}
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-8">
-            Pharmacy surveillance (VRAC) in cocoa regions provides a workforce health proxy; a 3–4 week lag to harvest impact is documented in research. Use it alongside satellite and production data for impact analysis.
+            {h.heroSubtitle}
           </p>
         </div>
 
@@ -110,26 +66,23 @@ export default function HealthImpactOverview() {
           <Card className="p-8 md:p-12">
             <CardContent className="p-0">
               <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
-                Understanding the Health-Agriculture Correlation
+                {h.conceptTitle}
               </h2>
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                    Agricultural productivity in cocoa-growing regions is fundamentally tied to workforce health. 
-                    When malaria surges affect farmers and their families, harvest efficiency drops dramatically.
+                    {h.conceptP1}
                   </p>
                   <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                    Satellite monitoring tracks forest cover and land use; workforce health factors that affect 
-                    production capacity are observed via complementary data such as pharmacy surveillance.
+                    {h.conceptP2}
                   </p>
                   <div className="bg-health-50 dark:bg-health-900/30 p-6 rounded-lg border-l-4 border-health-600">
                     <div className="flex items-start gap-3">
                       <Heart className="h-6 w-6 text-health-600 flex-shrink-0 mt-1" />
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Key Insight</h3>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{h.keyInsight}</h3>
                         <p className="text-gray-700 dark:text-gray-300">
-                          Malaria reduces harvest efficiency by <strong>40-60%</strong> during acute episodes. 
-                          VRAC pharmacy data detects these surges <strong>weeks before</strong> they impact production.
+                          {h.keyInsightText}
                         </p>
                       </div>
                     </div>
@@ -138,32 +91,24 @@ export default function HealthImpactOverview() {
                 <div className="bg-gradient-to-br from-health-50 to-vitality-50 dark:from-health-900/30 dark:to-vitality-900/30 p-8 rounded-xl">
                   <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
                     <Sprout className="h-6 w-6 text-wellness-600" />
-                    The Data Source
+                    {h.dataSourceTitle}
                   </h3>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
                       <div className="w-2 h-2 rounded-full bg-vitality-600 mt-2 flex-shrink-0"></div>
-                      <span className="text-gray-700 dark:text-gray-300">
-                        <strong>VRAC (Veille Régionale Anti-Contrefaçon)</strong> - Pharmacy surveillance network
-                      </span>
+                      <span className="text-gray-700 dark:text-gray-300">{h.vracBullet1}</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <div className="w-2 h-2 rounded-full bg-vitality-600 mt-2 flex-shrink-0"></div>
-                      <span className="text-gray-700 dark:text-gray-300">
-                        Tracks antimalarial sales across cocoa-producing regions
-                      </span>
+                      <span className="text-gray-700 dark:text-gray-300">{h.vracBullet2}</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <div className="w-2 h-2 rounded-full bg-vitality-600 mt-2 flex-shrink-0"></div>
-                      <span className="text-gray-700 dark:text-gray-300">
-                        Real-time proxy for workforce health burden
-                      </span>
+                      <span className="text-gray-700 dark:text-gray-300">{h.vracBullet3}</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <div className="w-2 h-2 rounded-full bg-vitality-600 mt-2 flex-shrink-0"></div>
-                      <span className="text-gray-700 dark:text-gray-300">
-                        Complements satellite and weather data
-                      </span>
+                      <span className="text-gray-700 dark:text-gray-300">{h.vracBullet4}</span>
                     </li>
                   </ul>
                 </div>
@@ -178,7 +123,7 @@ export default function HealthImpactOverview() {
             <div className="flex items-center gap-3 mb-6">
               <AlertCircle className="h-8 w-8 text-orange-600" />
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Case Study: Gontougo Malaria Surge
+                {h.caseStudyTitle}
               </h2>
             </div>
             
@@ -186,7 +131,7 @@ export default function HealthImpactOverview() {
               <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur">
                 <CardContent className="p-6">
                   <div className="text-4xl font-bold text-red-600 mb-2">10x</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Antimalarial Surge</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{h.antimalarialSurge}</div>
                   <div className="text-xs text-gray-500 dark:text-gray-500">Aug-Dec 2024</div>
                 </CardContent>
               </Card>
@@ -194,39 +139,36 @@ export default function HealthImpactOverview() {
               <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur">
                 <CardContent className="p-6">
                   <div className="text-4xl font-bold text-orange-600 mb-2">24%</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Production Decline</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-500">Cocoa harvest</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{h.productionDecline}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-500">{h.cocoaHarvest}</div>
                 </CardContent>
               </Card>
               
               <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur">
                 <CardContent className="p-6">
                   <div className="text-4xl font-bold text-yellow-600 mb-2">3-4</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Week Lag</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-500">Health → Production</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{h.weekLag}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-500">{h.healthToProduction}</div>
                 </CardContent>
               </Card>
             </div>
 
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-              The Gontougo region experienced a dramatic malaria surge between August and December 2024, 
-              with antimalarial sales spiking to <strong>10 times normal levels</strong>. Three to four weeks later, 
-              cocoa production declined by <strong>24%</strong> — a clear demonstration of how workforce health 
-              directly impacts agricultural output.
+              {h.caseStudyBody}
             </p>
 
             <div className="flex flex-wrap gap-4">
               <Button asChild variant="primary" size="lg">
                 <Link to="/map" className="flex items-center gap-2">
                   <MapPin className="h-5 w-5" />
-                  View Regional Map
+                  {h.viewRegionalMap}
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
               <Button asChild variant="secondary" size="lg">
                 <Link to="/vrac" className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  Health Intelligence Dashboard
+                  {h.healthIntelligenceDashboard}
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
@@ -237,7 +179,7 @@ export default function HealthImpactOverview() {
         {/* Key Features Section */}
         <section className="mb-16">
           <h2 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">
-            Platform Features
+            {h.platformFeatures}
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             {keyFeatures.map((feature) => {
@@ -278,25 +220,25 @@ export default function HealthImpactOverview() {
             <CardContent className="p-8 md:p-12">
               <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-3">
                 <Shield className="h-8 w-8 text-wellness-600" />
-                Business Value
+                {h.businessValue}
               </h2>
               <div className="grid md:grid-cols-3 gap-8">
                 <div>
                   <Target className="h-10 w-10 text-wellness-600 mb-4" />
                   <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-                    For Commodity Traders
+                    {h.forCommodityTraders}
                   </h3>
                   <p className="text-gray-700 dark:text-gray-300">
-                    Early warning signals for supply disruptions, enabling proactive hedging and logistics planning.
+                    {h.forCommodityTradersDesc}
                   </p>
                 </div>
                 <div>
                   <LineChart className="h-10 w-10 text-wellness-600 mb-4" />
                   <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-                    For Processors
+                    {h.forProcessors}
                   </h3>
                   <p className="text-gray-700 dark:text-gray-300">
-                    Better understanding of upstream production capacity and quality variability by region.
+                    {h.forProcessorsDesc}
                   </p>
                 </div>
                 <div>
@@ -319,7 +261,7 @@ export default function HealthImpactOverview() {
             Partnership Opportunities
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {partnerships.map((partner) => (
+            {h.partnerships.map((partner) => (
               <Card key={partner.name} className="text-center hover:shadow-lg transition-all">
                 <CardContent className="p-6">
                   <MapPin className="h-8 w-8 text-blue-600 mx-auto mb-4" />

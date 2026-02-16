@@ -157,6 +157,7 @@ export default function DirectoryPage() {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         setError(errorMessage);
+        setRecords([]);
         console.error('Error fetching directory records:', err);
       } finally {
         setLoading(false);

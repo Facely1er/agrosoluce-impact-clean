@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Package, Award, MapPin, Building2, CheckCircle, Clock, Phone, Mail } from 'lucide-react';
+import { Package, Award, MapPin, Building2, CheckCircle, Clock, Phone, Mail, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Cooperative, Product } from '@/types';
 import { getProducts } from '@/features/products/api/productsApi';
 
@@ -11,6 +11,7 @@ export default function CooperativeStats({ cooperative }: CooperativeStatsProps)
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [productsError, setProductsError] = useState<string | null>(null);
+  const [contactExpanded, setContactExpanded] = useState(false);
 
   useEffect(() => {
     async function loadProducts() {
@@ -177,49 +178,62 @@ export default function CooperativeStats({ cooperative }: CooperativeStatsProps)
         </div>
       </div>
 
-      {/* Contact Information */}
+      {/* Contact Information — gated: collapsed by default, expand to reveal */}
       {(cooperative.phone || cooperative.email || cooperative.primaryPhoneE164) && (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <Phone className="h-5 w-5 text-secondary-600" />
-            Informations de Contact
-          </h3>
-          <div className="space-y-3">
-            {cooperative.primaryPhoneE164 && (
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-gray-400" />
-                <a 
-                  href={`tel:${cooperative.primaryPhoneE164}`}
-                  className="text-secondary-600 hover:text-secondary-700 font-medium"
-                >
-                  {cooperative.primaryPhoneE164}
-                </a>
-              </div>
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setContactExpanded((prev) => !prev)}
+            className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Phone className="h-5 w-5 text-secondary-600" />
+              Informations de Contact
+            </h3>
+            {contactExpanded ? (
+              <ChevronUp className="h-5 w-5 text-gray-500" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-gray-500" />
             )}
-            {cooperative.phone && cooperative.phone !== cooperative.primaryPhoneE164 && (
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-900">{cooperative.phone}</span>
-              </div>
-            )}
-            {cooperative.email && (
-              <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-gray-400" />
-                <a 
-                  href={`mailto:${cooperative.email}`}
-                  className="text-secondary-600 hover:text-secondary-700 font-medium"
-                >
-                  {cooperative.email}
-                </a>
-              </div>
-            )}
-            {cooperative.address && (
-              <div className="flex items-start gap-3">
-                <MapPin className="h-4 w-4 text-gray-400 mt-0.5" />
-                <span className="text-gray-900">{cooperative.address}</span>
-              </div>
-            )}
-          </div>
+          </button>
+          {contactExpanded && (
+            <div className="px-6 pb-6 pt-0 space-y-3 border-t border-gray-100">
+              {cooperative.primaryPhoneE164 && (
+                <div className="flex items-center gap-3">
+                  <Phone className="h-4 w-4 text-gray-400" />
+                  <a 
+                    href={`tel:${cooperative.primaryPhoneE164}`}
+                    className="text-secondary-600 hover:text-secondary-700 font-medium"
+                  >
+                    {cooperative.primaryPhoneE164}
+                  </a>
+                </div>
+              )}
+              {cooperative.phone && cooperative.phone !== cooperative.primaryPhoneE164 && (
+                <div className="flex items-center gap-3">
+                  <Phone className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-900">{cooperative.phone}</span>
+                </div>
+              )}
+              {cooperative.email && (
+                <div className="flex items-center gap-3">
+                  <Mail className="h-4 w-4 text-gray-400" />
+                  <a 
+                    href={`mailto:${cooperative.email}`}
+                    className="text-secondary-600 hover:text-secondary-700 font-medium"
+                  >
+                    {cooperative.email}
+                  </a>
+                </div>
+              )}
+              {cooperative.address && (
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-4 w-4 text-gray-400 mt-0.5" />
+                  <span className="text-gray-900">{cooperative.address}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -238,8 +252,7 @@ export default function CooperativeStats({ cooperative }: CooperativeStatsProps)
                   <div className="flex items-center gap-3">
                     <div className="w-32 bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-secondary-500 h-2 rounded-full"
-                        style={{ width: `${(count / products.length) * 100}%` }}
+                        className={`bg-secondary-500 h-2 rounded-full coop-stats-progress-fill coop-stats-progress-${Math.min(100, Math.round((count / products.length) * 100 / 10) * 10)}`}
                       />
                     </div>
                     <span className="text-sm font-semibold text-gray-900 w-8 text-right">

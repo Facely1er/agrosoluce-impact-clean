@@ -257,7 +257,7 @@ export default function Navbar() {
               <button
                 onClick={toggleTheme}
                 className="flex items-center justify-center w-10 h-10 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
-                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                aria-label={theme === 'light' ? t.nav.themeDark : t.nav.themeLight}
                 title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
               >
                 {theme === 'light' ? (
@@ -273,7 +273,7 @@ export default function Navbar() {
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
-                aria-label="Change language"
+                aria-label={t.nav.changeLanguage}
               >
                 <Globe className="h-4 w-4" />
                 <span className="uppercase font-semibold">{language}</span>
@@ -294,7 +294,7 @@ export default function Navbar() {
                           : 'text-gray-700 dark:text-gray-300'
                       }`}
                     >
-                      🇬🇧 English
+                      {t.nav.english}
                     </button>
                     <button
                       onClick={() => toggleLanguage('fr')}
@@ -304,7 +304,7 @@ export default function Navbar() {
                           : 'text-gray-700 dark:text-gray-300'
                       }`}
                     >
-                      🇫🇷 Français
+                      {t.nav.french}
                     </button>
                   </div>
                 </>
@@ -316,7 +316,7 @@ export default function Navbar() {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-label={mobileMenuOpen ? t.nav.closeMenu : t.nav.openMenu}
           >
             {mobileMenuOpen ? (
               <X className="h-6 w-6" />
@@ -416,7 +416,7 @@ export default function Navbar() {
                   }}
                   className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
-                  {theme === 'light' ? 'Dark' : 'Light'}
+                  {theme === 'light' ? t.nav.themeDark : t.nav.themeLight}
                 </button>
               </div>
             </div>
@@ -439,7 +439,7 @@ export default function Navbar() {
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
-                  🇬🇧 EN
+                  {t.nav.enShort}
                 </button>
                 <button
                   onClick={() => {
@@ -452,7 +452,7 @@ export default function Navbar() {
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
-                  🇫🇷 FR
+                  {t.nav.frShort}
                 </button>
               </div>
             </div>

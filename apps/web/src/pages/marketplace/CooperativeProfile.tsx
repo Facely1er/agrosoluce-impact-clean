@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapPin, Building2, Phone, User, ArrowLeft, CheckCircle, Clock, BarChart3, Users, Shield, AlertTriangle, FileCheck, BookOpen } from 'lucide-react';
+import { MapPin, Building2, Phone, User, CheckCircle, Clock, BarChart3, Users, Shield, AlertTriangle, FileCheck, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { useCooperatives } from '@/hooks/useCooperatives';
 import CooperativeLocationMap from '@/features/cooperatives/components/CooperativeLocationMap';
 import CooperativeStats from '@/features/cooperatives/components/CooperativeStats';
@@ -12,6 +12,7 @@ export default function CooperativeProfile() {
   const { cooperatives, loading } = useCooperatives();
   const [activeTab, setActiveTab] = useState<'details' | 'map' | 'stats'>('details');
   const [farmerCount, setFarmerCount] = useState<number | null>(null);
+  const [contactExpanded, setContactExpanded] = useState(false);
 
   // Support both UUID (string) and legacy numeric IDs
   const cooperative = cooperatives.find(c => {
@@ -201,52 +202,70 @@ export default function CooperativeProfile() {
                   </div>
 
                   <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-500 mb-1">Contact</h3>
-                      <div className="space-y-3">
-                        {cooperative.president && (
-                          <div className="flex items-start gap-3">
-                            <User className="h-5 w-5 text-gray-400 mt-0.5" />
-                            <div>
-                              <div className="text-sm text-gray-500">Président</div>
-                              <div className="font-medium text-gray-900">{cooperative.president}</div>
-                            </div>
-                          </div>
-                        )}
-                        {cooperative.primaryPhoneE164 && (
-                          <div className="flex items-start gap-3">
-                            <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
-                            <div>
-                              <div className="text-sm text-gray-500">Téléphone</div>
-                              <div className="font-medium text-gray-900">{cooperative.primaryPhoneE164}</div>
-                            </div>
-                          </div>
-                        )}
-                        {cooperative.email && (
-                          <div className="flex items-start gap-3">
-                            <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
-                            <div>
-                              <div className="text-sm text-gray-500">Email</div>
-                              <a 
-                                href={`mailto:${cooperative.email}`}
-                                className="font-medium text-secondary-600 hover:text-secondary-700"
-                              >
-                                {cooperative.email}
-                              </a>
-                            </div>
-                          </div>
-                        )}
-                        {cooperative.address && (
-                          <div className="flex items-start gap-3">
-                            <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
-                            <div>
-                              <div className="text-sm text-gray-500">Adresse</div>
-                              <div className="font-medium text-gray-900">{cooperative.address}</div>
-                            </div>
+                    {(cooperative.president || cooperative.primaryPhoneE164 || cooperative.email || cooperative.address) && (
+                      <div className="border border-gray-200 rounded-lg overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setContactExpanded((prev) => !prev)}
+                          className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                        >
+                          <h3 className="text-sm font-semibold text-gray-500 flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-gray-400" />
+                            Contact
+                          </h3>
+                          {contactExpanded ? (
+                            <ChevronUp className="h-4 w-4 text-gray-400" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 text-gray-400" />
+                          )}
+                        </button>
+                        {contactExpanded && (
+                          <div className="px-4 pb-4 pt-0 space-y-3 border-t border-gray-100">
+                            {cooperative.president && (
+                              <div className="flex items-start gap-3">
+                                <User className="h-5 w-5 text-gray-400 mt-0.5" />
+                                <div>
+                                  <div className="text-sm text-gray-500">Président</div>
+                                  <div className="font-medium text-gray-900">{cooperative.president}</div>
+                                </div>
+                              </div>
+                            )}
+                            {cooperative.primaryPhoneE164 && (
+                              <div className="flex items-start gap-3">
+                                <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
+                                <div>
+                                  <div className="text-sm text-gray-500">Téléphone</div>
+                                  <div className="font-medium text-gray-900">{cooperative.primaryPhoneE164}</div>
+                                </div>
+                              </div>
+                            )}
+                            {cooperative.email && (
+                              <div className="flex items-start gap-3">
+                                <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
+                                <div>
+                                  <div className="text-sm text-gray-500">Email</div>
+                                  <a 
+                                    href={`mailto:${cooperative.email}`}
+                                    className="font-medium text-secondary-600 hover:text-secondary-700"
+                                  >
+                                    {cooperative.email}
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                            {cooperative.address && (
+                              <div className="flex items-start gap-3">
+                                <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
+                                <div>
+                                  <div className="text-sm text-gray-500">Adresse</div>
+                                  <div className="font-medium text-gray-900">{cooperative.address}</div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 

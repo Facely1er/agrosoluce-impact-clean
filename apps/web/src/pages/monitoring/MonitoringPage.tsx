@@ -17,15 +17,17 @@ import {
   MapPin
 } from 'lucide-react';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export default function MonitoringPage() {
+  const { t } = useI18n();
   return (
     <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 dark:from-gray-900 via-primary-50 dark:via-gray-900 to-white dark:to-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Monitoring', path: '/monitoring' }
+          { label: t.nav.home, path: '/' },
+          { label: t.monitoring.breadcrumb, path: '/monitoring' }
         ]} />
 
         {/* Hero Section */}
@@ -36,18 +38,16 @@ export default function MonitoringPage() {
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="h-8 w-8 text-white/90" />
-              <span className="text-sm font-semibold text-white/80 uppercase tracking-wider">Compliance & Monitoring</span>
+              <span className="text-sm font-semibold text-white/80 uppercase tracking-wider">{t.monitoring.badge}</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-              Child Labor Monitoring & Compliance
+              {t.monitoring.title}
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-6 max-w-3xl">
-              Track documentation, self-assessments, and improvement efforts across agricultural cooperatives
+              {t.monitoring.subtitle}
             </p>
             <p className="text-base text-white/80 max-w-3xl mb-6 leading-relaxed">
-              AgroSoluce™ supports learning, monitoring, and improvement — not marketing narratives. 
-              Our monitoring platform helps cooperatives, buyers, and partners track child labor prevention 
-              efforts, documentation coverage, and compliance readiness across supply chains.
+              {t.monitoring.intro}
             </p>
             <div className="flex flex-wrap gap-4 mt-6">
               <Link
@@ -55,7 +55,7 @@ export default function MonitoringPage() {
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-all border border-white/30 font-medium"
               >
                 <BarChart3 className="h-5 w-5" />
-                View Dashboard
+                {t.monitoring.viewDashboard}
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
@@ -63,7 +63,7 @@ export default function MonitoringPage() {
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all border border-white/20 font-medium"
               >
                 <FileCheck className="h-5 w-5" />
-                New Assessment
+                {t.monitoring.newAssessment}
               </Link>
             </div>
           </div>
@@ -75,10 +75,9 @@ export default function MonitoringPage() {
             <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center mb-4">
               <BarChart3 className="h-6 w-6 text-primary-600 dark:text-primary-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Documentation Tracking</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t.monitoring.documentationTracking}</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              Monitor documentation coverage rates, track self-assessment scores, and identify gaps 
-              in compliance readiness across cooperatives.
+              {t.monitoring.documentationTrackingDesc}
             </p>
           </div>
 
@@ -86,10 +85,9 @@ export default function MonitoringPage() {
             <div className="w-12 h-12 bg-secondary-100 dark:bg-secondary-900/30 rounded-lg flex items-center justify-center mb-4">
               <Users className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Farmer Engagement</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t.monitoring.farmerEngagement}</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              Track farmer-level activities at cooperative scale, including training participation, 
-              declarations, and baseline indicators.
+              {t.monitoring.farmerEngagementDesc}
             </p>
           </div>
 
@@ -97,10 +95,9 @@ export default function MonitoringPage() {
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4">
               <TrendingUp className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Progress Monitoring</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t.monitoring.progressMonitoring}</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              Record readiness snapshots, track visible improvements, and monitor remaining gaps 
-              over time to support continuous improvement.
+              {t.monitoring.progressMonitoringDesc}
             </p>
           </div>
 
@@ -108,10 +105,9 @@ export default function MonitoringPage() {
             <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-4">
               <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Risk Assessment</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t.monitoring.riskAssessment}</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              Identify and track child labor violations, assess severity levels, and monitor 
-              remediation efforts across regions and cooperatives.
+              {t.monitoring.riskAssessmentDesc}
             </p>
           </div>
 
@@ -119,10 +115,9 @@ export default function MonitoringPage() {
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4">
               <Award className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Certification Tracking</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t.monitoring.certificationTracking}</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              Monitor active certifications, track expiration dates, and understand certification 
-              coverage across the cooperative network.
+              {t.monitoring.certificationTrackingDesc}
             </p>
           </div>
 
@@ -130,10 +125,9 @@ export default function MonitoringPage() {
             <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4">
               <MapPin className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Regional Analysis</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t.monitoring.regionalAnalysis}</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              View assessment scores, violation patterns, and improvement trends by region to 
-              identify areas requiring focused support.
+              {t.monitoring.regionalAnalysisDesc}
             </p>
           </div>
         </div>
@@ -142,14 +136,14 @@ export default function MonitoringPage() {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-6">
             <Target className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">What You Can Monitor</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t.monitoring.whatYouCanMonitor}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Documentation Coverage Rate</h4>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{t.monitoring.documentationCoverageRate}</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
                     Percentage of cooperatives with assessment scores ≥75, indicating strong documentation coverage.
                   </p>
@@ -158,7 +152,7 @@ export default function MonitoringPage() {
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Average Readiness Score</h4>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{t.monitoring.averageReadinessScore}</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
                     Self-assessment scores (0-100 scale) indicating overall compliance readiness across cooperatives.
                   </p>

@@ -41,7 +41,8 @@ const migrations = [
   '016_farmer_declarations.sql',
   '017_add_farmer_declarations_to_buyer_view.sql',
   '018_add_evidence_type.sql',
-  '019_add_assessment_tables.sql'
+  '019_add_assessment_tables.sql',
+  '020_rename_compliance_to_readiness.sql'
 ];
 
 /**

@@ -20,7 +20,7 @@ import {
   ComplianceDashboard,
   ComplianceRating,
 } from '@/types/child-labor-monitoring-types';
-import { supabase } from '@/lib/supabase';
+import ChildLaborService from '@/services/childLaborService';
 
 // Chart components
 import {
@@ -63,27 +63,17 @@ const ChildLaborDashboard: React.FC<ChildLaborDashboardProps> = ({
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      if (!supabase) {
-        console.warn('Supabase client not initialized');
-        setLoading(false);
-        return;
-      }
+      // Uses ChildLaborService so it works without backend (returns [] when Supabase missing/fails)
+      const statuses = await ChildLaborService.getComplianceStatus();
 
-      // Fetch readiness statistics (self-assessment data)
-      const { data: statuses, error } = await supabase
-        .from('cooperative_readiness_status')
-        .select('*')
-        .order('readiness_score', { ascending: false });
+      setCooperativeStatuses(Array.isArray(statuses) ? statuses : []);
 
-      if (error) throw error;
-
-      setCooperativeStatuses(statuses || []);
-
-      // Calculate dashboard metrics
-      const metrics = calculateDashboardMetrics(statuses || []);
+      const metrics = calculateDashboardMetrics(Array.isArray(statuses) ? statuses : []);
       setDashboardData(metrics);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      setCooperativeStatuses([]);
+      setDashboardData(calculateDashboardMetrics([]));
     } finally {
       setLoading(false);
     }
