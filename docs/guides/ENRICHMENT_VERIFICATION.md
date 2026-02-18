@@ -17,6 +17,8 @@ This guide explains how to verify that database enrichment is in place and how t
 
 **Note:** If you see errors on **sections 8 or 9** (enrichment_log, market_prices, geographic_data, certification_standards), run migration `009_dataset_enrichment_guide.sql` first. Sections 1–7 and 10 use core schema and cooperatives only.
 
+**If you get "numeric field overflow"** when running `bootstrap_enrichment.sql` or when inserting/updating cooperatives, the `data_quality_score` column is too narrow for 0–100 scores. Run `packages/database/scripts/fix_data_quality_score_overflow.sql` once, then retry.
+
 ## What each section checks
 
 | Section | What it checks |
@@ -44,20 +46,15 @@ This guide explains how to verify that database enrichment is in place and how t
 
 If section 5 shows **total_cooperatives = 0** or section 10 shows **all percentages = 0**:
 
-1. **Seed cooperatives (if the table is empty)**  
-   In Supabase SQL Editor, run:  
-   `packages/database/scripts/seed_cooperatives_minimal.sql`  
-   This inserts two sample cooperatives only when the table has no rows.
-
-2. **Bootstrap enrichment**  
-   Run:  
+1. **If you already have cooperatives**  
+   Run **only** the bootstrap script in Supabase SQL Editor:  
    `packages/database/scripts/bootstrap_enrichment.sql`  
-   This sets `coverage_metrics`, `contextual_risks`, and `readiness_status` (and optionally `data_quality_score`) for cooperatives that are missing them, so section 10 shows non-zero percentages.
+   It fills `coverage_metrics`, `contextual_risks`, and `readiness_status` (and optionally `data_quality_score`) for cooperatives that are missing them. Then re-run `verify_enrichment_status.sql` to see non-zero percentages.
 
-3. **Re-run verification**  
-   Run `verify_enrichment_status.sql` again. You should see non-zero counts in section 5 and non-zero percentages in section 10.
+2. **If the cooperatives table is empty**  
+   Run `packages/database/scripts/seed_cooperatives_minimal.sql` first (inserts two sample cooperatives only when the table has no rows), then run `bootstrap_enrichment.sql`, then re-run verification.
 
-4. **Ongoing enrichment**  
+3. **Ongoing enrichment**  
    - **From the app:** Use the cooperative dashboard “Recalculer” (recalculate) to run full enrichment (farmers, plots, documents).  
    - **From SQL:** Use `packages/database/scripts/enrich_cooperatives_example.sql` for batch updates from metadata, market prices, geographic data, etc.
 

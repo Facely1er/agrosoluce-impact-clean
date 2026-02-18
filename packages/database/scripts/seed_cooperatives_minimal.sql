@@ -1,4 +1,5 @@
--- Minimal seed: insert a few cooperatives when the table is empty.
+-- Minimal seed: insert a few cooperatives only when the table is empty.
+-- Use this only if you have no cooperatives; if you already have data, run bootstrap_enrichment.sql instead.
 -- Run in Supabase SQL Editor after migrations 001 and 011 (or ALL_MIGRATIONS).
 -- Safe to run multiple times: only inserts if no cooperatives exist.
 

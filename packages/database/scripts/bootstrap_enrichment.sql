@@ -20,7 +20,8 @@ WHERE coverage_metrics IS NULL
    OR readiness_status IS NULL
    OR contextual_risks IS NULL;
 
--- 2. Optional: refresh data_quality_score via DB function (requires migration 009)
+-- 2. Optional: refresh data_quality_score via DB function (requires migration 009).
+--    If you get "numeric field overflow", run fix_data_quality_score_overflow.sql first.
 DO $$
 BEGIN
     IF EXISTS (
