@@ -116,12 +116,12 @@ SELECT 'geographic_data', COUNT(*) FROM agrosoluce.geographic_data
 UNION ALL
 SELECT 'certification_standards', COUNT(*) FROM agrosoluce.certification_standards;
 
--- 10. QUALITY SUMMARY (percent of cooperatives with enrichment data)
+-- 10. QUALITY SUMMARY (percent of cooperatives with enrichment data; 0 when no cooperatives)
 SELECT
-    ROUND(100.0 * COUNT(contextual_risks) / NULLIF(COUNT(*), 0), 1) AS pct_with_contextual_risks,
-    ROUND(100.0 * COUNT(coverage_metrics) / NULLIF(COUNT(*), 0), 1) AS pct_with_coverage_metrics,
-    ROUND(100.0 * COUNT(CASE WHEN readiness_status = 'buyer_ready' THEN 1 END) / NULLIF(COUNT(*), 0), 1) AS pct_buyer_ready,
-    ROUND(100.0 * COUNT(CASE WHEN readiness_status = 'in_progress' THEN 1 END) / NULLIF(COUNT(*), 0), 1) AS pct_in_progress
+    COALESCE(ROUND(100.0 * COUNT(contextual_risks) / NULLIF(COUNT(*), 0), 1), 0) AS pct_with_contextual_risks,
+    COALESCE(ROUND(100.0 * COUNT(coverage_metrics) / NULLIF(COUNT(*), 0), 1), 0) AS pct_with_coverage_metrics,
+    COALESCE(ROUND(100.0 * COUNT(CASE WHEN readiness_status = 'buyer_ready' THEN 1 END) / NULLIF(COUNT(*), 0), 1), 0) AS pct_buyer_ready,
+    COALESCE(ROUND(100.0 * COUNT(CASE WHEN readiness_status = 'in_progress' THEN 1 END) / NULLIF(COUNT(*), 0), 1), 0) AS pct_in_progress
 FROM agrosoluce.cooperatives;
 
 -- Verification complete. See docs/guides/ENRICHMENT_VERIFICATION.md for interpretation.
