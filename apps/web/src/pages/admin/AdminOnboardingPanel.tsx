@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Building2, Users, Clock, CheckCircle, AlertCircle,
   Mail, Phone, MapPin, RefreshCw, Eye, Filter, Search,
-  TrendingUp, ArrowRight, Shield
+  TrendingUp, ArrowRight, Shield, Link2, Copy, Check
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth/AuthContext';
@@ -33,6 +33,16 @@ interface OnboardingRecord {
   cooperative_name?: string;
 }
 
+interface DirectoryCooperative {
+  id: string;
+  name: string;
+  region: string | null;
+  department: string | null;
+  email: string | null;
+  phone: string | null;
+  user_profile_id: string | null;
+}
+
 const REQUEST_STATUS_CONFIG = {
   pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
   contacted: { label: 'Contacté', color: 'bg-blue-100 text-blue-800 border-blue-300' },
@@ -51,13 +61,15 @@ const ONBOARDING_STATUS_CONFIG = {
 export default function AdminOnboardingPanel() {
   const navigate = useNavigate();
   const { profile, loading: authLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState<'requests' | 'onboarding'>('requests');
+  const [activeTab, setActiveTab] = useState<'requests' | 'onboarding' | 'directory'>('requests');
   const [requests, setRequests] = useState<CoopRequest[]>([]);
   const [onboardings, setOnboardings] = useState<OnboardingRecord[]>([]);
+  const [directoryCoops, setDirectoryCoops] = useState<DirectoryCooperative[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Guard: redirect if not admin
   useEffect(() => {
@@ -76,7 +88,7 @@ export default function AdminOnboardingPanel() {
     setLoading(true);
     if (!supabase) { setLoading(false); return; }
 
-    const [reqResult, onbResult] = await Promise.all([
+    const [reqResult, onbResult, dirResult] = await Promise.all([
       supabase
         .from('cooperative_requests')
         .select('*')
@@ -85,6 +97,11 @@ export default function AdminOnboardingPanel() {
         .from('cooperative_onboarding')
         .select('*, cooperatives(name)')
         .order('started_at', { ascending: false }),
+      supabase
+        .from('cooperatives')
+        .select('id, name, region, department, email, phone, user_profile_id')
+        .order('name', { ascending: true })
+        .limit(500),
     ]);
 
     if (reqResult.data) setRequests(reqResult.data as CoopRequest[]);
@@ -95,6 +112,7 @@ export default function AdminOnboardingPanel() {
       }));
       setOnboardings(mapped as OnboardingRecord[]);
     }
+    if (dirResult.data) setDirectoryCoops(dirResult.data as DirectoryCooperative[]);
     setLoading(false);
   };
 
@@ -122,6 +140,32 @@ export default function AdminOnboardingPanel() {
     const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const filteredDirectory = directoryCoops.filter((c) => {
+    const matchesSearch =
+      !search ||
+      (c.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (c.region || '').toLowerCase().includes(search.toLowerCase()) ||
+      (c.email || '').toLowerCase().includes(search.toLowerCase());
+    return matchesSearch;
+  });
+
+  const buildInviteLink = (coop: DirectoryCooperative) => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const params = new URLSearchParams();
+    params.set('coop_id', coop.id);
+    params.set('name', coop.name);
+    if (coop.email) params.set('email', coop.email);
+    return `${origin}/cooperative/register?${params.toString()}`;
+  };
+
+  const handleCopyInviteLink = (coop: DirectoryCooperative) => {
+    const link = buildInviteLink(coop);
+    navigator.clipboard.writeText(link).then(() => {
+      setCopiedId(coop.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  };
 
   // Stats
   const stats = {
@@ -190,17 +234,21 @@ export default function AdminOnboardingPanel() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="border-b border-gray-200 px-6 pt-4 flex items-center justify-between gap-4 flex-wrap">
             <div className="flex gap-1">
-              {(['requests', 'onboarding'] as const).map((tab) => (
+              {[
+                { id: 'requests' as const, label: `Demandes (${requests.length})` },
+                { id: 'onboarding' as const, label: `Intégrations (${onboardings.length})` },
+                { id: 'directory' as const, label: `Répertoire (${directoryCoops.length})` },
+              ].map(({ id, label }) => (
                 <button
-                  key={tab}
-                  onClick={() => { setActiveTab(tab); setStatusFilter('all'); setSearch(''); }}
+                  key={id}
+                  onClick={() => { setActiveTab(id); setStatusFilter('all'); setSearch(''); }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === tab
+                    activeTab === id
                       ? 'bg-primary-50 text-primary-700'
                       : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
                   }`}
                 >
-                  {tab === 'requests' ? `Demandes (${requests.length})` : `Intégrations (${onboardings.length})`}
+                  {label}
                 </button>
               ))}
             </div>
@@ -215,24 +263,26 @@ export default function AdminOnboardingPanel() {
                   className="pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none w-52"
                 />
               </div>
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white"
-                  aria-label="Filtrer par statut"
-                >
-                  <option value="all">Tous les statuts</option>
-                  {activeTab === 'requests'
-                    ? Object.entries(REQUEST_STATUS_CONFIG).map(([k, v]) => (
-                        <option key={k} value={k}>{v.label}</option>
-                      ))
-                    : Object.entries(ONBOARDING_STATUS_CONFIG).map(([k, v]) => (
-                        <option key={k} value={k}>{v.label}</option>
-                      ))}
-                </select>
-              </div>
+              {activeTab !== 'directory' && (
+                <div className="relative">
+                  <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white"
+                    aria-label="Filtrer par statut"
+                  >
+                    <option value="all">Tous les statuts</option>
+                    {activeTab === 'requests'
+                      ? Object.entries(REQUEST_STATUS_CONFIG).map(([k, v]) => (
+                          <option key={k} value={k}>{v.label}</option>
+                        ))
+                      : Object.entries(ONBOARDING_STATUS_CONFIG).map(([k, v]) => (
+                          <option key={k} value={k}>{v.label}</option>
+                        ))}
+                  </select>
+                </div>
+              )}
             </div>
           </div>
 
@@ -246,8 +296,14 @@ export default function AdminOnboardingPanel() {
               updatingId={updatingId}
               onStatusChange={updateRequestStatus}
             />
-          ) : (
+          ) : activeTab === 'onboarding' ? (
             <OnboardingsTable onboardings={filteredOnboardings} />
+          ) : (
+            <DirectoryTable
+              cooperatives={filteredDirectory}
+              copiedId={copiedId}
+              onCopyInviteLink={handleCopyInviteLink}
+            />
           )}
         </div>
       </div>
@@ -429,6 +485,117 @@ function OnboardingsTable({ onboardings }: { onboardings: OnboardingRecord[] }) 
                     Voir
                     <ArrowRight className="h-3 w-3" />
                   </Link>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function DirectoryTable({
+  cooperatives,
+  copiedId,
+  onCopyInviteLink,
+}: {
+  cooperatives: DirectoryCooperative[];
+  copiedId: string | null;
+  onCopyInviteLink: (coop: DirectoryCooperative) => void;
+}) {
+  if (cooperatives.length === 0) {
+    return (
+      <div className="text-center py-16 text-gray-500">
+        <Building2 className="h-10 w-10 mx-auto mb-3 text-gray-300" />
+        <p>Aucune coopérative trouvée</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50 border-b border-gray-200">
+          <tr>
+            {['Coopérative', 'Région', 'Contact', 'Compte', 'Lien d\'invitation'].map((h) => (
+              <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {cooperatives.map((coop) => {
+            const hasAccount = !!coop.user_profile_id;
+            const justCopied = copiedId === coop.id;
+            return (
+              <tr key={coop.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-3 font-semibold text-gray-900">{coop.name}</td>
+                <td className="px-4 py-3 text-gray-600">
+                  {coop.region && (
+                    <span className="flex items-center gap-1 text-xs">
+                      <MapPin className="h-3 w-3" /> {coop.region}
+                      {coop.department ? ` · ${coop.department}` : ''}
+                    </span>
+                  )}
+                  {!coop.region && '—'}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex flex-col gap-0.5">
+                    {coop.email && (
+                      <a href={`mailto:${coop.email}`} className="flex items-center gap-1 text-xs text-blue-600 hover:underline">
+                        <Mail className="h-3 w-3" /> {coop.email}
+                      </a>
+                    )}
+                    {coop.phone && (
+                      <a href={`tel:${coop.phone}`} className="flex items-center gap-1 text-xs text-blue-600 hover:underline">
+                        <Phone className="h-3 w-3" /> {coop.phone}
+                      </a>
+                    )}
+                    {!coop.email && !coop.phone && <span className="text-gray-400 text-xs">—</span>}
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  {hasAccount ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-300">
+                      <CheckCircle className="h-3 w-3" /> Compte lié
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-300">
+                      Sans compte
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  {hasAccount ? (
+                    <span className="text-xs text-gray-400" title="Un compte est déjà lié à cette coopérative">
+                      —
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => onCopyInviteLink(coop)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        justCopied
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-primary-50 text-primary-700 hover:bg-primary-100'
+                      }`}
+                      title="Copier le lien d'invitation à envoyer à la coopérative (WhatsApp, e-mail, etc.)"
+                    >
+                      {justCopied ? (
+                        <>
+                          <Check className="h-3.5 w-3.5" />
+                          Copié !
+                        </>
+                      ) : (
+                        <>
+                          <Link2 className="h-3.5 w-3.5" />
+                          Copier le lien
+                        </>
+                      )}
+                    </button>
+                  )}
                 </td>
               </tr>
             );

@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Building2, Mail, Lock, User, Phone, Eye, EyeOff,
-  CheckCircle, AlertCircle, ArrowRight, Sprout
+  CheckCircle, AlertCircle, ArrowRight, Sprout, Link2
 } from 'lucide-react';
 import { signUp } from '@/lib/auth/authService';
 import { supabase } from '@/lib/supabase/client';
@@ -21,6 +21,11 @@ interface RegisterForm {
 
 export default function CooperativeRegister() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const prefilledCoopId = searchParams.get('coop_id') || '';
+  const prefilledName = searchParams.get('name') ? decodeURIComponent(searchParams.get('name')!) : '';
+  const prefilledEmail = searchParams.get('email') ? decodeURIComponent(searchParams.get('email')!) : '';
+
   const [step, setStep] = useState<Step>('form');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,13 +33,23 @@ export default function CooperativeRegister() {
   const [errorMsg, setErrorMsg] = useState('');
   const [form, setForm] = useState<RegisterForm>({
     fullName: '',
-    email: '',
+    email: prefilledEmail,
     phone: '',
     password: '',
     confirmPassword: '',
-    organizationName: '',
+    organizationName: prefilledName,
     agreedToTerms: false,
   });
+
+  useEffect(() => {
+    if (prefilledName || prefilledEmail) {
+      setForm((prev) => ({
+        ...prev,
+        organizationName: prefilledName || prev.organizationName,
+        email: prefilledEmail || prev.email,
+      }));
+    }
+  }, [prefilledName, prefilledEmail]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -98,34 +113,65 @@ export default function CooperativeRegister() {
       return;
     }
 
-    // Create cooperative record linked to the new user profile
-    if (newUser && newProfile && supabase) {
-      const { data: coopRecord } = await supabase
-        .from('cooperatives')
-        .insert({
-          name: form.organizationName,
-          phone: form.phone || null,
-          email: form.email,
-          user_profile_id: newProfile.id,
-          is_verified: false,
-        })
-        .select('id')
-        .single();
+    if (!newUser || !newProfile || !supabase) {
+      setStep('success');
+      setSubmitting(false);
+      return;
+    }
 
-      // Create the onboarding record immediately
-      if (coopRecord) {
-        await supabase.from('cooperative_onboarding').upsert(
-          {
-            cooperative_id: coopRecord.id,
-            status: 'in_progress',
-            current_step: 1,
-          },
-          { onConflict: 'cooperative_id', ignoreDuplicates: true }
-        );
-        // Redirect directly to the onboarding wizard
-        navigate(`/cooperative/onboarding/${coopRecord.id}`, { replace: true });
+    // Invite link: link existing cooperative to new user profile (no new cooperative created)
+    if (prefilledCoopId) {
+      const { error: updateError } = await supabase
+        .from('cooperatives')
+        .update({
+          user_profile_id: newProfile.id,
+          email: form.email || undefined,
+          phone: form.phone || undefined,
+        })
+        .eq('id', prefilledCoopId);
+
+      if (updateError) {
+        setErrorMsg(updateError.message || 'Erreur lors de la liaison du compte.');
+        setSubmitting(false);
         return;
       }
+
+      await supabase.from('cooperative_onboarding').upsert(
+        {
+          cooperative_id: prefilledCoopId,
+          status: 'in_progress',
+          current_step: 1,
+        },
+        { onConflict: 'cooperative_id', ignoreDuplicates: true }
+      );
+      navigate(`/cooperative/onboarding/${prefilledCoopId}`, { replace: true });
+      return;
+    }
+
+    // No invite link: create new cooperative and onboarding
+    const { data: coopRecord } = await supabase
+      .from('cooperatives')
+      .insert({
+        name: form.organizationName,
+        phone: form.phone || null,
+        email: form.email,
+        user_profile_id: newProfile.id,
+        is_verified: false,
+      })
+      .select('id')
+      .single();
+
+    if (coopRecord) {
+      await supabase.from('cooperative_onboarding').upsert(
+        {
+          cooperative_id: coopRecord.id,
+          status: 'in_progress',
+          current_step: 1,
+        },
+        { onConflict: 'cooperative_id', ignoreDuplicates: true }
+      );
+      navigate(`/cooperative/onboarding/${coopRecord.id}`, { replace: true });
+      return;
     }
 
     setStep('success');
@@ -173,11 +219,25 @@ export default function CooperativeRegister() {
           <div className="inline-flex items-center justify-center w-14 h-14 bg-primary-100 rounded-2xl mb-4">
             <Sprout className="h-7 w-7 text-primary-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Créer votre compte</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {prefilledCoopId ? 'Activer votre compte' : 'Créer votre compte'}
+          </h1>
           <p className="text-gray-600">
-            Inscrivez votre coopérative sur AgroSoluce® — gratuit pour la 1ère année.
+            {prefilledCoopId
+              ? 'Vous avez été invité à activer le compte de votre coopérative. Complétez le formulaire ci-dessous.'
+              : 'Inscrivez votre coopérative sur AgroSoluce® — gratuit pour la 1ère année.'}
           </p>
         </div>
+
+        {/* Invite banner */}
+        {prefilledCoopId && (
+          <div className="mb-6 flex items-center gap-3 bg-primary-50 border border-primary-200 rounded-xl px-4 py-3">
+            <Link2 className="h-5 w-5 text-primary-600 flex-shrink-0" />
+            <p className="text-sm text-primary-800">
+              Lien d'invitation reçu — la coopérative est déjà identifiée. Validez l'accès en créant votre mot de passe.
+            </p>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-5">
@@ -193,10 +253,13 @@ export default function CooperativeRegister() {
                 name="organizationName"
                 type="text"
                 required
+                readOnly={!!prefilledCoopId}
                 value={form.organizationName}
                 onChange={handleChange}
                 placeholder="Nom officiel de votre coopérative"
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+                className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${
+                  prefilledCoopId ? 'bg-gray-50 cursor-not-allowed' : ''
+                }`}
               />
             </div>
           </div>
