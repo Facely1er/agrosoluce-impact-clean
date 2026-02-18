@@ -32,17 +32,17 @@ export default function CooperativeSpaceLanding() {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/cooperatives"
+              to="/cooperative/request-access"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-all shadow-lg hover:shadow-xl"
             >
-              {t.cooperativeSpace.cta.findCooperative}
+              Demander l'accès gratuit
               <ArrowRight className="h-5 w-5" />
             </Link>
             <Link
-              to="/directory"
+              to="/cooperative/register"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary-600 rounded-xl font-semibold border-2 border-primary-200 hover:border-primary-400 hover:bg-primary-50 transition-all"
             >
-              Explorer le répertoire
+              J'ai déjà une invitation →
             </Link>
           </div>
         </div>
@@ -207,17 +207,17 @@ export default function CooperativeSpaceLanding() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/cooperatives"
+              to="/cooperative/request-access"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary-600 rounded-xl font-semibold hover:bg-gray-100 transition-colors shadow-lg"
             >
-              {t.cooperativeSpace.cta.findCooperative}
+              Demander l'accès gratuit
               <ArrowRight className="h-5 w-5" />
             </Link>
             <Link
-              to="/"
+              to="/cooperative/register"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold hover:bg-white/20 transition-colors border border-white/20"
             >
-              {t.cooperativeSpace.cta.learnMore}
+              Créer mon compte →
             </Link>
           </div>
           <p className="text-sm text-white/80 mt-6">

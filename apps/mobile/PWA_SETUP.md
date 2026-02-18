@@ -8,7 +8,7 @@ The mobile app is now configured as a **Progressive Web App (PWA)** that is comp
 
 **This mobile app serves a DIFFERENT purpose than the web app:**
 - **Mobile App**: Field Intelligence & Operations Platform (ERMITS team, cooperative managers, farmers)
-- **Web App**: B2B Marketplace Platform (buyers, cooperatives, directory)
+- **Web App**: Cooperative Management Platform (buyers, cooperatives, directory)
 
 See `PURPOSE.md` for detailed comparison.
 

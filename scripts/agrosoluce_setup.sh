@@ -4,7 +4,7 @@
 
 set -e  # Exit on any error
 
-echo "🌾 AgroSoluce® Marketplace Development Setup"
+echo "🌾 AgroSoluce® Platform Development Setup"
 echo "=============================================="
 echo "Setting up your complete development environment..."
 echo ""
@@ -12,8 +12,8 @@ echo ""
 # Check if running in correct directory
 if [ ! -f "package.json" ]; then
     echo "📁 Creating new project directory..."
-    mkdir -p agrosoluce-marketplace
-    cd agrosoluce-marketplace
+    mkdir -p agrosoluce-platform
+    cd agrosoluce-platform
 fi
 
 # GitHub Token Setup (set YOUR_GITHUB_TOKEN or use: gh auth login)
@@ -698,16 +698,16 @@ export function HomePage() {
               Connecting West African farmers with global buyers
             </p>
             <p className="text-lg mb-10 text-green-200 max-w-3xl mx-auto">
-              The secure agricultural marketplace platform that transforms farming 
+              The Cooperative Management Platform that transforms farming 
               communities through verified connections, compliance automation, 
-              and fair trade opportunities.
+              and documentation support.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth" className="bg-white text-agriculture-green px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
                 Join as Cooperative
               </Link>
               <Link to="/auth" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-agriculture-green transition-colors">
-                Find Suppliers
+                Explore Cooperatives
               </Link>
             </div>
           </div>
@@ -747,8 +747,8 @@ export function HomePage() {
               <div className="w-16 h-16 bg-agriculture-green rounded-full flex items-center justify-center mx-auto mb-4">
                 <Globe className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Global Marketplace</h3>
-              <p className="text-gray-600">Connect with international buyers seeking quality agricultural products</p>
+              <h3 className="text-xl font-semibold mb-2">Buyer Connections</h3>
+              <p className="text-gray-600">Connect with buyers seeking quality agricultural products and documentation-ready cooperatives</p>
             </div>
 
             <div className="text-center">
@@ -849,7 +849,7 @@ export function AuthPage() {
             {isSignUp ? 'Create Account' : 'Sign In'}
           </h2>
           <p className="mt-2 text-gray-600">
-            {isSignUp ? 'Join the AgroSoluce marketplace' : 'Access your account'}
+            {isSignUp ? 'Join AgroSoluce' : 'Access your account'}
           </p>
         </div>
         
@@ -935,7 +935,7 @@ export function CooperativePortal() {
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="card">
             <h3 className="font-semibold text-gray-900 mb-2">Products</h3>
-            <p className="text-gray-600 text-sm">Manage your product listings</p>
+            <p className="text-gray-600 text-sm">Manage your cooperative profile</p>
           </div>
           <div className="card">
             <h3 className="font-semibold text-gray-900 mb-2">Orders</h3>
@@ -982,7 +982,7 @@ export function BuyerPortal() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Find Suppliers</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Explore Cooperatives</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {cooperatives?.map((cooperative) => (
@@ -1031,21 +1031,21 @@ npm pkg set scripts.lint="eslint . --ext ts,tsx --report-unused-disable-directiv
 
 # Create README
 cat > README.md << 'EOF'
-# 🌾 AgroSoluce® - Agricultural Marketplace Platform
+# 🌾 AgroSoluce® - Cooperative Management Platform
 
 > Cultivating Secure Agriculture through verified connections and compliance automation
 
 ## Overview
 
-AgroSoluce is the leading agricultural marketplace platform that connects 3,797+ verified Côte d'Ivoire cooperatives with international buyers while providing comprehensive cybersecurity, compliance, and financial services.
+AgroSoluce is the Cooperative Management Platform that connects 3,797+ verified Côte d'Ivoire cooperatives with buyers while providing documentation support, compliance tools, and buyer-cooperative matching.
 
 ## Features
 
 - **Verified Cooperatives**: 3,797+ pre-verified agricultural cooperatives
 - **EUDR Compliance**: Automated compliance verification for EU Deforestation Regulation
-- **Global Marketplace**: Connect with international buyers seeking quality products
-- **Secure Transactions**: Escrow system with mobile money integration
-- **Real-time Matching**: AI-powered buyer-seller connections
+- **Buyer Connections**: Connect with buyers seeking quality products and documentation-ready cooperatives
+- **Documentation Support**: Evidence management and due diligence tools
+- **Buyer-Cooperative Matching**: Match buyer requests with cooperatives based on requirements
 - **Mobile-First**: Progressive web app with offline capabilities
 
 ## Technology Stack
@@ -1068,8 +1068,8 @@ AgroSoluce is the leading agricultural marketplace platform that connects 3,797+
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Facely1er/agrosoluce-marketplace.git
-cd agrosoluce-marketplace
+git clone https://github.com/Facely1er/agrosoluce-impact-clean.git
+cd agrosoluce-impact-clean
 ```
 
 2. Install dependencies:

@@ -50,3 +50,11 @@ All references to "MarketplaceHome" have been removed. The application now corre
 ## Status
 ✅ **Complete** - All incorrect "marketplace" references have been corrected.
 
+## Additional Fixes (2026-02-18)
+
+See `docs/MARKETPLACE_LANGUAGE_FIXES.md` for a comprehensive list of additional marketplace language fixes applied across:
+- `packages/types`, database migrations, setup script
+- `matchingService.ts` (Buyer-Seller → Buyer-Cooperative)
+- Mobile app docs (README, PURPOSE, PWA_SETUP, App.tsx)
+- Deployment documentation
+

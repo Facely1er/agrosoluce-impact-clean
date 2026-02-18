@@ -1,5 +1,5 @@
 -- Migration: Initial Agrosoluce Schema Setup
--- This migration creates the initial database schema for the Agrosoluce marketplace
+-- This migration creates the initial database schema for the AgroSoluce Cooperative Management Platform
 -- Uses the 'agrosoluce' schema to avoid conflicts with other projects
 
 -- =============================================
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS agrosoluce.migrations (
 
 -- Insert this migration record
 INSERT INTO agrosoluce.migrations (migration_name, description) 
-VALUES ('001_initial_schema_setup', 'Initial Agrosoluce marketplace schema setup')
+VALUES ('001_initial_schema_setup', 'Initial AgroSoluce Cooperative Management Platform schema setup')
 ON CONFLICT (migration_name) DO NOTHING;
 
 -- =============================================
@@ -318,7 +318,7 @@ ON CONFLICT (name) DO NOTHING;
 -- COMMENTS AND DOCUMENTATION
 -- =============================================
 
-COMMENT ON SCHEMA agrosoluce IS 'Agrosoluce Marketplace - Agricultural marketplace platform for West African cooperatives';
+COMMENT ON SCHEMA agrosoluce IS 'AgroSoluce Cooperative Management Platform - Documentation, compliance, and buyer-cooperative matching for West African cooperatives';
 COMMENT ON TABLE agrosoluce.cooperatives IS 'Cooperative organizations and their information';
 COMMENT ON TABLE agrosoluce.products IS 'Products listed by cooperatives';
 COMMENT ON TABLE agrosoluce.orders IS 'Orders placed by buyers';

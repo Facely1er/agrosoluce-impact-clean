@@ -63,7 +63,7 @@ export default function AggregatedDashboardPage() {
   const regionFromUrl = searchParams.get('region');
   const [selectedCountry, setSelectedCountry] = useState<string>('CI');
   const [selectedRegion, setSelectedRegion] = useState<string>(regionFromUrl || 'all');
-  const [selectedCommodity, setSelectedCommodity] = useState<EudrCommodity | 'all'>('cocoa');
+  const [selectedCommodity, setSelectedCommodity] = useState<EudrCommodity | 'all'>('all');
   const [viewMode, setViewMode] = useState<'map' | 'grid' | 'list'>('map');
 
   useEffect(() => {
@@ -208,14 +208,14 @@ export default function AggregatedDashboardPage() {
   const clearFilters = () => {
     setSelectedCountry('CI');
     setSelectedRegion('all');
-    setSelectedCommodity(availableCommodities.includes('cocoa') ? 'cocoa' : availableCommodities[0] || 'all');
+    setSelectedCommodity('all');
     setSearchParams({}, { replace: true });
   };
 
   const hasActiveFilters =
     selectedCountry !== 'CI' ||
     selectedRegion !== 'all' ||
-    (selectedCommodity !== 'cocoa' && selectedCommodity !== 'all');
+    selectedCommodity !== 'all';
 
   const isDrillDown = selectedRegion !== 'all';
 

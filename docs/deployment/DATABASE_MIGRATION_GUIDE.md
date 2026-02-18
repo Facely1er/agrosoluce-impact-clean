@@ -1,6 +1,6 @@
 # 🗄️ AgroSoluce Database Migration Guide
 
-This guide explains how to run database migrations for the AgroSoluce marketplace platform.
+This guide explains how to run database migrations for the AgroSoluce Cooperative Management Platform.
 
 ## 📋 Overview
 

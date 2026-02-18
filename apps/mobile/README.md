@@ -12,10 +12,10 @@
 **This mobile app serves a DIFFERENT purpose than the web application:**
 
 ### Web App (apps/web)
-- **Purpose**: B2B Marketplace Platform
+- **Purpose**: Cooperative Management Platform
 - **Users**: Buyers, Cooperatives (web interface)
-- **Features**: Directory browsing, buyer portal, cooperative profiles, marketplace transactions
-- **Use Case**: Desktop/web-based trading platform
+- **Features**: Directory browsing, buyer portal, cooperative profiles, buyer-cooperative matching
+- **Use Case**: Desktop/web-based platform for documentation, compliance, and buyer connections
 
 ### Mobile App (apps/mobile) 
 - **Purpose**: Field Intelligence & Operations Platform

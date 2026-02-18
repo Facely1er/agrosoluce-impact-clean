@@ -34,27 +34,27 @@ The mobile app and web app serve **completely different purposes** and user base
 
 ---
 
-## 🌐 Web App: B2B Marketplace Platform
+## 🌐 Web App: Cooperative Management Platform
 
-**Purpose**: Trading platform connecting cooperatives with international buyers
+**Purpose**: Platform for documentation, compliance, and buyer-cooperative connections
 
 **Target Users**:
-- International buyers
+- Buyers (sourcing teams)
 - Cooperative representatives (web interface)
 - General public browsing directory
 
 **Key Features**:
 - Cooperative directory
 - Buyer portal
-- Marketplace transactions
+- Buyer-cooperative matching
 - Profile browsing
 - Request management
 - Web-based interface
 
 **Use Cases**:
 - Buyers searching for cooperatives
-- Cooperatives showcasing their profiles
-- Marketplace transactions
+- Cooperatives showcasing their profiles and documentation readiness
+- Buyer-cooperative matching and connections
 - Directory browsing
 
 ---
@@ -63,18 +63,18 @@ The mobile app and web app serve **completely different purposes** and user base
 
 | Aspect | Mobile App | Web App |
 |--------|-----------|---------|
-| **Primary Purpose** | Field operations & intelligence | B2B marketplace |
+| **Primary Purpose** | Field operations & intelligence | Cooperative Management Platform |
 | **User Base** | ERMITS team, Cooperative managers, Farmers | Buyers, Cooperative web users |
 | **Interface** | Mobile-first, offline-capable | Desktop/web-optimized |
-| **Key Feature** | Offline-first, voice-guided | Marketplace, directory |
+| **Key Feature** | Offline-first, voice-guided | Directory, buyer portal |
 | **Deployment** | PWA (installable) | Web application |
-| **Use Case** | Field work, monitoring | Trading, browsing |
+| **Use Case** | Field work, monitoring | Browsing, buyer connections |
 
 ---
 
 ## ✅ Why Separate Applications?
 
-1. **Different User Needs**: Field workers need offline access, voice guidance, and mobile-optimized interfaces. Marketplace users need rich web interfaces for browsing and transactions.
+1. **Different User Needs**: Field workers need offline access, voice guidance, and mobile-optimized interfaces. Web platform users need rich web interfaces for browsing cooperatives and managing buyer connections.
 
 2. **Different Technical Requirements**: 
    - Mobile: Offline-first, GPS, camera, voice input
@@ -82,7 +82,7 @@ The mobile app and web app serve **completely different purposes** and user base
 
 3. **Different Development Priorities**: 
    - Mobile: Field usability, offline sync, multi-language
-   - Web: Marketplace features, buyer experience, SEO
+   - Web: Platform features, buyer experience, SEO
 
 4. **Independent Deployment**: Can be deployed and updated independently based on different user needs.
 

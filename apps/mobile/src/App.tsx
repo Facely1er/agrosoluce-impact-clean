@@ -4,7 +4,7 @@
  * Field Intelligence & Operations Platform
  * 
  * DIFFERENT PURPOSE FROM WEB APP:
- * - Web App: B2B Marketplace (buyers, cooperatives, directory)
+ * - Web App: Cooperative Management Platform (buyers, cooperatives, directory)
  * - Mobile App: Field Intelligence (ERMITS team, cooperative managers, farmers)
  * 
  * Three-Tier Interface:

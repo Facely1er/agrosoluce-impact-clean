@@ -1,5 +1,5 @@
-// Buyer-Seller Matching Service
-// Matches buyers with suppliers based on requirements
+// Buyer-Cooperative Matching Service
+// Matches buyer requests with cooperatives based on requirements
 
 import { getProducts } from '@/features/products/api/productsApi';
 import { getCertifications } from '@/features/compliance/api/complianceApi';
@@ -24,7 +24,7 @@ export interface MatchResult {
 }
 
 /**
- * Find suppliers matching buyer requirements
+ * Find cooperatives matching buyer requirements
  */
 export async function findSuppliers(
   requirements: BuyerRequirements,
@@ -152,7 +152,7 @@ async function scoreMatch(
 }
 
 /**
- * Find buyers for a supplier's products
+ * Find buyers for a cooperative's products (reserved for future use)
  */
 export async function findBuyers(
   _product: Product, // Reserved for future implementation

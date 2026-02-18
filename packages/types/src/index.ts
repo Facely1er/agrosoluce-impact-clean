@@ -1,4 +1,4 @@
-// Core types for AgroSoluce Marketplace
+// Core types for AgroSoluce Cooperative Management Platform
 // Shared types used across apps
 
 // Re-export all core types

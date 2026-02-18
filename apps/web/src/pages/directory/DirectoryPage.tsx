@@ -103,7 +103,7 @@ export default function DirectoryPage() {
   // Default: Cocoa, CI (Côte d'Ivoire), All regions, All coverage levels
   // Check URL params for region filter from map clicks
   const regionFromUrl = searchParams.get('region');
-  const [selectedCommodity, setSelectedCommodity] = useState<EudrCommodity | 'all'>('cocoa');
+  const [selectedCommodity, setSelectedCommodity] = useState<EudrCommodity | 'all'>('all');
   const [selectedCountry, setSelectedCountry] = useState<string>('CI'); // Côte d'Ivoire as v1 default
   const [selectedRegion, setSelectedRegion] = useState<string>(regionFromUrl || 'all');
   const [selectedCoverage, setSelectedCoverage] = useState<CoverageBand | 'all'>('all');
@@ -208,10 +208,13 @@ export default function DirectoryPage() {
     });
   }, [records]);
 
-  // Adjust default commodity if 'cocoa' is not available
+  // Adjust selected commodity if it's no longer in available list (e.g. after filter change)
   useEffect(() => {
-    if (availableCommodities.length > 0 && selectedCommodity === 'cocoa' && !availableCommodities.includes('cocoa')) {
-      // If cocoa is not available, default to first available commodity
+    if (
+      selectedCommodity !== 'all' &&
+      availableCommodities.length > 0 &&
+      !availableCommodities.includes(selectedCommodity)
+    ) {
       setSelectedCommodity(availableCommodities[0]);
     }
   }, [availableCommodities, selectedCommodity]);
@@ -297,11 +300,7 @@ export default function DirectoryPage() {
   };
 
   const clearFilters = () => {
-    // Reset to first available commodity (or 'cocoa' if available, otherwise first in list)
-    const defaultCommodity = availableCommodities.includes('cocoa') 
-      ? 'cocoa' 
-      : (availableCommodities[0] || 'all');
-    setSelectedCommodity(defaultCommodity);
+    setSelectedCommodity('all');
     setSelectedCountry('CI');
     setSelectedRegion('all');
     setSelectedCoverage('all');
@@ -310,13 +309,8 @@ export default function DirectoryPage() {
     setPilotFilter('');
   };
 
-  // Determine default commodity for hasActiveFilters check
-  const defaultCommodity = availableCommodities.includes('cocoa') 
-    ? 'cocoa' 
-    : (availableCommodities[0] || 'all');
-
-  const hasActiveFilters = 
-    selectedCommodity !== defaultCommodity ||
+  const hasActiveFilters =
+    selectedCommodity !== 'all' ||
     selectedCountry !== 'CI' ||
     selectedRegion !== 'all' ||
     selectedCoverage !== 'all' ||

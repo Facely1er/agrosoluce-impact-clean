@@ -207,22 +207,67 @@ export function getRegionCoordinates(regionName: string): [number, number] {
   return [7.54, -5.55]; // Default to center of Côte d'Ivoire
 }
 
+/** EUDR commodity IDs used for filtering */
+const COMMODITY_MAP: Array<{ patterns: string[]; id: string }> = [
+  { patterns: ['cacao', 'cocoa'], id: 'cocoa' },
+  { patterns: ['cafe', 'café', 'coffee'], id: 'coffee' },
+  { patterns: ['palm', 'huile de palme'], id: 'palm_oil' },
+  { patterns: ['rubber', 'caoutchouc', 'hévéa'], id: 'rubber' },
+  { patterns: ['soja', 'soy'], id: 'soy' },
+  { patterns: ['cattle', 'bétail', 'viande'], id: 'cattle' },
+  { patterns: ['wood', 'bois', 'timber'], id: 'wood' },
+];
+
+/**
+ * Derive commodity from cooperative secteur or name when commodity field is missing.
+ * Used for CooperativeDirectory filter and dropdown population.
+ */
+export function deriveCommodityFromCooperative(c: {
+  commodity?: string | null;
+  secteur?: string | null;
+  sector?: string | null;
+  name?: string | null;
+}): string | null {
+  const existing = (c.commodity || '').trim().toLowerCase();
+  if (existing) return existing;
+
+  const text = [
+    c.secteur || '',
+    c.sector || '',
+    c.name || '',
+  ]
+    .join(' ')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+  for (const { patterns, id } of COMMODITY_MAP) {
+    if (patterns.some((p) => text.includes(p))) return id;
+  }
+  return null;
+}
+
 export function enrichCooperatives(cooperatives: any[]): any[] {
-  return cooperatives.map(c => {
+  return cooperatives.map((c) => {
     const [lat, lng] = getRegionCoordinates(c.region || '');
     const contactParts = splitContact(c.contact);
     const phoneCandidates = [c.phone, ...contactParts];
-    const phonesE164 = (phoneCandidates
-      .map(p => normalizeCIPhone(p))
+    const phonesE164 = phoneCandidates
+      .map((p) => normalizeCIPhone(p))
       .filter(Boolean)
-      .filter((v, i, arr) => arr.indexOf(v) === i)) as string[];
-    
+      .filter((v, i, arr) => arr.indexOf(v) === i) as string[];
+
     // Format cooperative name according to workflow requirements
     const formattedName = formatCooperativeName(c.name);
-    
+
+    // Derive commodity from secteur/name when missing (for filter dropdown)
+    const commodity =
+      c.commodity || deriveCommodityFromCooperative(c) || undefined;
+
     return {
       ...c,
       name: formattedName, // Use formatted name (not displayed directly)
+      commodity,
       lat,
       lng,
       regionSlug: toSlug(c.region),
@@ -234,8 +279,8 @@ export function enrichCooperatives(cooperatives: any[]): any[] {
       searchKeywords: [
         normalizeText(c.name), // Keep original for search
         normalizeText(c.departement),
-        normalizeText(c.president)
-      ].filter(Boolean)
+        normalizeText(c.president),
+      ].filter(Boolean),
     };
   });
 }

@@ -19,6 +19,9 @@ const WhoItsForPage = lazy(() => import('./pages/about/WhoItsForPage'));
 const PartnerLandingPage = lazy(() => import('./pages/partners/PartnerLandingPage'));
 const CooperativeDashboard = lazy(() => import('./pages/cooperative/CooperativeDashboard'));
 const FarmersFirstDashboard = lazy(() => import('./pages/cooperative/FarmersFirstDashboard'));
+const CooperativeRegister = lazy(() => import('./pages/cooperative/CooperativeRegister'));
+const CooperativeRequestAccess = lazy(() => import('./pages/cooperative/CooperativeRequestAccess'));
+const CooperativeOnboardingPage = lazy(() => import('./pages/cooperative/CooperativeOnboardingPage'));
 const DirectoryPage = lazy(() => import('./pages/directory/DirectoryPage'));
 const DirectoryDetailPage = lazy(() => import('./pages/directory/DirectoryDetailPage'));
 const AggregatedDashboardPage = lazy(() => import('./pages/directory/AggregatedDashboardPage'));
@@ -101,8 +104,11 @@ function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/what-we-do" element={<WhatWeDoPage />} />
             <Route path="/who-its-for" element={<WhoItsForPage />} />
-            <Route path="/cooperative/*" element={<CooperativeDashboard />} />
+            <Route path="/cooperative/register" element={<CooperativeRegister />} />
+            <Route path="/cooperative/request-access" element={<CooperativeRequestAccess />} />
+            <Route path="/cooperative/onboarding/:id" element={<CooperativeOnboardingPage />} />
             <Route path="/cooperative/:id/farmers-first" element={<FarmersFirstDashboard />} />
+            <Route path="/cooperative/*" element={<CooperativeDashboard />} />
             <Route path="/principles/farmer-protection" element={<FarmerProtectionPage />} />
             <Route path="/regulatory-references" element={<RegulatoryReferencesPage />} />
             <Route path="/references/ngo" element={<NGORegistryPage />} />

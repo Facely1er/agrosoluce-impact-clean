@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, MapPin, Building2, Download, Users, Shield, TrendingUp, Info, ArrowRight, Eye } from 'lucide-react';
 import { useCooperatives } from '@/hooks/useCooperatives';
 import { normalizeText } from '@/lib/utils/cooperativeUtils';
+import { EUDR_COMMODITIES_IN_SCOPE } from '@/types';
 import CooperativeMap from '@/features/cooperatives/components/CooperativeMap';
 import CooperativeCard from '@/features/cooperatives/components/CooperativeCard';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
@@ -39,8 +40,8 @@ export default function CooperativeDirectory() {
         (coop as any).country === countryFilter || 
         coop.country === countryFilter;
       
-      const matchesCommodity = !commodityFilter || 
-        (coop as any).commodity === commodityFilter;
+      const matchesCommodity = !commodityFilter ||
+        ((coop as any).commodity || '').toLowerCase() === commodityFilter.toLowerCase();
       
       const matchesCertifications = certificationFilter.length === 0 ||
         certificationFilter.every(cert => 
@@ -67,8 +68,16 @@ export default function CooperativeDirectory() {
     return [...new Set(cooperatives.map(c => (c as any).country || 'Côte d\'Ivoire').filter(Boolean))].sort();
   }, [cooperatives]);
 
+  // Commodities: show all EUDR commodities that exist in data, sorted by label
   const commodities = useMemo(() => {
-    return [...new Set(cooperatives.map(c => (c as any).commodity || '').filter(Boolean))].sort();
+    const inData = new Set(
+      cooperatives
+        .map((c) => ((c as any).commodity || '').toLowerCase())
+        .filter(Boolean)
+    );
+    return EUDR_COMMODITIES_IN_SCOPE.filter((c) => inData.has(c.id)).map(
+      (c) => c.id
+    );
   }, [cooperatives]);
 
   const availableCertifications = useMemo(() => {
@@ -357,9 +366,16 @@ export default function CooperativeDirectory() {
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
                   <option value="">All Commodities</option>
-                  {commodities.map(commodity => (
-                    <option key={commodity} value={commodity}>{commodity}</option>
-                  ))}
+                  {commodities.map((commodityId) => {
+                    const commodity = EUDR_COMMODITIES_IN_SCOPE.find(
+                      (c) => c.id === commodityId
+                    );
+                    return (
+                      <option key={commodityId} value={commodityId}>
+                        {commodity?.label || commodityId}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
               <div>
