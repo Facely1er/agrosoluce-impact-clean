@@ -283,6 +283,13 @@ export default function CooperativeSpaceLanding() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
             <Link 
+              to="/cooperative/login" 
+              className="text-primary-600 hover:text-primary-700 font-medium hover:underline"
+            >
+              Se connecter à mon espace
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link 
               to="/cooperatives" 
               className="text-primary-600 hover:text-primary-700 font-medium hover:underline"
             >

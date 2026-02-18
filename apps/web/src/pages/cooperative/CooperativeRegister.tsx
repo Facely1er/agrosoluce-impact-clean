@@ -5,6 +5,7 @@ import {
   CheckCircle, AlertCircle, ArrowRight, Sprout
 } from 'lucide-react';
 import { signUp } from '@/lib/auth/authService';
+import { supabase } from '@/lib/supabase/client';
 
 type Step = 'form' | 'success';
 
@@ -82,7 +83,7 @@ export default function CooperativeRegister() {
     setSubmitting(true);
     setErrorMsg('');
 
-    const { error } = await signUp({
+    const { user: newUser, profile: newProfile, error } = await signUp({
       email: form.email,
       password: form.password,
       fullName: form.fullName,
@@ -95,6 +96,36 @@ export default function CooperativeRegister() {
       setErrorMsg(error.message || 'Une erreur est survenue. Veuillez réessayer.');
       setSubmitting(false);
       return;
+    }
+
+    // Create cooperative record linked to the new user profile
+    if (newUser && newProfile && supabase) {
+      const { data: coopRecord } = await supabase
+        .from('cooperatives')
+        .insert({
+          name: form.organizationName,
+          phone: form.phone || null,
+          email: form.email,
+          user_profile_id: newProfile.id,
+          is_verified: false,
+        })
+        .select('id')
+        .single();
+
+      // Create the onboarding record immediately
+      if (coopRecord) {
+        await supabase.from('cooperative_onboarding').upsert(
+          {
+            cooperative_id: coopRecord.id,
+            status: 'in_progress',
+            current_step: 1,
+          },
+          { onConflict: 'cooperative_id', ignoreDuplicates: true }
+        );
+        // Redirect directly to the onboarding wizard
+        navigate(`/cooperative/onboarding/${coopRecord.id}`, { replace: true });
+        return;
+      }
     }
 
     setStep('success');

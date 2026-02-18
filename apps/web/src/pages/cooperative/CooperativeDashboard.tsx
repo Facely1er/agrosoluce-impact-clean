@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Building2, Package, ShoppingCart, MessageSquare, Users, Shield, FileText, Route, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Building2, Package, ShoppingCart, Users, Shield, FileText, Route, CheckCircle, AlertCircle, XCircle, Zap, LogOut } from 'lucide-react';
 import FarmerList from '@/features/producers/components/FarmerList';
 import ComplianceDashboard from '@/features/compliance/components/ComplianceDashboard';
 import AuditList from '@/features/evidence/components/AuditList';
@@ -8,56 +9,54 @@ import { BatchCard } from '@/features/traceability/components';
 import { getBatchesByCooperative } from '@/features/traceability/api/traceabilityApi';
 import { getCooperativeById } from '@/features/cooperatives/api/cooperativesApi';
 import { useCooperativeEnrichment } from '@/hooks/useCooperativeEnrichment';
+import { useAuth } from '@/lib/auth/AuthContext';
+import { getOnboardingByCooperativeId } from '@/features/onboarding/api';
 import type { Cooperative } from '@/types';
 import CoopReadinessChecklist from '@/components/CoopReadinessChecklist';
-import { getCurrentUser } from '@/lib/supabase/client';
 import CooperativeSpaceLanding from './CooperativeSpaceLanding';
 
-// Mock cooperative ID - in real app, get from auth/context
-const MOCK_COOPERATIVE_ID = 'cooperative-id-placeholder';
-
 export default function CooperativeDashboard() {
+  const navigate = useNavigate();
+  const { user, profile, cooperative: authCooperative, loading: authLoading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<
     'overview' | 'farmers' | 'products' | 'traceability' | 'compliance' | 'evidence'
   >('overview');
   const [showFieldDeclarationForm, setShowFieldDeclarationForm] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [onboardingIncomplete, setOnboardingIncomplete] = useState(false);
+
+  // The real cooperative ID from auth context
+  const cooperativeId = authCooperative?.id || '';
 
   useEffect(() => {
-    checkAuthentication();
-  }, []);
+    if (!authLoading && cooperativeId) {
+      checkOnboarding();
+    }
+  }, [cooperativeId, authLoading]);
 
-  const checkAuthentication = async () => {
-    try {
-      const user = await getCurrentUser();
-      // For now, we'll show the landing page if no user is authenticated
-      // In production, you might also check if the user has a cooperative role
-      setIsAuthenticated(user !== null);
-    } catch (error) {
-      setIsAuthenticated(false);
-    } finally {
-      setLoading(false);
+  const checkOnboarding = async () => {
+    const { data } = await getOnboardingByCooperativeId(cooperativeId);
+    if (data && data.status !== 'completed') {
+      setOnboardingIncomplete(true);
     }
   };
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">Chargement...</p>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
+  if (!user || !profile) {
     return <CooperativeSpaceLanding />;
   }
 
   const tabs = [
-    { id: 'overview', label: 'Vue d\'ensemble', icon: Building2 },
+    { id: 'overview', label: "Vue d'ensemble", icon: Building2 },
     { id: 'farmers', label: 'Producteurs', icon: Users },
     { id: 'products', label: 'Produits', icon: Package },
     { id: 'traceability', label: 'Traçabilité', icon: Route },
@@ -68,14 +67,54 @@ export default function CooperativeDashboard() {
   return (
     <div className="min-h-screen py-8 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Tableau de Bord Coopérative
-          </h1>
-          <p className="text-gray-600">
-            Gérez vos producteurs, produits, traçabilité, conformité et preuves
-          </p>
+        {/* Header */}
+        <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-1">
+              {authCooperative?.name || profile.organization_name || 'Tableau de Bord Coopérative'}
+            </h1>
+            <p className="text-gray-500 text-sm">
+              Bienvenue, {profile.full_name} · {profile.user_type === 'admin' ? 'Admin' : 'Coopérative'}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {profile.user_type === 'admin' && (
+              <Link
+                to="/admin/onboarding"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
+            <button
+              onClick={async () => { await signOut(); navigate('/cooperative', { replace: true }); }}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+              Déconnexion
+            </button>
+          </div>
         </div>
+
+        {/* Onboarding incomplete banner */}
+        {onboardingIncomplete && cooperativeId && (
+          <div className="mb-6 flex items-center justify-between gap-4 bg-amber-50 border border-amber-300 rounded-xl px-5 py-4">
+            <div className="flex items-center gap-3">
+              <Zap className="h-5 w-5 text-amber-600 flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-amber-900">Intégration non terminée</p>
+                <p className="text-sm text-amber-700">Complétez les étapes restantes pour débloquer toutes les fonctionnalités.</p>
+              </div>
+            </div>
+            <Link
+              to={`/cooperative/onboarding/${cooperativeId}`}
+              className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-semibold hover:bg-amber-600 transition-colors"
+            >
+              Reprendre l'intégration →
+            </Link>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow-md mb-6">
@@ -102,18 +141,27 @@ export default function CooperativeDashboard() {
           </div>
 
           <div className="p-6">
-            {activeTab === 'overview' && <OverviewTab />}
-            {activeTab === 'farmers' && <FarmerList cooperativeId={MOCK_COOPERATIVE_ID} />}
+            {activeTab === 'overview' && <OverviewTab cooperativeId={cooperativeId} />}
+            {activeTab === 'farmers' && cooperativeId && <FarmerList cooperativeId={cooperativeId} />}
             {activeTab === 'products' && <ProductsTab />}
-            {activeTab === 'traceability' && <TraceabilityTab cooperativeId={MOCK_COOPERATIVE_ID} />}
-            {activeTab === 'compliance' && <ComplianceDashboard cooperativeId={MOCK_COOPERATIVE_ID} />}
-            {activeTab === 'evidence' && (
+            {activeTab === 'traceability' && cooperativeId && <TraceabilityTab cooperativeId={cooperativeId} />}
+            {activeTab === 'compliance' && cooperativeId && <ComplianceDashboard cooperativeId={cooperativeId} />}
+            {activeTab === 'evidence' && cooperativeId && (
               <EvidenceTab
-                cooperativeId={MOCK_COOPERATIVE_ID}
+                cooperativeId={cooperativeId}
                 showFieldDeclarationForm={showFieldDeclarationForm}
                 onShowForm={() => setShowFieldDeclarationForm(true)}
                 onHideForm={() => setShowFieldDeclarationForm(false)}
               />
+            )}
+            {!cooperativeId && activeTab !== 'overview' && (
+              <div className="text-center py-12 text-gray-500">
+                <AlertCircle className="h-8 w-8 mx-auto mb-3 text-gray-300" />
+                <p>Aucun profil coopérative lié à votre compte.</p>
+                <Link to="/cooperative/onboarding/new" className="text-primary-600 hover:underline text-sm mt-2 inline-block">
+                  Démarrer l'intégration
+                </Link>
+              </div>
             )}
           </div>
         </div>
@@ -122,18 +170,18 @@ export default function CooperativeDashboard() {
   );
 }
 
-function OverviewTab() {
+function OverviewTab({ cooperativeId }: { cooperativeId: string }) {
   const [cooperative, setCooperative] = useState<Cooperative | null>(null);
   const [loading, setLoading] = useState(true);
   const { recomputeEnrichment } = useCooperativeEnrichment();
 
   useEffect(() => {
-    loadCooperative();
-  }, []);
+    if (cooperativeId) loadCooperative();
+    else setLoading(false);
+  }, [cooperativeId]);
 
   const loadCooperative = async () => {
-    // In real app, get cooperative ID from auth/context
-    const { data } = await getCooperativeById(MOCK_COOPERATIVE_ID);
+    const { data } = await getCooperativeById(cooperativeId);
     if (data) {
       setCooperative(data);
     }
