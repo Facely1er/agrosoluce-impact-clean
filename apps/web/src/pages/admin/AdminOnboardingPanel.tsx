@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Building2, Users, Clock, CheckCircle, AlertCircle,
   Mail, Phone, MapPin, RefreshCw, Eye, Filter, Search,
-  TrendingUp, ArrowRight, Shield, Link2, Copy, Check,
+  TrendingUp, ArrowRight, Shield, Link2, Check,
   Home, Sparkles
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
