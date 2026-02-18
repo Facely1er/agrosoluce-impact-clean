@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Building2, Users, Clock, CheckCircle, AlertCircle,
   Mail, Phone, MapPin, RefreshCw, Eye, Filter, Search,
-  TrendingUp, ArrowRight, Shield, Link2, Copy, Check
+  TrendingUp, ArrowRight, Shield, Link2, Copy, Check,
+  Home, Sparkles
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth/AuthContext';
@@ -181,78 +182,116 @@ export default function AdminOnboardingPanel() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-primary-50/30 to-secondary-50/20">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary-200 border-t-primary-600" />
+          <p className="text-sm text-gray-500">Chargement du tableau de bord…</p>
+        </div>
       </div>
     );
   }
 
+  const statCards = [
+    { label: 'Demandes totales', value: stats.totalRequests, sub: 'toutes périodes', icon: Building2, bg: 'bg-slate-100', iconColor: 'text-slate-600', border: 'hover:border-slate-300' },
+    { label: 'En attente', value: stats.pendingRequests, sub: 'à traiter', icon: Clock, bg: 'bg-amber-100', iconColor: 'text-amber-600', border: 'hover:border-amber-300' },
+    { label: 'Intégrations actives', value: stats.inProgressOnboardings, sub: 'en cours', icon: TrendingUp, bg: 'bg-blue-100', iconColor: 'text-blue-600', border: 'hover:border-blue-300' },
+    { label: 'Terminées', value: stats.completedOnboardings, sub: 'intégrations', icon: CheckCircle, bg: 'bg-primary-100', iconColor: 'text-primary-600', border: 'hover:border-primary-400' },
+  ];
+
+  const tabs = [
+    { id: 'requests' as const, label: 'Demandes', count: requests.length, icon: Users },
+    { id: 'onboarding' as const, label: 'Intégrations', count: onboardings.length, icon: TrendingUp },
+    { id: 'directory' as const, label: 'Répertoire', count: directoryCoops.length, icon: Building2 },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 bg-gradient-to-br from-slate-50 via-primary-50/40 to-secondary-50/30 relative overflow-hidden">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 coop-landing-dot-pattern text-primary-100/50 pointer-events-none" aria-hidden />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Shield className="h-5 w-5 text-primary-600" />
-              <span className="text-sm font-medium text-primary-600 uppercase tracking-wider">Admin</span>
+        <header className="mb-8 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-500/25">
+                <Shield className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-xs font-semibold text-primary-600 uppercase tracking-wider">Admin</span>
+                  <Sparkles className="h-3.5 w-3.5 text-secondary-500" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Pipeline d'intégration</h1>
+                <p className="text-gray-600 mt-1">
+                  {profile?.full_name ? `Bienvenue, ${profile.full_name}. ` : ''}
+                  Suivez les demandes et l'intégration des coopératives.
+                </p>
+              </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Pipeline d'intégration</h1>
-            <p className="text-gray-500 mt-1">Suivez les demandes et l'intégration des coopératives</p>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Link
+                to="/"
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white/80 text-gray-700 hover:bg-white hover:border-primary-200 hover:text-primary-700 transition-all text-sm font-medium shadow-sm"
+              >
+                <Home className="h-4 w-4" />
+                <span className="hidden sm:inline">Accueil</span>
+              </Link>
+              <button
+                onClick={loadData}
+                disabled={loading}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-primary-50 hover:border-primary-200 hover:text-primary-700 transition-all text-sm font-medium shadow-sm disabled:opacity-60"
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                Actualiser
+              </button>
+            </div>
           </div>
-          <button
-            onClick={loadData}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            Actualiser
-          </button>
-        </div>
+        </header>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          {[
-            { label: 'Demandes totales', value: stats.totalRequests, color: 'border-l-gray-400', icon: Building2 },
-            { label: 'En attente', value: stats.pendingRequests, color: 'border-l-yellow-400', icon: Clock },
-            { label: 'Intégrations actives', value: stats.inProgressOnboardings, color: 'border-l-blue-400', icon: TrendingUp },
-            { label: 'Intégrations terminées', value: stats.completedOnboardings, color: 'border-l-green-400', icon: CheckCircle },
-          ].map(({ label, value, color, icon: Icon }) => (
-            <div key={label} className={`bg-white rounded-xl shadow-sm p-5 border-l-4 ${color}`}>
-              <div className="flex items-center justify-between">
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" aria-label="Statistiques">
+          {statCards.map(({ label, value, sub, icon: Icon, bg, iconColor, border }) => (
+            <div
+              key={label}
+              className={`bg-white/90 backdrop-blur rounded-2xl p-5 border-2 border-white/80 shadow-sm hover:shadow-md transition-all duration-200 ${border} animate-fade-in`}
+            >
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">{value}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+                  <p className="text-2xl font-bold text-gray-900 tabular-nums">{value}</p>
+                  <p className="text-sm font-medium text-gray-700 mt-0.5">{label}</p>
+                  {sub && <p className="text-xs text-gray-500 mt-0.5">{sub}</p>}
                 </div>
-                <Icon className="h-8 w-8 text-gray-300" />
+                <div className={`flex-shrink-0 w-11 h-11 rounded-xl ${bg} flex items-center justify-center ${iconColor}`}>
+                  <Icon className="h-5 w-5" />
+                </div>
               </div>
             </div>
           ))}
-        </div>
+        </section>
 
         {/* Tabs + Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="border-b border-gray-200 px-6 pt-4 flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex gap-1">
-              {[
-                { id: 'requests' as const, label: `Demandes (${requests.length})` },
-                { id: 'onboarding' as const, label: `Intégrations (${onboardings.length})` },
-                { id: 'directory' as const, label: `Répertoire (${directoryCoops.length})` },
-              ].map(({ id, label }) => (
+        <div className="bg-white/95 backdrop-blur rounded-2xl shadow-lg border border-gray-200/80 overflow-hidden animate-fade-in">
+          <div className="border-b border-gray-200 bg-gray-50/60 px-4 sm:px-6 pt-4 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+              {tabs.map(({ id, label, count, icon: TabIcon }) => (
                 <button
                   key={id}
                   onClick={() => { setActiveTab(id); setStatusFilter('all'); setSearch(''); }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     activeTab === id
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                      ? 'bg-white text-primary-700 shadow-sm border border-primary-100'
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-white/60'
                   }`}
                 >
+                  <TabIcon className="h-4 w-4" />
                   {label}
+                  <span className={`ml-0.5 px-1.5 py-0.5 rounded-md text-xs font-semibold ${activeTab === id ? 'bg-primary-100 text-primary-700' : 'bg-gray-200 text-gray-600'}`}>
+                    {count}
+                  </span>
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-3 pb-3">
+            <div className="flex items-center gap-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
@@ -260,7 +299,7 @@ export default function AdminOnboardingPanel() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Rechercher..."
-                  className="pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none w-52"
+                  className="pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none w-48 sm:w-52 transition-shadow"
                 />
               </div>
               {activeTab !== 'directory' && (
@@ -269,7 +308,7 @@ export default function AdminOnboardingPanel() {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white"
+                    className="pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none"
                     aria-label="Filtrer par statut"
                   >
                     <option value="all">Tous les statuts</option>
@@ -287,8 +326,9 @@ export default function AdminOnboardingPanel() {
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary-200 border-t-primary-600" />
+              <p className="text-sm text-gray-500">Chargement des données…</p>
             </div>
           ) : activeTab === 'requests' ? (
             <RequestsTable
@@ -322,9 +362,14 @@ function RequestsTable({
 }) {
   if (requests.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-500">
-        <Users className="h-10 w-10 mx-auto mb-3 text-gray-300" />
-        <p>Aucune demande trouvée</p>
+      <div className="text-center py-20 px-6">
+        <div className="inline-flex w-16 h-16 rounded-2xl bg-primary-50 items-center justify-center mb-4">
+          <Users className="h-8 w-8 text-primary-500" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-800 mb-1">Aucune demande</h3>
+        <p className="text-gray-500 text-sm max-w-sm mx-auto">
+          Les demandes d'accès des coopératives apparaîtront ici. Pensez à actualiser après une nouvelle soumission.
+        </p>
       </div>
     );
   }
@@ -332,10 +377,10 @@ function RequestsTable({
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="bg-gray-50 border-b border-gray-200">
+        <thead className="bg-gray-50/80 border-b border-gray-200">
           <tr>
             {['Coopérative', 'Contact', 'Région / Produit', 'Producteurs', 'Date', 'Statut', 'Actions'].map((h) => (
-              <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              <th key={h} className="px-5 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {h}
               </th>
             ))}
@@ -345,8 +390,8 @@ function RequestsTable({
           {requests.map((req) => {
             const statusCfg = REQUEST_STATUS_CONFIG[req.status];
             return (
-              <tr key={req.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3">
+              <tr key={req.id} className="hover:bg-primary-50/40 transition-colors">
+                <td className="px-5 py-3.5">
                   <div className="font-semibold text-gray-900">{req.cooperative_name}</div>
                   {req.message && (
                     <div className="text-xs text-gray-500 mt-0.5 max-w-[200px] truncate" title={req.message}>
@@ -354,7 +399,7 @@ function RequestsTable({
                     </div>
                   )}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-3.5">
                   <div className="font-medium text-gray-800">{req.contact_name}</div>
                   <div className="flex flex-col gap-0.5 mt-1">
                     {req.phone && (
@@ -369,7 +414,7 @@ function RequestsTable({
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-gray-600">
+                <td className="px-5 py-3.5 text-gray-600">
                   {req.region && (
                     <div className="flex items-center gap-1 text-xs">
                       <MapPin className="h-3 w-3" /> {req.region}
@@ -379,22 +424,22 @@ function RequestsTable({
                     <div className="text-xs mt-0.5 text-primary-700 font-medium">{req.primary_product}</div>
                   )}
                 </td>
-                <td className="px-4 py-3 text-center text-gray-600 text-xs">{req.farmer_count || '—'}</td>
-                <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+                <td className="px-5 py-3.5 text-center text-gray-600 text-xs">{req.farmer_count || '—'}</td>
+                <td className="px-5 py-3.5 text-xs text-gray-500 whitespace-nowrap">
                   {new Date(req.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-3.5">
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${statusCfg.color}`}>
                     {statusCfg.label}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-3.5">
                   <select
                     value={req.status}
                     onChange={(e) => onStatusChange(req.id, e.target.value as CoopRequest['status'])}
                     disabled={updatingId === req.id}
                     aria-label={`Changer le statut de ${req.cooperative_name}`}
-                    className="text-xs px-2 py-1.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none disabled:opacity-50"
+                    className="text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none disabled:opacity-50"
                   >
                     {Object.entries(REQUEST_STATUS_CONFIG).map(([k, v]) => (
                       <option key={k} value={k}>{v.label}</option>
@@ -413,9 +458,14 @@ function RequestsTable({
 function OnboardingsTable({ onboardings }: { onboardings: OnboardingRecord[] }) {
   if (onboardings.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-500">
-        <Building2 className="h-10 w-10 mx-auto mb-3 text-gray-300" />
-        <p>Aucune intégration trouvée</p>
+      <div className="text-center py-20 px-6">
+        <div className="inline-flex w-16 h-16 rounded-2xl bg-blue-50 items-center justify-center mb-4">
+          <TrendingUp className="h-8 w-8 text-blue-500" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-800 mb-1">Aucune intégration</h3>
+        <p className="text-gray-500 text-sm max-w-sm mx-auto">
+          Les parcours d'intégration en cours ou terminés s'afficheront ici.
+        </p>
       </div>
     );
   }
@@ -423,10 +473,10 @@ function OnboardingsTable({ onboardings }: { onboardings: OnboardingRecord[] }) 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="bg-gray-50 border-b border-gray-200">
+        <thead className="bg-gray-50/80 border-b border-gray-200">
           <tr>
             {['Coopérative', 'Étape', 'Statut', 'Débuté le', 'Terminé le', 'Appel de bienvenue', 'Actions'].map((h) => (
-              <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              <th key={h} className="px-5 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {h}
               </th>
             ))}
@@ -437,9 +487,9 @@ function OnboardingsTable({ onboardings }: { onboardings: OnboardingRecord[] }) 
             const cfg = ONBOARDING_STATUS_CONFIG[o.status];
             const StatusIcon = cfg.icon;
             return (
-              <tr key={o.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3 font-semibold text-gray-900">{o.cooperative_name}</td>
-                <td className="px-4 py-3">
+              <tr key={o.id} className="hover:bg-primary-50/40 transition-colors">
+                <td className="px-5 py-3.5 font-semibold text-gray-900">{o.cooperative_name}</td>
+                <td className="px-5 py-3.5">
                   <div className="flex items-center gap-2">
                     <div className="w-full max-w-[100px] bg-gray-200 rounded-full h-1.5">
                       <div
@@ -450,23 +500,23 @@ function OnboardingsTable({ onboardings }: { onboardings: OnboardingRecord[] }) 
                     <span className="text-xs text-gray-600 whitespace-nowrap">{o.current_step}/7</span>
                   </div>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-3.5">
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${cfg.color}`}>
                     <StatusIcon className="h-3 w-3" />
                     {cfg.label}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500">
+                <td className="px-5 py-3.5 text-xs text-gray-500">
                   {o.started_at
                     ? new Date(o.started_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
                     : '—'}
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500">
+                <td className="px-5 py-3.5 text-xs text-gray-500">
                   {o.completed_at
                     ? new Date(o.completed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
                     : '—'}
                 </td>
-                <td className="px-4 py-3 text-xs">
+                <td className="px-5 py-3.5 text-xs">
                   {o.welcome_call_scheduled_at ? (
                     <span className="flex items-center gap-1 text-green-700">
                       <CheckCircle className="h-3.5 w-3.5" />
@@ -476,10 +526,10 @@ function OnboardingsTable({ onboardings }: { onboardings: OnboardingRecord[] }) 
                     <span className="text-gray-400">Non planifié</span>
                   )}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-3.5">
                   <Link
                     to={`/cooperative/onboarding/${o.cooperative_id}`}
-                    className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-primary-600 hover:bg-primary-50 font-medium transition-colors"
                   >
                     <Eye className="h-3.5 w-3.5" />
                     Voir
@@ -506,9 +556,14 @@ function DirectoryTable({
 }) {
   if (cooperatives.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-500">
-        <Building2 className="h-10 w-10 mx-auto mb-3 text-gray-300" />
-        <p>Aucune coopérative trouvée</p>
+      <div className="text-center py-20 px-6">
+        <div className="inline-flex w-16 h-16 rounded-2xl bg-secondary-50 items-center justify-center mb-4">
+          <Building2 className="h-8 w-8 text-secondary-500" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-800 mb-1">Aucune coopérative</h3>
+        <p className="text-gray-500 text-sm max-w-sm mx-auto">
+          Aucun résultat pour cette recherche. Essayez un autre terme ou affichez le répertoire complet.
+        </p>
       </div>
     );
   }
@@ -516,10 +571,10 @@ function DirectoryTable({
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="bg-gray-50 border-b border-gray-200">
+        <thead className="bg-gray-50/80 border-b border-gray-200">
           <tr>
             {['Coopérative', 'Région', 'Contact', 'Compte', 'Lien d\'invitation'].map((h) => (
-              <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              <th key={h} className="px-5 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {h}
               </th>
             ))}
@@ -530,9 +585,9 @@ function DirectoryTable({
             const hasAccount = !!coop.user_profile_id;
             const justCopied = copiedId === coop.id;
             return (
-              <tr key={coop.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3 font-semibold text-gray-900">{coop.name}</td>
-                <td className="px-4 py-3 text-gray-600">
+              <tr key={coop.id} className="hover:bg-primary-50/40 transition-colors">
+                <td className="px-5 py-3.5 font-semibold text-gray-900">{coop.name}</td>
+                <td className="px-5 py-3.5 text-gray-600">
                   {coop.region && (
                     <span className="flex items-center gap-1 text-xs">
                       <MapPin className="h-3 w-3" /> {coop.region}
@@ -541,7 +596,7 @@ function DirectoryTable({
                   )}
                   {!coop.region && '—'}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-3.5">
                   <div className="flex flex-col gap-0.5">
                     {coop.email && (
                       <a href={`mailto:${coop.email}`} className="flex items-center gap-1 text-xs text-blue-600 hover:underline">
@@ -556,7 +611,7 @@ function DirectoryTable({
                     {!coop.email && !coop.phone && <span className="text-gray-400 text-xs">—</span>}
                   </div>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-3.5">
                   {hasAccount ? (
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-300">
                       <CheckCircle className="h-3 w-3" /> Compte lié
@@ -567,7 +622,7 @@ function DirectoryTable({
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-3.5">
                   {hasAccount ? (
                     <span className="text-xs text-gray-400" title="Un compte est déjà lié à cette coopérative">
                       —
@@ -576,10 +631,10 @@ function DirectoryTable({
                     <button
                       type="button"
                       onClick={() => onCopyInviteLink(coop)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         justCopied
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-primary-50 text-primary-700 hover:bg-primary-100'
+                          ? 'bg-primary-100 text-primary-800 border border-primary-200'
+                          : 'bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-100'
                       }`}
                       title="Copier le lien d'invitation à envoyer à la coopérative (WhatsApp, e-mail, etc.)"
                     >
