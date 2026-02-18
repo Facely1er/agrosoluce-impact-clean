@@ -143,10 +143,11 @@ export default function WelcomeCallStep({ cooperativeId: _cooperativeId, onboard
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="preferred-date" className="block text-sm font-medium text-gray-700 mb-1">
               Date souhaitée
             </label>
             <input
+              id="preferred-date"
               type="date"
               min={minDateStr}
               value={preferredDate}
@@ -155,11 +156,12 @@ export default function WelcomeCallStep({ cooperativeId: _cooperativeId, onboard
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="preferred-time" className="block text-sm font-medium text-gray-700 mb-1">
               <Clock className="inline h-3.5 w-3.5 mr-1" />
               Créneau horaire (UTC+0)
             </label>
             <select
+              id="preferred-time"
               value={preferredTime}
               onChange={(e) => setPreferredTime(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white"

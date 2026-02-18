@@ -137,6 +137,7 @@ export default function ChampionsStep({ cooperativeId: _cooperativeId, onComplet
               {champions.length > 1 && (
                 <button
                   type="button"
+                  aria-label={`Supprimer le champion ${index + 1}`}
                   onClick={() => removeChampion(index)}
                   className="text-gray-400 hover:text-red-500 transition-colors"
                 >
@@ -160,8 +161,9 @@ export default function ChampionsStep({ cooperativeId: _cooperativeId, onComplet
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Rôle dans la coopérative</label>
+                <label htmlFor={`champion-role-${index}`} className="block text-xs font-medium text-gray-600 mb-1">Rôle dans la coopérative</label>
                 <select
+                  id={`champion-role-${index}`}
                   value={champion.role}
                   onChange={(e) => updateChampion(index, 'role', e.target.value)}
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white"

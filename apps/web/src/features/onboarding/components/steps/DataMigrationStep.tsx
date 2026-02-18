@@ -158,6 +158,7 @@ export default function DataMigrationStep({ cooperativeId: _cooperativeId, onCom
               type="file"
               accept=".csv,.xlsx,.xls"
               onChange={handleFileChange}
+              aria-label="Sélectionner un fichier CSV ou Excel à importer"
               className="hidden"
             />
             {file ? (

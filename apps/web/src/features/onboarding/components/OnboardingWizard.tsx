@@ -205,7 +205,7 @@ export default function OnboardingWizard({ cooperativeId, onComplete, onClose }:
           </p>
         </div>
         {onClose && (
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button onClick={onClose} aria-label="Fermer" className="text-gray-400 hover:text-gray-600 transition-colors">
             <X className="h-6 w-6" />
           </button>
         )}
@@ -303,10 +303,11 @@ export default function OnboardingWizard({ cooperativeId, onComplete, onClose }:
             ← Précédent
           </button>
           <div className="flex items-center gap-2">
-            {DEFAULT_ONBOARDING_STEPS.map((_, index) => (
+            {DEFAULT_ONBOARDING_STEPS.map((step, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentStepIndex(index)}
+                aria-label={`Aller à l'étape ${step.stepNumber}: ${step.stepName}`}
                 className={`w-2 h-2 rounded-full transition-colors ${
                   index === currentStepIndex ? 'bg-primary-600' : 'bg-gray-300'
                 }`}
