@@ -40,4 +40,25 @@ This guide explains how to verify that database enrichment is in place and how t
 - **Log (8):** Confirms that enrichment jobs have been running and when they last ran.
 - **Reference data (9):** Non-zero counts indicate seed/reference data is loaded for enrichment logic.
 
+## Next steps when verification shows 0%
+
+If section 5 shows **total_cooperatives = 0** or section 10 shows **all percentages = 0**:
+
+1. **Seed cooperatives (if the table is empty)**  
+   In Supabase SQL Editor, run:  
+   `packages/database/scripts/seed_cooperatives_minimal.sql`  
+   This inserts two sample cooperatives only when the table has no rows.
+
+2. **Bootstrap enrichment**  
+   Run:  
+   `packages/database/scripts/bootstrap_enrichment.sql`  
+   This sets `coverage_metrics`, `contextual_risks`, and `readiness_status` (and optionally `data_quality_score`) for cooperatives that are missing them, so section 10 shows non-zero percentages.
+
+3. **Re-run verification**  
+   Run `verify_enrichment_status.sql` again. You should see non-zero counts in section 5 and non-zero percentages in section 10.
+
+4. **Ongoing enrichment**  
+   - **From the app:** Use the cooperative dashboard “Recalculer” (recalculate) to run full enrichment (farmers, plots, documents).  
+   - **From SQL:** Use `packages/database/scripts/enrich_cooperatives_example.sql` for batch updates from metadata, market prices, geographic data, etc.
+
 For a full enrichment workflow, see [ENRICHMENT_QUICK_START.md](./ENRICHMENT_QUICK_START.md).
