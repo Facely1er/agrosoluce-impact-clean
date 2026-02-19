@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth/AuthContext';
+import styles from './AdminOnboardingPanel.module.css';
 
 interface CoopRequest {
   id: string;
@@ -498,8 +499,7 @@ function OnboardingsTable({ onboardings }: { onboardings: OnboardingRecord[] }) 
                   <div className="flex items-center gap-2">
                     <div className="w-full max-w-[100px] bg-gray-200 rounded-full h-1.5">
                       <div
-                        className="bg-primary-600 h-1.5 rounded-full transition-all"
-                        style={{ width: `${(o.current_step / 7) * 100}%` }}
+                        className={`${styles.progressFill} bg-primary-600 ${styles[`progressFillStep${Math.min(7, Math.max(0, o.current_step))}` as keyof typeof styles]}`}
                       />
                     </div>
                     <span className="text-xs text-gray-600 whitespace-nowrap">{o.current_step}/7</span>

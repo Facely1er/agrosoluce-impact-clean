@@ -1,0 +1,15 @@
+/* Progress bar fill width by step (0–7) for onboarding table */
+.progressFill {
+  height: 0.375rem;
+  border-radius: 9999px;
+  transition: width 0.2s ease;
+}
+
+.progressFillStep0 { width: 0%; }
+.progressFillStep1 { width: 14.29%; }
+.progressFillStep2 { width: 28.57%; }
+.progressFillStep3 { width: 42.86%; }
+.progressFillStep4 { width: 57.14%; }
+.progressFillStep5 { width: 71.43%; }
+.progressFillStep6 { width: 85.71%; }
+.progressFillStep7 { width: 100%; }
