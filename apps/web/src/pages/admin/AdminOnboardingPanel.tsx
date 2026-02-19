@@ -34,6 +34,11 @@ interface OnboardingRecord {
   cooperative_name?: string;
 }
 
+/** Raw row from cooperative_onboarding with cooperatives(name) join */
+type OnboardingRow = Omit<OnboardingRecord, 'cooperative_name'> & {
+  cooperatives: { name: string } | null;
+};
+
 interface DirectoryCooperative {
   id: string;
   name: string;
@@ -107,7 +112,7 @@ export default function AdminOnboardingPanel() {
 
     if (reqResult.data) setRequests(reqResult.data as CoopRequest[]);
     if (onbResult.data) {
-      const mapped = onbResult.data.map((r: any) => ({
+      const mapped = onbResult.data.map((r: OnboardingRow) => ({
         ...r,
         cooperative_name: r.cooperatives?.name || '—',
       }));
