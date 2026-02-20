@@ -4,8 +4,9 @@
  * Displays a single HWI score with alert level and optional component breakdown
  */
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { AlertLevelBadge } from './AlertLevelBadge';
+import styles from './HWICard.module.css';
 
 export interface HWICardProps {
   score: number;
@@ -58,12 +59,17 @@ export function HWICard({
     lg: 'text-4xl',
   };
 
+  const cardRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    cardRef.current?.style.setProperty('--alert-color', getAlertColor(alertLevel));
+  }, [alertLevel]);
+
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border-l-4 ${sizeClasses[size]} ${
+      ref={cardRef}
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border-l-4 ${styles.cardBorder} ${sizeClasses[size]} ${
         onClick ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''
       }`}
-      style={{ borderLeftColor: getAlertColor(alertLevel) }}
       onClick={onClick}
     >
       {/* Header */}
@@ -149,8 +155,14 @@ interface ComponentBarProps {
 function ComponentBar({ label, score, size }: ComponentBarProps) {
   const textSize = size === 'sm' ? 'text-xs' : 'text-sm';
   const barHeight = size === 'sm' ? 'h-1.5' : 'h-2';
-
   const color = getScoreColor(score);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.style.setProperty('--component-width', `${Math.min(score, 100)}%`);
+      ref.current.style.setProperty('--component-bg', color);
+    }
+  }, [score, color]);
 
   return (
     <div>
@@ -160,11 +172,8 @@ function ComponentBar({ label, score, size }: ComponentBarProps) {
       </div>
       <div className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full ${barHeight} overflow-hidden`}>
         <div
-          className={`${barHeight} rounded-full transition-all duration-300`}
-          style={{
-            width: `${Math.min(score, 100)}%`,
-            backgroundColor: color,
-          }}
+          ref={ref}
+          className={`${barHeight} rounded-full transition-all duration-300 ${styles.componentBarFill}`}
         />
       </div>
     </div>

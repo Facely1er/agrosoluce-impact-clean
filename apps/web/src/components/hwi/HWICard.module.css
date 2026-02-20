@@ -1,0 +1,8 @@
+.cardBorder {
+  border-left-color: var(--alert-color);
+}
+
+.componentBarFill {
+  width: var(--component-width, 0%);
+  background-color: var(--component-bg);
+}

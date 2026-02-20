@@ -17,7 +17,7 @@ import {
   UsersRound,
   MapPin,
 } from 'lucide-react';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import { useVracData } from '@/hooks/useVracData';
 import { supabase } from '@/lib/supabase';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -281,9 +281,10 @@ export default function AnalyticsDashboardPage() {
   const hasAnyData = aggregate.health || aggregate.compliance || aggregate.hwi;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <Breadcrumbs items={[{ label: 'Home', path: '/' }, { label: 'Analytics', path: '/analytics' }]} />
+    <PageShell
+      containerClassName="max-w-[1600px]"
+      breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Analytics', path: '/analytics' }]}
+    >
 
         {/* Top bar: title + export + links */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -401,7 +402,6 @@ export default function AnalyticsDashboardPage() {
             {hwiError && <p>HWI: {hwiError}</p>}
           </div>
         )}
-      </div>
-    </div>
+    </PageShell>
   );
 }

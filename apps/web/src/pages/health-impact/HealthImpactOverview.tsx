@@ -15,7 +15,7 @@ import {
   Shield
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import { Button, Card, CardContent, Badge } from '@/components/ui';
 import { FrameworkComplianceBadge } from '@/components/framework';
 
@@ -32,13 +32,10 @@ export default function HealthImpactOverview() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-health-50 via-wellness-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: t.nav.home, path: '/' },
-          { label: h.breadcrumb }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: t.nav.home, path: '/' },
+      { label: h.breadcrumb }
+    ]}>
 
         {/* Hero Section */}
         <div className="text-center mb-16">
@@ -313,7 +310,6 @@ export default function HealthImpactOverview() {
             </CardContent>
           </Card>
         </section>
-      </div>
-    </div>
+    </PageShell>
   );
 }

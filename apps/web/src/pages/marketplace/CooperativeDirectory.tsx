@@ -37,11 +37,10 @@ export default function CooperativeDirectory() {
       
       // v1 scope filters
       const matchesCountry = !countryFilter || 
-        (coop as any).country === countryFilter || 
         coop.country === countryFilter;
       
       const matchesCommodity = !commodityFilter ||
-        ((coop as any).commodity || '').toLowerCase() === commodityFilter.toLowerCase();
+        (coop.commodity || '').toLowerCase() === commodityFilter.toLowerCase();
       
       const matchesCertifications = certificationFilter.length === 0 ||
         certificationFilter.every(cert => 
@@ -49,7 +48,7 @@ export default function CooperativeDirectory() {
         );
       
       const matchesEudr = eudrFilter === null ||
-        ((coop as any).complianceFlags?.eudrReady === eudrFilter);
+        (coop.complianceFlags?.eudrReady === eudrFilter);
 
       return matchesSearch && matchesRegion && matchesDept && 
              matchesCountry && matchesCommodity && matchesCertifications && matchesEudr;
@@ -65,14 +64,14 @@ export default function CooperativeDirectory() {
   }, [cooperatives]);
 
   const countries = useMemo(() => {
-    return [...new Set(cooperatives.map(c => (c as any).country || 'Côte d\'Ivoire').filter(Boolean))].sort();
+    return [...new Set(cooperatives.map(c => c.country || 'Côte d\'Ivoire').filter(Boolean))].sort();
   }, [cooperatives]);
 
   // Commodities: show all EUDR commodities that exist in data, sorted by label
   const commodities = useMemo(() => {
     const inData = new Set(
       cooperatives
-        .map((c) => ((c as any).commodity || '').toLowerCase())
+        .map((c) => (c.commodity || '').toLowerCase())
         .filter(Boolean)
     );
     return EUDR_COMMODITIES_IN_SCOPE.filter((c) => inData.has(c.id)).map(
@@ -122,7 +121,7 @@ export default function CooperativeDirectory() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <p className="text-gray-700 dark:text-gray-300">Chargement des données...</p>
@@ -133,7 +132,7 @@ export default function CooperativeDirectory() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="text-center text-red-600">
           <p>Erreur de chargement: {error}</p>
         </div>

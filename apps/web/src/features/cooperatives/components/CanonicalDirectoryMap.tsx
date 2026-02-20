@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -88,18 +88,22 @@ export default function CanonicalDirectoryMap({
 
   const hasHealth = regionHealth && Object.keys(regionHealth).length > 0;
   const mapHeight = height != null ? (typeof height === 'number' ? `${height}px` : height) : '600px';
+  const mapWrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    mapWrapperRef.current?.style.setProperty('--map-height', mapHeight);
+  }, [mapHeight]);
 
   // Default center for Côte d'Ivoire
   const defaultCenter: [number, number] = [7.54, -5.55];
   const defaultZoom = records.length === 0 ? 7 : 8;
 
   return (
-    <div className="relative">
+    <div ref={mapWrapperRef} className={`relative ${styles.mapWrapper}`}>
       <MapContainer
         center={defaultCenter}
         zoom={defaultZoom}
-        style={{ height: mapHeight, width: '100%', borderRadius: '0.5rem' }}
-        className="z-0"
+        className={`z-0 ${styles.mapContainer}`}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

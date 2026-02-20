@@ -1,0 +1,7 @@
+.scoreBarFill {
+  width: var(--score-pct, 0%);
+}
+
+.sectionProgressFill {
+  width: var(--section-progress-pct, 0%);
+}

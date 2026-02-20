@@ -1,0 +1,8 @@
+.mapHeight {
+  height: var(--map-height);
+}
+
+.mapContainer {
+  height: var(--map-height);
+  width: 100%;
+}

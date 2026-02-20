@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Shield,
   MapPin,
@@ -26,6 +26,7 @@ import {
   type StaffTrainedResponse,
   type ReadinessBand,
 } from '../api/cooperativeEudrApi';
+import styles from './CooperativeEudrReadiness.module.css';
 
 // =============================================
 // TYPES & CONFIG
@@ -94,12 +95,26 @@ const EMPTY_FORM: CooperativeEudrReadinessForm = {
 // =============================================
 
 function ScoreBar({ score, color }: { score: number; color: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.style.setProperty('--score-pct', `${Math.min(100, score)}%`);
+  }, [score]);
   return (
-    <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-      <div
-        className={`h-2 rounded-full transition-all duration-500 ${color}`}
-        style={{ width: `${Math.min(100, score)}%` }}
-      />
+    <div ref={ref} className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+      <div className={`h-2 rounded-full transition-all duration-500 ${styles.scoreBarFill} ${color}`} />
+    </div>
+  );
+}
+
+function SectionProgressBar({ currentSection, totalSections }: { currentSection: number; totalSections: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const pct = totalSections > 0 ? ((currentSection + 1) / totalSections) * 100 : 0;
+  useEffect(() => {
+    ref.current?.style.setProperty('--section-progress-pct', `${pct}%`);
+  }, [pct]);
+  return (
+    <div ref={ref} className="w-full bg-gray-100 rounded-full h-1.5">
+      <div className={`bg-primary-500 h-1.5 rounded-full transition-all duration-300 ${styles.sectionProgressFill}`} />
     </div>
   );
 }
@@ -568,12 +583,7 @@ function ReadinessForm({
           </span>
           <span>{Math.round(((currentSection + 1) / totalSections) * 100)}%</span>
         </div>
-        <div className="w-full bg-gray-100 rounded-full h-1.5">
-          <div
-            className="bg-primary-500 h-1.5 rounded-full transition-all duration-300"
-            style={{ width: `${((currentSection + 1) / totalSections) * 100}%` }}
-          />
-        </div>
+        <SectionProgressBar currentSection={currentSection} totalSections={totalSections} />
       </div>
 
       {/* Live preview score */}

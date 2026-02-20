@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import {
   LineChart,
   Line,
@@ -14,6 +14,19 @@ import { computeHealthIndex, PHARMACIES } from '@agrosoluce/data-insights';
 import type { PharmacyId } from '@agrosoluce/types';
 import { TrendingUp, AlertCircle } from 'lucide-react';
 import { getStaticDataUrl } from '@/lib/staticDataUrl';
+import styles from './HealthIndexTrendChart.module.css';
+
+function LegendCard({ color, children }: { color: string; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.style.setProperty('--pharmacy-color', color);
+  }, [color]);
+  return (
+    <div ref={ref} className={`p-3 rounded-lg border ${styles.legendCard}`}>
+      {children}
+    </div>
+  );
+}
 
 interface ProcessedPeriod {
   pharmacyId: PharmacyId;
@@ -156,20 +169,19 @@ export function HealthIndexTrendChart({ pharmacyIds }: HealthIndexTrendChartProp
         </p>
       </div>
 
+      <div className={styles.chartWrapper}>
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="period"
             stroke="#6b7280"
-            style={{ fontSize: '12px' }}
             angle={-45}
             textAnchor="end"
             height={80}
           />
           <YAxis
             stroke="#6b7280"
-            style={{ fontSize: '12px' }}
             label={{
               value: 'Antimalarial Share (%)',
               angle: -90,
@@ -214,6 +226,7 @@ export function HealthIndexTrendChart({ pharmacyIds }: HealthIndexTrendChartProp
           )}
         </LineChart>
       </ResponsiveContainer>
+      </div>
 
       <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         {(pharmacyIds || (['tanda', 'prolife', 'olympique', 'attobrou'] as PharmacyId[])).map(
@@ -228,24 +241,17 @@ export function HealthIndexTrendChart({ pharmacyIds }: HealthIndexTrendChartProp
                 : '0.00';
 
             return (
-              <div
-                key={pharmacyId}
-                className="p-3 rounded-lg border"
-                style={{ borderColor: pharmacyColors[pharmacyId] }}
-              >
+              <LegendCard key={pharmacyId} color={pharmacyColors[pharmacyId]}>
                 <div className="flex items-center gap-2 mb-1">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: pharmacyColors[pharmacyId] }}
-                  />
+                  <div className={`w-3 h-3 rounded-full ${styles.legendDot}`} />
                   <p className="font-medium text-gray-900">{pharmacy?.name || pharmacyId}</p>
                 </div>
                 <p className="text-xs text-gray-600">{pharmacy?.regionLabel || 'Unknown'}</p>
-                <p className="text-lg font-semibold mt-1" style={{ color: pharmacyColors[pharmacyId] }}>
+                <p className={`text-lg font-semibold mt-1 ${styles.legendValue}`}>
                   {avgShare}%
                 </p>
                 <p className="text-xs text-gray-500">Avg. antimalarial share</p>
-              </div>
+              </LegendCard>
             );
           }
         )}

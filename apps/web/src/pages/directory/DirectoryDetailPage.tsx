@@ -116,7 +116,7 @@ export default function DirectoryDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement...</p>
@@ -127,7 +127,7 @@ export default function DirectoryDetailPage() {
 
   if (error || !record) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 mb-4">{error || 'Enregistrement non trouvé'}</p>
           <Link

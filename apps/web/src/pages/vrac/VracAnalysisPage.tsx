@@ -11,7 +11,7 @@ import {
   LineChart,
   Line,
 } from 'recharts';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import PageHeader from '@/components/layout/PageHeader';
 import { Activity, TrendingUp, MapPin, Info, Download, Filter, AlertTriangle, TrendingDown, Heart } from 'lucide-react';
 import { useVracData } from '@/hooks/useVracData';
@@ -173,7 +173,7 @@ export default function VracAnalysisPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen py-8 flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
       </div>
     );
@@ -181,8 +181,8 @@ export default function VracAnalysisPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen py-8 px-4">
-        <div className="max-w-2xl mx-auto text-center py-12">
+      <PageShell noBreadcrumbs containerClassName="max-w-2xl">
+        <div className="text-center py-12">
           <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Run <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">npm run vrac:process</code> to generate
@@ -195,27 +195,25 @@ export default function VracAnalysisPage() {
             Retry
           </button>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   if (!healthIndex.length) {
     return (
-      <div className="min-h-screen py-8 px-4">
-        <div className="max-w-2xl mx-auto text-center py-12">
+      <PageShell noBreadcrumbs containerClassName="max-w-2xl">
+        <div className="text-center py-12">
           <p className="text-gray-600 dark:text-gray-400 mb-4">No VRAC data available.</p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Run <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">npm run vrac:process</code>
           </p>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 dark:from-gray-900 via-primary-50 dark:via-gray-900 to-white dark:to-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Breadcrumbs items={[{ label: 'Home', path: '/' }, { label: 'Health Intelligence', path: '/vrac' }]} />
+    <PageShell breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Health Intelligence', path: '/vrac' }]}>
 
         <PageHeader
           badge="Health Intelligence • Pharmacy Surveillance"
@@ -626,7 +624,6 @@ export default function VracAnalysisPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }

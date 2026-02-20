@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import PageHeader from '@/components/layout/PageHeader';
 import { HWICard } from '../../components/hwi/HWICard';
 import { HWIGauge } from '../../components/hwi/HWIGauge';
@@ -55,7 +55,7 @@ export default function HouseholdWelfareIndex() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     );
@@ -63,7 +63,7 @@ export default function HouseholdWelfareIndex() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 max-w-md">
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
@@ -86,9 +86,7 @@ export default function HouseholdWelfareIndex() {
   const stats = latestScores.length > 0 ? generateSummaryStats(latestScores) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-50 dark:from-gray-900 via-primary-50 dark:via-gray-900 to-white dark:to-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Breadcrumbs items={[{ label: 'Home', path: '/' }, { label: 'Household Welfare Index', path: '/hwi' }]} />
+    <PageShell breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Household Welfare Index', path: '/hwi' }]}>
         <PageHeader
           badge="ESG Monitoring"
           icon={AlertCircle}
@@ -244,8 +242,7 @@ export default function HouseholdWelfareIndex() {
             )}
           </div>
         )}
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

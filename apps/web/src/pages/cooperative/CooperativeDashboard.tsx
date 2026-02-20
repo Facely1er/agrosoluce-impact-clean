@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Building2, Package, ShoppingCart, Users, Shield, FileText, Route, CheckCircle, AlertCircle, XCircle, Zap, LogOut } from 'lucide-react';
 import FarmerList from '@/features/producers/components/FarmerList';
@@ -16,6 +16,19 @@ import { getOnboardingByCooperativeId } from '@/features/onboarding/api';
 import type { Cooperative } from '@/types';
 import CoopReadinessChecklist from '@/components/CoopReadinessChecklist';
 import CooperativeSpaceLanding from './CooperativeSpaceLanding';
+import styles from './CooperativeDashboard.module.css';
+
+function CoverageBar({ percent }: { percent: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.style.setProperty('--progress-pct', `${percent}%`);
+  }, [percent]);
+  return (
+    <div ref={ref} className="w-full bg-gray-200 rounded-full h-2">
+      <div className={`bg-primary-600 h-2 rounded-full ${styles.progressBarFill}`} />
+    </div>
+  );
+}
 
 export default function CooperativeDashboard() {
   const navigate = useNavigate();
@@ -272,19 +285,14 @@ function OverviewTab({ cooperativeId }: { cooperativeId: string }) {
               <div className="text-2xl font-bold text-gray-900 mb-1">
                 {coverageMetrics.farmers_with_declarations || 0} / {coverageMetrics.farmers_total || 0}
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-primary-600 h-2 rounded-full"
-                  style={{
-                    width: `${coverageMetrics.farmers_total > 0 
-                      ? ((coverageMetrics.farmers_with_declarations || 0) / coverageMetrics.farmers_total * 100) 
-                      : 0}%`,
-                  }}
-                />
-              </div>
+              <CoverageBar
+                percent={(coverageMetrics.farmers_total ?? 0) > 0
+                  ? ((coverageMetrics.farmers_with_declarations || 0) / (coverageMetrics.farmers_total ?? 0) * 100)
+                  : 0}
+              />
               <div className="text-xs text-gray-500 mt-1">
-                {coverageMetrics.farmers_total > 0
-                  ? Math.round(((coverageMetrics.farmers_with_declarations || 0) / coverageMetrics.farmers_total) * 100)
+                {(coverageMetrics.farmers_total ?? 0) > 0
+                  ? Math.round(((coverageMetrics.farmers_with_declarations || 0) / (coverageMetrics.farmers_total ?? 0)) * 100)
                   : 0}%
               </div>
             </div>
@@ -295,19 +303,14 @@ function OverviewTab({ cooperativeId }: { cooperativeId: string }) {
               <div className="text-2xl font-bold text-gray-900 mb-1">
                 {coverageMetrics.plots_with_geo || 0} / {coverageMetrics.plots_total || 0}
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-primary-600 h-2 rounded-full"
-                  style={{
-                    width: `${coverageMetrics.plots_total > 0 
-                      ? ((coverageMetrics.plots_with_geo || 0) / coverageMetrics.plots_total * 100) 
-                      : 0}%`,
-                  }}
-                />
-              </div>
+              <CoverageBar
+                percent={(coverageMetrics.plots_total ?? 0) > 0
+                  ? ((coverageMetrics.plots_with_geo || 0) / (coverageMetrics.plots_total ?? 0) * 100)
+                  : 0}
+              />
               <div className="text-xs text-gray-500 mt-1">
-                {coverageMetrics.plots_total > 0
-                  ? Math.round(((coverageMetrics.plots_with_geo || 0) / coverageMetrics.plots_total) * 100)
+                {(coverageMetrics.plots_total ?? 0) > 0
+                  ? Math.round(((coverageMetrics.plots_with_geo || 0) / (coverageMetrics.plots_total ?? 0)) * 100)
                   : 0}%
               </div>
             </div>
@@ -318,19 +321,14 @@ function OverviewTab({ cooperativeId }: { cooperativeId: string }) {
               <div className="text-2xl font-bold text-gray-900 mb-1">
                 {coverageMetrics.required_docs_present || 0} / {coverageMetrics.required_docs_total || 0}
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-primary-600 h-2 rounded-full"
-                  style={{
-                    width: `${coverageMetrics.required_docs_total > 0 
-                      ? ((coverageMetrics.required_docs_present || 0) / coverageMetrics.required_docs_total * 100) 
-                      : 0}%`,
-                  }}
-                />
-              </div>
+              <CoverageBar
+                percent={(coverageMetrics.required_docs_total ?? 0) > 0
+                  ? ((coverageMetrics.required_docs_present || 0) / (coverageMetrics.required_docs_total ?? 0) * 100)
+                  : 0}
+              />
               <div className="text-xs text-gray-500 mt-1">
-                {coverageMetrics.required_docs_total > 0
-                  ? Math.round(((coverageMetrics.required_docs_present || 0) / coverageMetrics.required_docs_total) * 100)
+                {(coverageMetrics.required_docs_total ?? 0) > 0
+                  ? Math.round(((coverageMetrics.required_docs_present || 0) / (coverageMetrics.required_docs_total ?? 0)) * 100)
                   : 0}%
               </div>
             </div>

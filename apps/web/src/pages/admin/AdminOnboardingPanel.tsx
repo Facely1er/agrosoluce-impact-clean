@@ -189,7 +189,7 @@ export default function AdminOnboardingPanel() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-primary-50/30 to-secondary-50/20">
+      <div className="py-32 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary-200 border-t-primary-600" />
           <p className="text-sm text-gray-500">Chargement du tableau de bord…</p>

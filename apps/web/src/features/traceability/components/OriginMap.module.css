@@ -1,0 +1,12 @@
+.placeholderHeight {
+  height: var(--origin-map-height);
+}
+
+.mapOuter {
+  height: var(--origin-map-height);
+}
+
+.mapFullSize {
+  height: 100%;
+  width: 100%;
+}

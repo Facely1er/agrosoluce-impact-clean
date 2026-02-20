@@ -4,7 +4,8 @@
  * Circular gauge visualization for HWI score with color gradient
  */
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
+import styles from './HWIGauge.module.css';
 
 export interface HWIGaugeProps {
   score: number;
@@ -26,10 +27,14 @@ export function HWIGauge({
 
   // Determine color based on score
   const color = getGaugeColor(score);
+  const containerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    containerRef.current?.style.setProperty('--gauge-size', `${size}px`);
+  }, [size]);
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative" style={{ width: size, height: size }}>
+      <div ref={containerRef} className={`relative ${styles.gaugeContainer}`}>
         {/* Background circle */}
         <svg
           width={size}

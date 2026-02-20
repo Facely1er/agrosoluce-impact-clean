@@ -1,0 +1,15 @@
+/* Progress bar fill - width set via --progress-pct (e.g. ref + setProperty) */
+.progressBarFill {
+  width: var(--progress-pct, 0%);
+}
+
+/* Step indicator - width set via --step-width on parent */
+.progressStep {
+  width: var(--step-width);
+  text-align: center;
+}
+
+/* Score bar fill - width set via --score-pct */
+.scoreBarFill {
+  width: var(--score-pct, 0%);
+}

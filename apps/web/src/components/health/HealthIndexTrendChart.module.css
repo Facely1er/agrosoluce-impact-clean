@@ -1,0 +1,15 @@
+.chartWrapper :global(.recharts-cartesian-axis-tick text) {
+  font-size: 12px;
+}
+
+.legendCard {
+  border-color: var(--pharmacy-color);
+}
+
+.legendDot {
+  background-color: var(--pharmacy-color);
+}
+
+.legendValue {
+  color: var(--pharmacy-color);
+}

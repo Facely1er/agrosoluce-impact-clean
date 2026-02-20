@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import PageShell from '@/components/layout/PageShell';
 import { saveBuyerEUDRAssessment } from '@/lib/api/buyersApi';
+import styles from './BuyerEUDRAssessment.module.css';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -622,6 +623,14 @@ function getComplianceLabel(score: number, lang: Language): string {
   return levels[4].label;
 }
 
+function ScoreBarFill({ percent, className }: { percent: number; className: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.style.setProperty('--score-pct', `${percent}%`);
+  }, [percent]);
+  return <div ref={ref} className={`h-2 rounded-full transition-all duration-700 ${styles.scoreBarFill} ${className}`} />;
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function BuyerEUDRAssessment() {
@@ -649,6 +658,15 @@ export default function BuyerEUDRAssessment() {
   // Assessment sections excluding profile (section 0 is handled separately)
   const scoredSections = ASSESSMENT_SECTIONS.filter(s => s.id !== 'profile');
   const profileSection = ASSESSMENT_SECTIONS.find(s => s.id === 'profile')!;
+
+  const totalStepsForProgress = 1 + scoredSections.length;
+  const progressPct = totalStepsForProgress > 1 ? Math.round((currentSection / (totalStepsForProgress - 1)) * 100) : 0;
+  const progressBarContainerRef = useRef<HTMLDivElement>(null);
+  const progressStepsContainerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (progressBarContainerRef.current) progressBarContainerRef.current.style.setProperty('--progress-pct', `${progressPct}%`);
+    if (progressStepsContainerRef.current) progressStepsContainerRef.current.style.setProperty('--step-width', `${100 / totalStepsForProgress}%`);
+  }, [progressPct, totalStepsForProgress]);
 
   const handleResponse = useCallback((questionId: string, value: string | string[]) => {
     setResponses(prev => ({ ...prev, [questionId]: value }));
@@ -965,7 +983,7 @@ export default function BuyerEUDRAssessment() {
     ];
 
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="bg-gray-50">
         <div className="bg-white border-b shadow-sm px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={() => setView('start')} className="flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm">
@@ -1199,12 +1217,12 @@ export default function BuyerEUDRAssessment() {
               <span className="text-sm font-medium text-gray-700">{sectionLabels[currentSection]}</span>
               <span className="text-sm text-gray-500">{progress}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-gradient-to-r from-green-500 to-primary-600 h-2 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+            <div ref={progressBarContainerRef} className="w-full bg-gray-200 rounded-full h-2">
+              <div className={`bg-gradient-to-r from-green-500 to-primary-600 h-2 rounded-full transition-all duration-500 ${styles.progressBarFill}`} />
             </div>
-            <div className="flex justify-between mt-2">
-              {sectionLabels.map((label, i) => (
-                <div key={i} className={`text-xs ${i <= currentSection ? 'text-primary-600 font-medium' : 'text-gray-400'} hidden sm:block`} style={{ width: `${100 / totalSteps}%`, textAlign: 'center' }}>
+            <div ref={progressStepsContainerRef} className="flex justify-between mt-2">
+              {sectionLabels.map((_label, i) => (
+                <div key={i} className={`text-xs ${i <= currentSection ? 'text-primary-600 font-medium' : 'text-gray-400'} hidden sm:block ${styles.progressStep}`}>
                   {i < currentSection ? '✓' : i === currentSection ? '●' : '○'}
                 </div>
               ))}
@@ -1367,7 +1385,10 @@ export default function BuyerEUDRAssessment() {
                       <span className={`text-sm font-bold ${sc.text}`}>{score}%</span>
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2">
-                      <div className={`h-2 rounded-full transition-all duration-700 ${score >= 85 ? 'bg-green-500' : score >= 70 ? 'bg-blue-500' : score >= 50 ? 'bg-yellow-500' : score >= 30 ? 'bg-orange-500' : 'bg-red-500'}`} style={{ width: `${score}%` }} />
+                      <ScoreBarFill
+                        percent={score}
+                        className={score >= 85 ? 'bg-green-500' : score >= 70 ? 'bg-blue-500' : score >= 50 ? 'bg-yellow-500' : score >= 30 ? 'bg-orange-500' : 'bg-red-500'}
+                      />
                     </div>
                   </div>
                 );

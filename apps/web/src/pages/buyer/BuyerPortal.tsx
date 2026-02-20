@@ -9,8 +9,6 @@ import {
   CheckCircle,
   ArrowRight,
   Eye,
-  BarChart3,
-  AlertCircle,
   Info
 } from 'lucide-react';
 
@@ -113,7 +111,7 @@ export default function BuyerPortal() {
 
           <Link
             to="/buyer/request"
-            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border-l-4 border-secondary-500 group border-2 border-secondary-200 transform hover:-translate-y-1"
+            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border-2 border-secondary-200 border-l-4 border-l-secondary-500 group transform hover:-translate-y-1"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="bg-secondary-100 p-3 rounded-lg group-hover:bg-secondary-200 transition-colors">

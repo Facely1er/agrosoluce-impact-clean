@@ -4,21 +4,18 @@
  */
 
 import { Activity, Download, FileText } from 'lucide-react';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import { Button, Card, CardContent, Badge } from '@/components/ui';
 import { FrameworkComplianceBadge, ExportReportButton } from '@/components/framework';
 import { HealthIndicatorsDashboard } from '@/components/health';
 
 export default function FrameworkDemoPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-health-50 via-wellness-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Health & Impact', path: '/health-impact' },
-          { label: 'Framework Demo' }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: 'Home', path: '/' },
+      { label: 'Health & Impact', path: '/health-impact' },
+      { label: 'Framework Demo' }
+    ]}>
 
         {/* Header */}
         <div className="text-center mb-12">
@@ -202,7 +199,6 @@ export default function FrameworkDemoPage() {
             </CardContent>
           </Card>
         </section>
-      </div>
-    </div>
+    </PageShell>
   );
 }

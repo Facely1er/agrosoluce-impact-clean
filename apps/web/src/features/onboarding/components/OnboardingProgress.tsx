@@ -1,8 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { getOnboardingByCooperativeId, getOnboardingSteps } from '../api';
 import type { CooperativeOnboarding, OnboardingStep } from '../types';
 import { DEFAULT_ONBOARDING_STEPS } from '../types';
+import styles from './OnboardingProgress.module.css';
+
+function OnboardingProgressBar({ progressPercentage }: { progressPercentage: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.style.setProperty('--onboarding-progress-pct', `${progressPercentage}%`);
+  }, [progressPercentage]);
+  return (
+    <div className="mb-6">
+      <div ref={ref} className="w-full bg-gray-200 rounded-full h-3">
+        <div className={`bg-primary-600 h-3 rounded-full transition-all duration-300 ${styles.progressFill}`} />
+      </div>
+      <p className="text-sm text-gray-600 mt-2 text-right">{Math.round(progressPercentage)}% complété</p>
+    </div>
+  );
+}
 
 interface OnboardingProgressProps {
   cooperativeId: string;
@@ -88,15 +104,7 @@ export default function OnboardingProgress({ cooperativeId }: OnboardingProgress
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-6">
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div
-            className="bg-primary-600 h-3 rounded-full transition-all duration-300"
-            style={{ width: `${progressPercentage}%` }}
-          ></div>
-        </div>
-        <p className="text-sm text-gray-600 mt-2 text-right">{Math.round(progressPercentage)}% complété</p>
-      </div>
+      <OnboardingProgressBar progressPercentage={progressPercentage} />
 
       {/* Steps List */}
       <div className="space-y-3">

@@ -1,7 +1,9 @@
+import { useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Batch } from '@/types';
+import styles from './OriginMap.module.css';
 
 interface OriginMapProps {
   batch: Batch;
@@ -10,10 +12,16 @@ interface OriginMapProps {
 
 export default function OriginMap({ batch, height = '400px' }: OriginMapProps) {
   const hasLocation = batch.origin_gps_latitude && batch.origin_gps_longitude;
+  const placeholderRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    placeholderRef.current?.style.setProperty('--origin-map-height', height);
+    mapRef.current?.style.setProperty('--origin-map-height', height);
+  }, [height]);
 
   if (!hasLocation) {
     return (
-      <div className="bg-gray-100 rounded-lg flex items-center justify-center" style={{ height }}>
+      <div ref={placeholderRef} className={`bg-gray-100 rounded-lg flex items-center justify-center ${styles.placeholderHeight}`}>
         <p className="text-gray-500">Aucune coordonnée GPS disponible</p>
       </div>
     );
@@ -25,11 +33,11 @@ export default function OriginMap({ batch, height = '400px' }: OriginMapProps) {
   ];
 
   return (
-    <div className="rounded-lg overflow-hidden border border-gray-200" style={{ height }}>
+    <div ref={mapRef} className={`rounded-lg overflow-hidden border border-gray-200 ${styles.mapOuter}`}>
       <MapContainer
         center={position}
         zoom={13}
-        style={{ height: '100%', width: '100%' }}
+        className={styles.mapFullSize}
         scrollWheelZoom={false}
       >
         <TileLayer

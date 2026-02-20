@@ -66,7 +66,7 @@ export default function MapPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col bg-gray-50 dark:bg-gray-900">
       <div className="flex-none px-4 sm:px-6 lg:px-8 py-3 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
         <Breadcrumbs items={[{ label: 'Home', path: '/' }, { label: 'Map', path: '/map' }]} />
         <div className="flex flex-wrap items-center justify-between gap-2 mt-2">

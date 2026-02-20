@@ -3,13 +3,14 @@
  * No cooperatives — focuses on regional health (antimalarial share, antibiotic, harvest risk).
  */
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { MapContainer, TileLayer, CircleMarker, Tooltip, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { getRegionCoordinates } from '@/lib/utils/cooperativeUtils';
 import { Heart } from 'lucide-react';
 import type { RegionHealthInfo } from '@/features/cooperatives/components/CanonicalDirectoryMap';
+import styles from './AnalyticsHealthMap.module.css';
 
 function getHealthStyle(antimalarialSharePct: number): { fillColor: string; color: string } {
   if (antimalarialSharePct >= 15) return { fillColor: '#dc2626', color: '#b91c1c' };
@@ -66,12 +67,18 @@ export default function AnalyticsHealthMap({ regionHealth, height = 'min(60vh, 5
   const defaultCenter: [number, number] = [7.54, -5.55];
   const defaultZoom = 7;
   const mapHeight = typeof height === 'number' ? `${height}px` : height;
+  const emptyRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    emptyRef.current?.style.setProperty('--map-height', mapHeight);
+    mapRef.current?.style.setProperty('--map-height', mapHeight);
+  }, [mapHeight]);
 
   if (regionEntries.length === 0) {
     return (
       <div
-        className="rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500"
-        style={{ height: mapHeight }}
+        ref={emptyRef}
+        className={`rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500 ${styles.mapHeight}`}
       >
         <p className="text-sm">No regional health data. Run VRAC process or connect Supabase.</p>
       </div>
@@ -79,12 +86,11 @@ export default function AnalyticsHealthMap({ regionHealth, height = 'min(60vh, 5
   }
 
   return (
-    <div className="relative rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+    <div ref={mapRef} className={`relative rounded-xl overflow-hidden border border-gray-200 shadow-sm ${styles.mapContainer}`}>
       <MapContainer
         center={defaultCenter}
         zoom={defaultZoom}
-        style={{ height: mapHeight, width: '100%' }}
-        className="z-0"
+        className="z-0 h-full w-full"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

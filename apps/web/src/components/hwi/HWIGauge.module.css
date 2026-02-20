@@ -1,0 +1,4 @@
+.gaugeContainer {
+  width: var(--gauge-size);
+  height: var(--gauge-size);
+}
