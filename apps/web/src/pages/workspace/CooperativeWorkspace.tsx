@@ -344,8 +344,7 @@ export default function CooperativeWorkspace() {
             {activeTab === 'assessment' && <AssessmentTab cooperativeId={coop_id} onComplete={() => setActiveTab('overview')} />}
           </div>
         </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 
@@ -2334,8 +2333,7 @@ function EnablementTab({ cooperativeId }: { cooperativeId: string }) {
         >
           {t.workspace.enablementTab.viewFarmerProtectionPrinciples}
         </Link>
-    </PageShell>
+      </div>
+    </div>
   );
 }
-
-
