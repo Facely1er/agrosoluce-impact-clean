@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -98,7 +98,7 @@ export default function CooperativeWorkspace() {
 
   if (!coop_id) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 mb-4">{t.workspace.cooperativeIdRequired}</p>
         </div>
@@ -108,7 +108,7 @@ export default function CooperativeWorkspace() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <p className="text-gray-600">{t.workspace.loadingWorkspace}</p>
@@ -160,13 +160,10 @@ export default function CooperativeWorkspace() {
   ];
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: t.nav.home, path: '/' },
-          { label: t.workspace.cooperativeWorkspace, path: `/workspace/${coop_id}` }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: t.nav.home, path: '/' },
+      { label: t.workspace.cooperativeWorkspace, path: `/workspace/${coop_id}` }
+    ]}>
 
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-500 rounded-xl shadow-lg p-8 md:p-12 mb-8 text-white relative overflow-hidden">
@@ -2337,8 +2334,7 @@ function EnablementTab({ cooperativeId }: { cooperativeId: string }) {
         >
           {t.workspace.enablementTab.viewFarmerProtectionPrinciples}
         </Link>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Building2, MapPin, Sprout, FileText, Globe, Shield, AlertTriangle, Info, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { getCanonicalDirectoryRecordById } from '@/features/cooperatives/api/canonicalDirectoryApi';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import {
   computeContextualRisks,
@@ -159,14 +159,12 @@ export default function DirectoryDetailPage() {
 
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Directory', path: '/directory' },
-          { label: record?.name || 'Cooperative' }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: 'Home', path: '/' },
+      { label: 'Directory', path: '/directory' },
+      { label: record?.name || 'Cooperative' }
+    ]}>
+      <div>
 
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-500 rounded-xl shadow-lg p-8 mb-6 text-white relative overflow-hidden">
@@ -793,7 +791,7 @@ export default function DirectoryDetailPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

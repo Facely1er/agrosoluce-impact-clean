@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 import { Home, ArrowLeft } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
+import PageShell from '@/components/layout/PageShell';
 
 export default function NotFoundPage() {
   const { t } = useI18n();
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-md w-full mx-auto px-4 text-center">
+    <PageShell noBreadcrumbs containerClassName="max-w-md">
+      <div className="flex items-center justify-center py-20">
+      <div className="w-full text-center">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="text-6xl font-bold text-primary-600 mb-4">404</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{t.notFound.title}</h1>
@@ -31,7 +33,8 @@ export default function NotFoundPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </PageShell>
   );
 }
 

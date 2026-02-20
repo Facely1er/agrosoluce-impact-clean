@@ -9,6 +9,7 @@ import { Building2, ArrowRight, Users, BarChart3, Info } from 'lucide-react';
 import { getCanonicalDirectoryRecords } from '@/features/cooperatives/api/canonicalDirectoryApi';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import { useI18n } from '@/lib/i18n/I18nProvider';
+import PageShell from '@/components/layout/PageShell';
 
 interface PilotInfo {
   pilot_id: string;
@@ -73,37 +74,30 @@ export default function PilotListingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-          </div>
-        </div>
+      <div className="py-32 flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <p className="text-red-800">Error loading pilots: {error}</p>
-            <Link
-              to="/directory"
-              className="mt-4 inline-block text-primary-600 hover:text-primary-700 underline"
-            >
-              Go to Directory
-            </Link>
-          </div>
+      <PageShell noBreadcrumbs>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <p className="text-red-800">Error loading pilots: {error}</p>
+          <Link
+            to="/directory"
+            className="mt-4 inline-block text-primary-600 hover:text-primary-700 underline"
+          >
+            Go to Directory
+          </Link>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageShell noBreadcrumbs>
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -205,8 +199,7 @@ export default function PilotListingPage() {
             {t.pilot.backToDirectory}
           </Link>
         </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

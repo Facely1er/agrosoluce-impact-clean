@@ -1,10 +1,11 @@
 // Farmer Protection Principles Page
 // Standalone page explaining AgroSoluce's approach to farmer protection
 
+import PageShell from '@/components/layout/PageShell';
+
 export default function FarmerProtectionPage() {
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageShell noBreadcrumbs containerClassName="max-w-4xl">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-8 mb-8 border-t-4 border-primary-500">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -162,8 +163,7 @@ export default function FarmerProtectionPage() {
             compliance, consult appropriate legal or compliance professionals.
           </p>
         </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

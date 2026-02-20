@@ -5,7 +5,7 @@ import { createBuyerRequest } from '@/features/buyers/api';
 import { matchCooperativesToRequest } from '@/domain/agro/matching';
 import { createRequestMatches } from '@/features/buyers/api';
 import { useCooperatives } from '@/hooks/useCooperatives';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import { Button, Card, CardContent, Alert, LoadingSpinner, Input, Select, Badge } from '@/components/ui';
 import type { BuyerRequest } from '@/domain/agro/types';
 
@@ -101,22 +101,22 @@ export default function BuyerRequestForm() {
 
   if (coopsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <LoadingSpinner size="lg" text="Loading cooperatives..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Buyers', path: '/buyers' },
-          { label: 'Buyer Portal', path: '/buyer' },
-          { label: 'Create Request' }
-        ]} />
+    <PageShell
+      containerClassName="max-w-3xl"
+      breadcrumbs={[
+        { label: 'Home', path: '/' },
+        { label: 'Buyers', path: '/buyers' },
+        { label: 'Buyer Portal', path: '/buyer' },
+        { label: 'Create Request' }
+      ]}
+    >
 
         {/* Header */}
         <Card variant="gradient" className="mb-6">
@@ -340,8 +340,7 @@ export default function BuyerRequestForm() {
           </div>
           </form>
         </Card>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

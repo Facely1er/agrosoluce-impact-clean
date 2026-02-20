@@ -6,6 +6,7 @@ import {
   getAllCountries,
 } from '@/data/ngoRegistry';
 import { useI18n } from '@/lib/i18n/I18nProvider';
+import PageShell from '@/components/layout/PageShell';
 
 export default function NGORegistryPage() {
   const { t } = useI18n();
@@ -55,8 +56,7 @@ export default function NGORegistryPage() {
   const hasActiveFilters = searchTerm || selectedThematicFocus !== 'all' || selectedCountry !== 'all';
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageShell noBreadcrumbs>
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6 border-t-4 border-primary-500">
           <div className="flex items-start justify-between">
@@ -265,8 +265,7 @@ export default function NGORegistryPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

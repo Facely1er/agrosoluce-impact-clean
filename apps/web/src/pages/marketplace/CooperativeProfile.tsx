@@ -4,8 +4,9 @@ import { MapPin, Building2, Phone, User, CheckCircle, Clock, BarChart3, Users, S
 import { useCooperatives } from '@/hooks/useCooperatives';
 import CooperativeLocationMap from '@/features/cooperatives/components/CooperativeLocationMap';
 import CooperativeStats from '@/features/cooperatives/components/CooperativeStats';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import { getFarmerCountByCooperative } from '@/features/producers/api/farmersApi';
+import CooperativeEudrReadiness from '@/features/compliance/components/CooperativeEudrReadiness';
 
 export default function CooperativeProfile() {
   const { id } = useParams<{ id: string }>();
@@ -34,7 +35,7 @@ export default function CooperativeProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-32">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement...</p>
@@ -45,7 +46,7 @@ export default function CooperativeProfile() {
 
   if (!cooperative) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-32">
         <div className="text-center">
           <p className="text-gray-600 mb-4">Coopérative non trouvée</p>
           <Link
@@ -67,14 +68,12 @@ export default function CooperativeProfile() {
   const department = cooperative.department || cooperative.departement;
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Cooperatives', path: '/cooperatives' },
-          { label: cooperative.name }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: 'Home', path: '/' },
+      { label: 'Cooperatives', path: '/cooperatives' },
+      { label: cooperative.name }
+    ]}>
+      <div>
 
         {/* Header */}
         <div className="bg-gradient-to-r from-secondary-500 to-secondary-600 rounded-xl shadow-lg p-8 mb-6 text-white relative overflow-hidden">
@@ -299,80 +298,65 @@ export default function CooperativeProfile() {
                   </div>
                 )}
 
-                {/* Due Diligence Panel - v1 Scope */}
+                {/* EUDR Readiness Assessment */}
                 <div className="border-t pt-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-primary-600" />
-                    Due Diligence Summary
-                  </h3>
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                    <p className="text-xs text-yellow-800">
-                      <strong>Disclaimer:</strong> Information may include self-reported data and does not constitute certification, verification, or regulatory approval.
-                    </p>
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <CooperativeEudrReadiness
+                      cooperativeId={cooperative.id}
+                      editable={false}
+                    />
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-                    {/* EUDR Information */}
-                    <div className="flex items-start justify-between p-4 bg-white rounded-lg border">
-                      <div className="flex items-start gap-3">
-                        <FileCheck className="h-5 w-5 text-blue-600 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-1">EUDR Information</h4>
-                          <p className="text-sm text-gray-600">
-                            European Union Deforestation Regulation context
-                          </p>
+
+                  {/* Contextual risk context — kept for supplementary info */}
+                  {(cooperative.contextual_risks || cooperative.regulatory_context) && (
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {cooperative.contextual_risks?.deforestation_zone && (
+                        <div className="p-4 bg-white rounded-lg border">
+                          <h4 className="font-medium text-gray-900 mb-2 text-sm flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4 text-orange-500" />
+                            Deforestation Zone Risk
+                          </h4>
+                          <span className={`px-3 py-1 text-xs rounded-full font-medium ${
+                            cooperative.contextual_risks.deforestation_zone === 'high'
+                              ? 'bg-red-100 text-red-800'
+                              : cooperative.contextual_risks.deforestation_zone === 'medium'
+                              ? 'bg-orange-100 text-orange-800'
+                              : cooperative.contextual_risks.deforestation_zone === 'low'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {cooperative.contextual_risks.deforestation_zone.charAt(0).toUpperCase() +
+                              cooperative.contextual_risks.deforestation_zone.slice(1)}
+                          </span>
                         </div>
-                      </div>
-                      <div>
-                        <span className="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">
-                          Informational
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Contextual Information */}
-                    <div className="flex items-start justify-between p-4 bg-white rounded-lg border">
-                      <div className="flex items-start gap-3">
-                        <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-1">Contextual Information</h4>
-                          <p className="text-sm text-gray-600">
-                            Contextual information about supply chain characteristics
-                          </p>
+                      )}
+                      {cooperative.regulatory_context?.eudr_applicable !== undefined && (
+                        <div className="p-4 bg-white rounded-lg border">
+                          <h4 className="font-medium text-gray-900 mb-2 text-sm flex items-center gap-2">
+                            <FileCheck className="h-4 w-4 text-blue-500" />
+                            EUDR Applicable
+                          </h4>
+                          <span className={`px-3 py-1 text-xs rounded-full font-medium ${
+                            cooperative.regulatory_context.eudr_applicable
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {cooperative.regulatory_context.eudr_applicable ? 'Yes — EU exports subject to EUDR' : 'Not applicable'}
+                          </span>
                         </div>
-                      </div>
-                      <div>
-                        <span className="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">
-                          Context Only
-                        </span>
-                      </div>
+                      )}
                     </div>
+                  )}
 
-                    {/* Additional Risk Assessments */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 bg-white rounded-lg border">
-                        <h4 className="font-medium text-gray-900 mb-2 text-sm">Land-use & Deforestation Risk</h4>
-                        <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                          Assessment Pending
-                        </span>
-                      </div>
-                      <div className="p-4 bg-white rounded-lg border">
-                        <h4 className="font-medium text-gray-900 mb-2 text-sm">Traceability Confidence</h4>
-                        <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                          Assessment Pending
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Integration Hook for ImpactSoluce */}
-                    <div className="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200">
-                      <h4 className="font-medium text-primary-900 mb-2 flex items-center gap-2">
-                        <BarChart3 className="h-4 w-4" />
-                        Impact Profile (via ImpactSoluce)
-                      </h4>
-                      <p className="text-sm text-primary-700">
-                        Additional contextual information may be available through ImpactSoluce integration.
-                      </p>
-                    </div>
+                  {/* Integration Hook for ImpactSoluce */}
+                  <div className="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200">
+                    <h4 className="font-medium text-primary-900 mb-2 flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4" />
+                      Impact Profile (via ImpactSoluce)
+                    </h4>
+                    <p className="text-sm text-primary-700">
+                      Additional contextual information may be available through ImpactSoluce integration.
+                    </p>
                   </div>
                 </div>
 
@@ -397,7 +381,7 @@ export default function CooperativeProfile() {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

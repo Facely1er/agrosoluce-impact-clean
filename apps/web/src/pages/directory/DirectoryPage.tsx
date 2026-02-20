@@ -8,7 +8,7 @@ import {
 import CanonicalDirectoryCard from '@/features/cooperatives/components/CanonicalDirectoryCard';
 import CanonicalDirectoryMap, { type RegionHealthInfo } from '@/features/cooperatives/components/CanonicalDirectoryMap';
 import DirectoryVisualizationDashboard from '@/features/cooperatives/components/DirectoryVisualizationDashboard';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import { useVracData } from '@/hooks/useVracData';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import type { EudrCommodity } from '@/types';
@@ -340,13 +340,11 @@ export default function DirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Directory', path: '/directory' }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: 'Home', path: '/' },
+      { label: 'Directory', path: '/directory' }
+    ]}>
+      <div>
 
         {/* Header */}
         <div className="bg-gradient-to-r from-secondary-500 to-secondary-600 rounded-xl shadow-lg p-8 mb-8 text-white relative overflow-hidden">
@@ -663,6 +661,6 @@ export default function DirectoryPage() {
           )}
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

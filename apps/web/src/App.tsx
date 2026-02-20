@@ -13,6 +13,7 @@ const BuyerPortal = lazy(() => import('./pages/buyer/BuyerPortal'));
 const BuyerRequestForm = lazy(() => import('./pages/buyer/BuyerRequestForm'));
 const BuyerMatches = lazy(() => import('./pages/buyer/BuyerMatches'));
 const BuyerLandingPage = lazy(() => import('./pages/buyer/BuyerLandingPage'));
+const BuyerEUDRAssessment = lazy(() => import('./pages/buyer/BuyerEUDRAssessment'));
 const AboutPage = lazy(() => import('./pages/about/AboutPage'));
 const WhatWeDoPage = lazy(() => import('./pages/about/WhatWeDoPage'));
 const WhoItsForPage = lazy(() => import('./pages/about/WhoItsForPage'));
@@ -100,6 +101,14 @@ function App() {
             <Route path="/buyer" element={<BuyerPortal />} />
             <Route path="/buyer/request" element={<BuyerRequestForm />} />
             <Route path="/buyer/requests/:requestId/matches" element={<BuyerMatches />} />
+            <Route
+              path="/buyer/eudr-assessment"
+              element={
+                <ErrorBoundary>
+                  <BuyerEUDRAssessment />
+                </ErrorBoundary>
+              }
+            />
             <Route path="/buyer/*" element={<BuyerPortal />} />
             <Route path="/partners" element={<PartnerLandingPage />} />
             <Route path="/ngos" element={<PartnerLandingPage />} />

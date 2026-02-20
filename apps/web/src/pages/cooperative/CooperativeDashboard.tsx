@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Building2, Package, ShoppingCart, Users, Shield, FileText, Route, CheckCircle, AlertCircle, XCircle, Zap, LogOut } from 'lucide-react';
 import FarmerList from '@/features/producers/components/FarmerList';
 import ComplianceDashboard from '@/features/compliance/components/ComplianceDashboard';
+import CooperativeEudrReadiness from '@/features/compliance/components/CooperativeEudrReadiness';
+import PageShell from '@/components/layout/PageShell';
 import AuditList from '@/features/evidence/components/AuditList';
 import FieldDeclarationForm from '@/features/evidence/components/FieldDeclarationForm';
 import { BatchCard } from '@/features/traceability/components';
@@ -42,7 +44,7 @@ export default function CooperativeDashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-32">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement...</p>
@@ -65,8 +67,8 @@ export default function CooperativeDashboard() {
   ];
 
   return (
-    <div className="min-h-screen py-8 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageShell noBreadcrumbs>
+      <div>
         {/* Header */}
         <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
           <div>
@@ -145,7 +147,16 @@ export default function CooperativeDashboard() {
             {activeTab === 'farmers' && cooperativeId && <FarmerList cooperativeId={cooperativeId} />}
             {activeTab === 'products' && <ProductsTab />}
             {activeTab === 'traceability' && cooperativeId && <TraceabilityTab cooperativeId={cooperativeId} />}
-            {activeTab === 'compliance' && cooperativeId && <ComplianceDashboard cooperativeId={cooperativeId} />}
+            {activeTab === 'compliance' && cooperativeId && (
+              <div className="space-y-8">
+                {/* EUDR Supply-Side Readiness Assessment (editable by cooperative) */}
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <CooperativeEudrReadiness cooperativeId={cooperativeId} editable={true} />
+                </div>
+                {/* Existing certifications & compliance requirements */}
+                <ComplianceDashboard cooperativeId={cooperativeId} />
+              </div>
+            )}
             {activeTab === 'evidence' && cooperativeId && (
               <EvidenceTab
                 cooperativeId={cooperativeId}
@@ -166,7 +177,7 @@ export default function CooperativeDashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

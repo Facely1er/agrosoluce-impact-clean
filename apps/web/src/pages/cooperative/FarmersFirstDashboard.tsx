@@ -13,6 +13,7 @@ import { OnboardingWizard, OnboardingProgress } from '@/features/onboarding/comp
 import { SatisfactionSurvey, FeedbackForm } from '@/features/feedback/components';
 import { BaselineAssessment, MonthlyProgressReport, ImpactDashboard } from '@/features/value-tracking/components';
 import { TrainingList } from '@/features/training/components';
+import PageShell from '@/components/layout/PageShell';
 import { getFarmersFirstSummary } from '@/features/farmers/api/farmersFirstApi';
 import type { FarmersFirstSummary } from '@/features/farmers/api/farmersFirstApi';
 
@@ -53,15 +54,14 @@ export default function FarmersFirstDashboard({ cooperativeId: propCooperativeId
 
   if (!cooperativeId) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <p className="text-gray-600">Cooperative ID is required</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageShell noBreadcrumbs>
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6 border-t-4 border-primary-500">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -434,8 +434,7 @@ export default function FarmersFirstDashboard({ cooperativeId: propCooperativeId
             )}
           </div>
         </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

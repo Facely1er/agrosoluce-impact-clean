@@ -1,36 +1,28 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import { 
-  Search, 
   UsersRound, 
-  Heart, 
   Briefcase, 
   FileText, 
   Shield, 
   TrendingUp, 
-  MapPin,
   CheckCircle,
   ArrowRight,
   Eye,
   BarChart3,
-  Target,
   AlertCircle,
   Info
 } from 'lucide-react';
 
 export default function BuyerPortal() {
-  const [searchTerm, setSearchTerm] = useState('');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Buyers', path: '/buyers' },
-          { label: 'Buyer Portal' }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: 'Home', path: '/' },
+      { label: 'Buyers', path: '/buyers' },
+      { label: 'Buyer Portal' }
+    ]}>
+      <div>
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-500 rounded-xl shadow-xl p-8 md:p-12 mb-8 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent"></div>
@@ -163,27 +155,32 @@ export default function BuyerPortal() {
             </p>
           </Link>
 
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+          <Link
+            to="/buyer/eudr-assessment"
+            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border-l-4 border-green-600 group transform hover:-translate-y-1 relative overflow-hidden"
+          >
+            <div className="absolute top-3 right-3">
+              <span className="text-xs bg-green-100 text-green-700 font-semibold px-2 py-0.5 rounded-full border border-green-200">
+                NEW
+              </span>
+            </div>
             <div className="flex items-center gap-4 mb-4">
-              <div className="bg-green-100 p-3 rounded-lg">
-                <BarChart3 className="h-8 w-8 text-green-600" />
+              <div className="bg-green-100 p-3 rounded-lg group-hover:bg-green-200 transition-colors">
+                <Shield className="h-8 w-8 text-green-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">Analytics & Reports</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">EUDR Self-Assessment</h3>
                 <p className="text-sm text-gray-600">
-                  Coming soon
+                  EU Regulation 2023/1115
                 </p>
               </div>
+              <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-green-600 group-hover:translate-x-1 transition-all" />
             </div>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              Advanced analytics, compliance dashboards, and custom reporting tools for 
-              comprehensive supply chain due diligence.
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Evaluate your EUDR compliance readiness across 7 areas: due diligence, traceability, 
+              deforestation monitoring and more. Get a score, identify gaps, and receive a tailored action plan.
             </p>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <Info className="h-4 w-4" />
-              <span>Feature in development</span>
-            </div>
-          </div>
+          </Link>
         </div>
 
         {/* What You Can Do Section */}
@@ -309,7 +306,7 @@ export default function BuyerPortal() {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

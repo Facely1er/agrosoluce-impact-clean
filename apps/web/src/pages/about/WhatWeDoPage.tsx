@@ -9,7 +9,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 
 export default function WhatWeDoPage() {
   const { t } = useI18n();
@@ -104,13 +104,10 @@ export default function WhatWeDoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'What We Do' }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: 'Home', path: '/' },
+      { label: 'What We Do' }
+    ]}>
 
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-500 rounded-xl shadow-lg p-8 md:p-12 mb-12 text-white relative overflow-hidden">
@@ -190,8 +187,7 @@ export default function WhatWeDoPage() {
             <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Building2, Mail, Phone, MapPin, Package, CheckCircle, AlertCircle, Star, ExternalLink } from 'lucide-react';
 import { getBuyerRequestById, getRequestMatches, updateMatchStatus } from '@/features/buyers/api';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import type { BuyerRequest, RequestMatch } from '@/domain/agro/types';
 import { matchCooperativesToRequest } from '@/domain/agro/matching';
 
@@ -103,15 +103,13 @@ export default function BuyerMatches() {
   }
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Buyers', path: '/buyers' },
-          { label: 'Buyer Portal', path: '/buyer' },
-          { label: 'Matching Results' }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: 'Home', path: '/' },
+      { label: 'Buyers', path: '/buyers' },
+      { label: 'Buyer Portal', path: '/buyer' },
+      { label: 'Matching Results' }
+    ]}>
+      <div>
 
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-500 rounded-xl shadow-lg p-8 mb-6 text-white relative overflow-hidden">
@@ -355,7 +353,7 @@ export default function BuyerMatches() {
           </div>
         )}
       </div>
-    </div>
+    </PageShell>
   );
 }
 

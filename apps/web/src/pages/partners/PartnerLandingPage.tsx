@@ -12,7 +12,7 @@ import {
   Target
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 
 export default function PartnerLandingPage() {
   const { t } = useI18n();
@@ -62,7 +62,7 @@ export default function PartnerLandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
+    <div>
       {/* Hero Section */}
       <section className="pt-20 pb-16 md:pt-32 md:pb-24 bg-gradient-to-r from-green-600 via-green-700 to-teal-500 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent"></div>
@@ -86,12 +86,10 @@ export default function PartnerLandingPage() {
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Partners & NGOs' }
-        ]} />
+      <PageShell breadcrumbs={[
+        { label: 'Home', path: '/' },
+        { label: 'Partners & NGOs' }
+      ]}>
 
         {/* The NGO & Program Challenge */}
         <section className="mb-16 md:mb-24">
@@ -252,7 +250,7 @@ export default function PartnerLandingPage() {
             {t.partnerLanding.disclaimer}
           </p>
         </section>
-      </div>
+      </PageShell>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Building2, Info, BarChart3, TrendingUp, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { getCanonicalDirectoryRecordsByPilotId } from '@/features/cooperatives/api/canonicalDirectoryApi';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import { getCoverageMetrics } from '@/features/coverage/api/coverageApi';
 import type { CoverageMetrics } from '@/services/coverageService';
@@ -146,7 +146,7 @@ export default function PilotDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading pilot data...</p>
@@ -157,7 +157,7 @@ export default function PilotDashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 mb-4">{error}</p>
           <Link
@@ -172,14 +172,11 @@ export default function PilotDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Directory', path: '/directory' },
-          { label: `Pilot: ${pilotLabel}` }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: 'Home', path: '/' },
+      { label: 'Directory', path: '/directory' },
+      { label: `Pilot: ${pilotLabel}` }
+    ]}>
 
         {/* Header Section */}
         <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-500 rounded-xl shadow-lg p-8 mb-6 text-white relative overflow-hidden">
@@ -428,8 +425,7 @@ export default function PilotDashboardPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

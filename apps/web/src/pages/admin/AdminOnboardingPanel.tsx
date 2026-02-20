@@ -9,6 +9,7 @@ import {
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth/AuthContext';
 import styles from './AdminOnboardingPanel.module.css';
+import PageShell from '@/components/layout/PageShell';
 
 interface CoopRequest {
   id: string;
@@ -211,10 +212,9 @@ export default function AdminOnboardingPanel() {
   ];
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-slate-50 via-primary-50/40 to-secondary-50/30 relative overflow-hidden">
+    <PageShell noBreadcrumbs>
       {/* Subtle background pattern */}
       <div className="absolute inset-0 coop-landing-dot-pattern text-primary-100/50 pointer-events-none" aria-hidden />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Header */}
         <header className="mb-8 animate-fade-in">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -352,8 +352,7 @@ export default function AdminOnboardingPanel() {
             />
           )}
         </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

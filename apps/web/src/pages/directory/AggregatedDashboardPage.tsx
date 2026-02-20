@@ -24,7 +24,7 @@ import CanonicalDirectoryMap from '@/features/cooperatives/components/CanonicalD
 import type { RegionHealthInfo } from '@/features/cooperatives/components/CanonicalDirectoryMap';
 import RegionAggregateCard from '@/features/cooperatives/components/RegionAggregateCard';
 import type { RegionAggregateData } from '@/features/cooperatives/components/RegionAggregateCard';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import { aggregateGeoContext } from '@/lib/utils/geoContextUtils';
 import { useVracData } from '@/hooks/useVracData';
 import type { CanonicalCooperativeDirectory } from '@/types';
@@ -252,15 +252,12 @@ export default function AggregatedDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Breadcrumbs
-          items={[
-            { label: 'Home', path: '/' },
-            { label: 'Directory', path: '/directory' },
-            { label: 'Aggregated dashboard', path: '/directory/aggregate' },
-          ]}
-        />
+    <PageShell breadcrumbs={[
+      { label: 'Home', path: '/' },
+      { label: 'Directory', path: '/directory' },
+      { label: 'Aggregated dashboard', path: '/directory/aggregate' },
+    ]}>
+      <div>
 
         <div className="bg-gradient-to-r from-secondary-500 to-secondary-600 rounded-xl shadow-lg p-8 mb-8 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent" />
@@ -543,6 +540,6 @@ export default function AggregatedDashboardPage() {
           )}
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

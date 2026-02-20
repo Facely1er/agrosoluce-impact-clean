@@ -16,19 +16,16 @@ import {
   Clock,
   MapPin
 } from 'lucide-react';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export default function MonitoringPage() {
   const { t } = useI18n();
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 dark:from-gray-900 via-primary-50 dark:via-gray-900 to-white dark:to-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: t.nav.home, path: '/' },
-          { label: t.monitoring.breadcrumb, path: '/monitoring' }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: t.nav.home, path: '/' },
+      { label: t.monitoring.breadcrumb, path: '/monitoring' }
+    ]}>
 
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-600 rounded-xl shadow-2xl p-8 md:p-12 mb-8 text-white relative overflow-hidden">
@@ -325,8 +322,7 @@ export default function MonitoringPage() {
             </Link>
           </div>
         </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

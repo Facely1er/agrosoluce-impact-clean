@@ -6,7 +6,7 @@ import { normalizeText } from '@/lib/utils/cooperativeUtils';
 import { EUDR_COMMODITIES_IN_SCOPE } from '@/types';
 import CooperativeMap from '@/features/cooperatives/components/CooperativeMap';
 import CooperativeCard from '@/features/cooperatives/components/CooperativeCard';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageShell from '@/components/layout/PageShell';
 import styles from './CooperativeDirectory.module.css';
 
 export default function CooperativeDirectory() {
@@ -142,13 +142,11 @@ export default function CooperativeDirectory() {
   }
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 dark:from-gray-900 via-primary-50 dark:via-gray-900 to-white dark:to-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
-          { label: 'Cooperatives', path: '/cooperatives' }
-        ]} />
+    <PageShell breadcrumbs={[
+      { label: 'Home', path: '/' },
+      { label: 'Cooperatives', path: '/cooperatives' }
+    ]}>
+      <div>
 
         {/* Enhanced Header */}
         <div className="bg-gradient-to-r from-secondary-500 via-secondary-600 to-primary-600 rounded-xl shadow-2xl p-8 md:p-12 mb-8 text-white relative overflow-hidden">
@@ -516,7 +514,7 @@ export default function CooperativeDirectory() {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

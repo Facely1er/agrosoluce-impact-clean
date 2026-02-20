@@ -1,4 +1,5 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import PageShell from '@/components/layout/PageShell';
 import { ArrowLeft, Building2 } from 'lucide-react';
 import OnboardingWizard from '@/features/onboarding/components/OnboardingWizard';
 
@@ -8,7 +9,7 @@ export default function CooperativeOnboardingPage() {
 
   if (!id) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 mb-4">Identifiant de coopérative manquant.</p>
           <Link to="/cooperative" className="text-primary-600 hover:underline">
@@ -20,8 +21,7 @@ export default function CooperativeOnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+    <PageShell noBreadcrumbs containerClassName="max-w-4xl">
         {/* Breadcrumb */}
         <div className="flex items-center gap-3 mb-6">
           <Link
@@ -44,7 +44,6 @@ export default function CooperativeOnboardingPage() {
           onComplete={() => navigate('/cooperative')}
           onClose={() => navigate('/cooperative')}
         />
-      </div>
-    </div>
+    </PageShell>
   );
 }

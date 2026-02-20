@@ -60,7 +60,7 @@ export default function BuyerLandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
+    <div>
       {/* Hero Section */}
       <section className="pt-20 pb-16 md:pt-32 md:pb-24 bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-500 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent"></div>
