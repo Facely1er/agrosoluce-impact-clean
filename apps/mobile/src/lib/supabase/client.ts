@@ -1,4 +1,5 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -6,7 +7,8 @@ const defaultSchema = (import.meta.env.VITE_SUPABASE_SCHEMA as string) || 'agros
 
 export const isSupabaseConfigured = (): boolean => !!(supabaseUrl && supabaseAnonKey);
 
-let supabaseInstance: SupabaseClient | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let supabaseInstance: SupabaseClient<any> | null = null;
 
 try {
   if (supabaseUrl && supabaseAnonKey) {
@@ -26,7 +28,8 @@ try {
   supabaseInstance = null;
 }
 
-export const supabase: SupabaseClient | null = supabaseInstance;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const supabase: SupabaseClient<any> | null = supabaseInstance;
 
 export const getCurrentUser = async () => {
   if (!supabase) return null;

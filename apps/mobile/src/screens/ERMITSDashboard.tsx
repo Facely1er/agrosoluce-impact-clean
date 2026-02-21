@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Target,
@@ -44,6 +44,12 @@ const MOCK_TRENDS = [
     type: 'social',
   },
 ];
+
+const TargetBarFill = ({ pct }: { pct: number }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { ref.current?.style.setProperty('--bar-pct', `${Math.min(pct, 100)}%`); }, [pct]);
+  return <div ref={ref} className="target-bar-fill target-bar-fill-dynamic" />;
+};
 
 const TREND_COLORS: Record<string, string> = {
   market: 'trend-market',
@@ -358,7 +364,7 @@ export const ERMITSDashboard = () => {
                         </span>
                       </div>
                       <div className="target-bar">
-                        <div className="target-bar-fill" style={{ width: `${Math.min(pct, 100)}%` }} />
+                        <TargetBarFill pct={pct} />
                       </div>
                     </div>
                   );

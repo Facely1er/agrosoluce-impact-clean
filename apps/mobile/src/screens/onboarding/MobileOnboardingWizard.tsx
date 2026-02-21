@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   CheckCircle2,
@@ -11,7 +11,6 @@ import {
   Users,
   Leaf,
   Building2,
-  MapPin,
   Phone,
   Mail,
   Lock,
@@ -20,6 +19,7 @@ import {
   AlertCircle,
   LogOut,
 } from 'lucide-react';
+
 import {
   getOnboardingByCooperativeId,
   createOrUpdateOnboarding,
@@ -126,8 +126,8 @@ const AccountSetupStep = ({ cooperativeId, onComplete }: { cooperativeId: string
       </div>
 
       <div className="mob-form-group">
-        <label className="mob-label">Région</label>
-        <select className="mob-input" value={form.region} onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))}>
+        <label className="mob-label" htmlFor="coop-region">Région</label>
+        <select id="coop-region" className="mob-input" title="Région de la coopérative" value={form.region} onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))} aria-label="Région">
           <option value="">Sélectionner</option>
           {REGIONS_CI.map((r) => <option key={r} value={r}>{r}</option>)}
         </select>
@@ -364,13 +364,17 @@ const WelcomeCallStep = ({
       </div>
       <div className="mob-form-row">
         <div className="mob-form-group mob-form-col">
-          <label className="mob-label">Date</label>
-          <input className="mob-input" type="date" value={date} min={new Date().toISOString().split('T')[0]}
+          <label htmlFor="call-date" className="mob-label">Date</label>
+          <input id="call-date" className="mob-input" type="date" value={date}
+            min={new Date().toISOString().split('T')[0]}
+            aria-label="Date de l'appel de bienvenue"
             onChange={(e) => setDate(e.target.value)} />
         </div>
         <div className="mob-form-group mob-form-col">
-          <label className="mob-label">Heure</label>
-          <input className="mob-input" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+          <label htmlFor="call-time" className="mob-label">Heure</label>
+          <input id="call-time" className="mob-input" type="time" value={time}
+            aria-label="Heure de l'appel de bienvenue"
+            onChange={(e) => setTime(e.target.value)} />
         </div>
       </div>
       <button className="mob-btn-primary" onClick={handleSchedule} disabled={!date || !time || saving}>
@@ -379,6 +383,13 @@ const WelcomeCallStep = ({
       <button className="mob-btn-skip" onClick={onComplete}>Passer pour l'instant →</button>
     </div>
   );
+};
+
+// ── Progress fill (CSS custom property, avoids inline style) ─────────────────
+const ProgressFill = ({ pct }: { pct: number }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { ref.current?.style.setProperty('--mob-prog-pct', `${pct}%`); }, [pct]);
+  return <div ref={ref} className="mob-progress-fill mob-progress-fill-dynamic" />;
 };
 
 // ── Main Wizard ───────────────────────────────────────────────────────────────
@@ -507,7 +518,7 @@ export const MobileOnboardingWizard = ({ cooperativeId = 'demo-coop-id' }: Props
       {/* Progress dots */}
       <div className="mob-progress-bar-wrap">
         <div className="mob-progress-bar">
-          <div className="mob-progress-fill" style={{ width: `${(completedCount / DEFAULT_ONBOARDING_STEPS.length) * 100}%` }} />
+          <ProgressFill pct={(completedCount / DEFAULT_ONBOARDING_STEPS.length) * 100} />
         </div>
         <div className="mob-progress-dots">
           {DEFAULT_ONBOARDING_STEPS.map((step, idx) => {
