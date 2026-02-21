@@ -3,7 +3,7 @@
  * that browse data across regions bidirectionally (overview ↔ drill-down by region).
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Building2,
@@ -14,6 +14,7 @@ import {
   MapPin,
   ArrowLeft,
   Layers,
+  RefreshCw,
 } from 'lucide-react';
 import {
   getCanonicalDirectoryRecords,
@@ -81,28 +82,22 @@ export default function AggregatedDashboardPage() {
     }
   }, [selectedRegion, regionFromUrl, setSearchParams]);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const result = await getCanonicalDirectoryRecordsByStatus('active');
-        if (!cancelled) {
-          if (result.error) throw result.error;
-          setRecords(result.data || []);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Unknown error');
-          setRecords([]);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
+  const fetchRecords = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await getCanonicalDirectoryRecordsByStatus('active');
+      if (result.error) throw result.error;
+      setRecords(result.data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setRecords([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { fetchRecords(); }, [fetchRecords]);
 
   const regionHealth = useMemo((): Record<string, RegionHealthInfo> => {
     if (!healthIndex.length) return {};
@@ -235,7 +230,7 @@ export default function AggregatedDashboardPage() {
       <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4" />
-          <p className="text-gray-600">Chargement du tableau de bord...</p>
+          <p className="text-gray-600">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -244,8 +239,15 @@ export default function AggregatedDashboardPage() {
   if (error) {
     return (
       <div className="py-32 flex items-center justify-center">
-        <div className="text-center text-red-600">
-          <p>Erreur: {error}</p>
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Failed to load data: {error}</p>
+          <button
+            onClick={fetchRecords}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors text-sm"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -341,14 +343,11 @@ export default function AggregatedDashboardPage() {
                 className="border rounded px-2 py-1 text-xs"
               >
                 <option value="all">All</option>
-                {availableCommodities.map((id) => {
-                  const c = EUDR_COMMODITIES_IN_SCOPE.find((x) => x.id === id);
-                  return (
-                    <option key={id} value={id}>
-                      {c?.label || id}
-                    </option>
-                  );
-                })}
+                {EUDR_COMMODITIES_IN_SCOPE.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                  </option>
+                ))}
               </select>
             </label>
 
@@ -411,12 +410,14 @@ export default function AggregatedDashboardPage() {
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-4" role="group" aria-label="View mode">
                 <button
                   type="button"
                   onClick={() => setViewMode('map')}
                   className={`p-2 rounded ${viewMode === 'map' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                   title="Map view"
+                  aria-label="Map view"
+                  aria-pressed={viewMode === 'map' ? 'true' : 'false'}
                 >
                   <MapPin className="h-4 w-4" />
                 </button>
@@ -425,6 +426,8 @@ export default function AggregatedDashboardPage() {
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded ${viewMode === 'grid' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                   title="Grid view"
+                  aria-label="Grid view"
+                  aria-pressed={viewMode === 'grid' ? 'true' : 'false'}
                 >
                   <Grid3x3 className="h-4 w-4" />
                 </button>
@@ -433,6 +436,8 @@ export default function AggregatedDashboardPage() {
                   onClick={() => setViewMode('list')}
                   className={`p-2 rounded ${viewMode === 'list' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                   title="List view"
+                  aria-label="List view"
+                  aria-pressed={viewMode === 'list' ? 'true' : 'false'}
                 >
                   <List className="h-4 w-4" />
                 </button>

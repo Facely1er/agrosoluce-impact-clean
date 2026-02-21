@@ -16,9 +16,15 @@ AgroSoluce is a comprehensive platform for managing agricultural cooperatives, t
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+**Required**
+
 - Node.js >= 18.0.0
 - npm or pnpm
-- Supabase account (for database)
+
+**Optional**
+
+- Supabase account (for database features; app runs with static/fallback data without it)
 
 ### Installation
 

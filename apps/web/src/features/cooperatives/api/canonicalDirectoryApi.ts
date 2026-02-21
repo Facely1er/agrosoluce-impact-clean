@@ -9,9 +9,37 @@ const SCHEMA = 'agrosoluce';
 /** Supabase/PostgREST default max rows per request; we paginate to fetch all */
 const PAGE_SIZE = 1000;
 
+/**
+ * Derive EUDR commodities from static JSON "secteur" (and optional primary_crop).
+ * Used so the directory filter shows all commodities present in the data (e.g. Cocoa, Rubber, Cattle),
+ * not only cocoa. Secteur values in cooperatives_cote_ivoire.json include CULTURES DIVERSES, HEVEA, ELEVAGE ET PECHE, etc.
+ */
+function deriveCommoditiesFromSecteur(secteur: string | null | undefined, primaryCrop?: string | null): EudrCommodity[] {
+  const combined = [secteur ?? '', primaryCrop ?? ''].join(' ').toUpperCase();
+  if (!combined.trim()) return [];
+
+  // Explicit EUDR mappings from secteur / primary_crop
+  if (/\bHEVEA\b|RUBBER|CAOUTCHOUC/.test(combined)) return ['rubber'];
+  if (/\bELEVAGE\b|PECHE|CATTLE|BETAIL|BŒUF|Boeuf/.test(combined)) return ['cattle'];
+  if (/\bCACAO\b|COCOA|CACAOYER/.test(combined)) return ['cocoa'];
+  if (/\bCAFE\b|COFFEE|CAFÉ/.test(combined)) return ['coffee'];
+  if (/\bPALM|HUILE DE PALME|OIL PALM/.test(combined)) return ['palm_oil'];
+  if (/\bSOJA\b|SOY|SOJA/.test(combined)) return ['soy'];
+  if (/\bBOIS\b|WOOD|TIMBER|FOREST/.test(combined)) return ['wood'];
+
+  // CULTURES DIVERSES in Côte d'Ivoire context is predominantly cocoa; default to cocoa so records are filterable
+  if (/\bCULTURES DIVERSES\b/.test(combined)) return ['cocoa'];
+
+  return [];
+}
+
 function transformStaticCooperative(raw: any): CanonicalCooperativeDirectory {
   const name = formatCooperativeName(raw.name);
   const region = (raw.region || '').trim();
+  const commodities = deriveCommoditiesFromSecteur(raw.secteur, raw.primary_crop);
+  // If no EUDR commodity derived, default to cocoa for backward compatibility (CI directory is mostly cocoa)
+  const finalCommodities = commodities.length > 0 ? commodities : (['cocoa'] as EudrCommodity[]);
+  const primaryCrop = finalCommodities[0] === 'cocoa' ? 'cocoa' : finalCommodities[0] === 'rubber' ? 'rubber' : finalCommodities[0] === 'cattle' ? 'cattle' : raw.primary_crop || undefined;
   return {
     coop_id: String(raw.id ?? raw.registrationNumber ?? Math.random().toString(36).slice(2)),
     name,
@@ -20,8 +48,8 @@ function transformStaticCooperative(raw: any): CanonicalCooperativeDirectory {
     region,
     regionName: region || undefined,
     department: raw.departement || raw.department,
-    primary_crop: raw.secteur?.includes('CACAO') || raw.secteur?.includes('CACAO') ? 'cocoa' : undefined,
-    commodities: ['cocoa'] as EudrCommodity[],
+    primary_crop: primaryCrop,
+    commodities: finalCommodities,
     source_registry: raw.metadata?.source,
     record_status: (raw.status === 'active' || raw.status === 'verified') ? 'active' : 'active',
     pilot_id: null,
@@ -467,6 +495,10 @@ function deriveCommoditiesFromPrimaryCrop(primaryCrop: string | null | undefined
 }
 
 // Helper function to transform database records to TypeScript types
+// Note: canonical_cooperative_directory has primary_crop but no commodities column. Commodities are
+// derived from primary_crop here. To get multiple commodities in the directory filter when using
+// Supabase, ensure primary_crop (or a future commodities column) is populated with varied values
+// (e.g. cocoa, rubber, coffee) when importing or seeding data.
 function transformCanonicalRecord(data: any): CanonicalCooperativeDirectory {
   // Use display_name if available, otherwise fall back to name
   // Format the name according to workflow requirements (names should not be displayed directly)

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Building2, MapPin, Sprout, FileText, Globe, Shield, AlertTriangle, Info, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { Building2, MapPin, Sprout, FileText, Globe, Shield, AlertTriangle, Info, ChevronDown, ChevronUp, ExternalLink, RefreshCw } from 'lucide-react';
 import { getCanonicalDirectoryRecordById } from '@/features/cooperatives/api/canonicalDirectoryApi';
 import PageShell from '@/components/layout/PageShell';
 import type { CanonicalCooperativeDirectory } from '@/types';
@@ -31,51 +31,41 @@ export default function DirectoryDetailPage() {
   const [countryContextExpanded, setCountryContextExpanded] = useState(false);
   const [commodityContextExpanded, setCommodityContextExpanded] = useState(false);
 
-  useEffect(() => {
-    const fetchRecord = async () => {
-      if (!coop_id) {
-        setError('Cooperative ID is required');
-        setLoading(false);
-        return;
+  const fetchRecord = useCallback(async () => {
+    if (!coop_id) {
+      setError('Cooperative ID is required');
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const [recordResult, coverageResult] = await Promise.all([
+        getCanonicalDirectoryRecordById(coop_id),
+        getCoverageMetrics(coop_id),
+      ]);
+      if (recordResult.error) throw recordResult.error;
+      if (!recordResult.data) throw new Error('Record not found');
+      setRecord(recordResult.data);
+      if (!coverageResult.error && coverageResult.data) {
+        setCoverageMetrics(coverageResult.data);
       }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const [recordResult, coverageResult] = await Promise.all([
-          getCanonicalDirectoryRecordById(coop_id),
-          getCoverageMetrics(coop_id),
-        ]);
-
-        if (recordResult.error) {
-          throw recordResult.error;
-        }
-        if (!recordResult.data) {
-          throw new Error('Record not found');
-        }
-        setRecord(recordResult.data);
-
-        if (!coverageResult.error && coverageResult.data) {
-          setCoverageMetrics(coverageResult.data);
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        setError(errorMessage);
-        console.error('Error fetching directory record:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecord();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(errorMessage);
+      console.error('Error fetching directory record:', err);
+    } finally {
+      setLoading(false);
+    }
   }, [coop_id]);
+
+  useEffect(() => { fetchRecord(); }, [fetchRecord]);
 
   // Derive market context
   const marketContext = record ? {
-    country: record.country || 'Non spécifié',
-    region: record.region || 'Non spécifié',
-    primaryCrop: record.primary_crop || 'Non spécifié',
+    country: record.country || 'Not specified',
+    region: record.region || 'Not specified',
+    primaryCrop: record.primary_crop || 'Not specified',
     isHighDeforestationRisk: HIGH_DEFORESTATION_RISK_COUNTRIES.includes(record.country as any),
     isMediumDeforestationRisk: MEDIUM_DEFORESTATION_RISK_COUNTRIES.includes(record.country as any),
     isEudrProducerCountry: EUDR_PRODUCER_COUNTRIES.includes(record.country as any),
@@ -119,7 +109,7 @@ export default function DirectoryDetailPage() {
       <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement...</p>
+          <p className="text-gray-600">Loading cooperative record...</p>
         </div>
       </div>
     );
@@ -129,13 +119,24 @@ export default function DirectoryDetailPage() {
     return (
       <div className="py-32 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">{error || 'Enregistrement non trouvé'}</p>
-          <Link
-            to="/directory"
-            className="text-secondary-600 hover:text-secondary-700"
-          >
-            Retour au répertoire
-          </Link>
+          <p className="text-gray-600 mb-4">{error || 'Record not found'}</p>
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            {error && (
+              <button
+                onClick={fetchRecord}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors text-sm"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Retry
+              </button>
+            )}
+            <Link
+              to="/directory"
+              className="inline-flex items-center gap-2 px-4 py-2 text-secondary-600 border border-secondary-300 rounded hover:bg-secondary-50 transition-colors text-sm"
+            >
+              Back to directory
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -144,16 +145,11 @@ export default function DirectoryDetailPage() {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'Actif';
-      case 'inactive':
-        return 'Inactif';
-      case 'archived':
-        return 'Archivé';
-      case 'pending':
-        return 'En attente';
-      default:
-        return status;
+      case 'active': return 'Active';
+      case 'inactive': return 'Inactive';
+      case 'archived': return 'Archived';
+      case 'pending': return 'Pending';
+      default: return status;
     }
   };
 
@@ -316,26 +312,27 @@ export default function DirectoryDetailPage() {
                 </div>
               </div>
               <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h4 className="font-medium text-blue-900 mb-2">Risques Contextuels</h4>
+                <h4 className="font-medium text-blue-900 mb-2">Contextual Risks</h4>
+                <p className="text-xs text-blue-700 mb-3">Risk levels are derived from country and crop data. They indicate factors to consider in due diligence — not a compliance determination.</p>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-blue-700">Risque de Déforestation:</span>
+                    <span className="text-blue-700" title="Based on the country's inclusion in EUDR high-risk country classifications">Deforestation risk:</span>
                     <span className={`font-medium ${
                       marketContext.isHighDeforestationRisk ? 'text-red-600' :
                       marketContext.isMediumDeforestationRisk ? 'text-yellow-600' :
                       'text-gray-600'
                     }`}>
-                      {marketContext.isHighDeforestationRisk ? 'Élevé' :
-                       marketContext.isMediumDeforestationRisk ? 'Moyen' :
-                       'Non évalué'}
+                      {marketContext.isHighDeforestationRisk ? 'High' :
+                       marketContext.isMediumDeforestationRisk ? 'Medium' :
+                       'Not assessed'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-blue-700">Risque de Travail des Enfants:</span>
+                    <span className="text-blue-700" title="Based on whether the crop is on the list of commodities associated with child labour risk">Child labour risk:</span>
                     <span className={`font-medium ${
                       marketContext.isChildLaborRiskCrop ? 'text-orange-600' : 'text-gray-600'
                     }`}>
-                      {marketContext.isChildLaborRiskCrop ? 'Potentiel' : 'Non identifié'}
+                      {marketContext.isChildLaborRiskCrop ? 'Potential' : 'Not identified'}
                     </span>
                   </div>
                 </div>
@@ -537,6 +534,8 @@ export default function DirectoryDetailPage() {
             <div className="bg-white rounded-lg shadow-md mb-6 border border-gray-200">
               <button
                 onClick={() => setCountryContextExpanded(!countryContextExpanded)}
+                aria-expanded={countryContextExpanded ? 'true' : 'false'}
+                aria-controls="country-context-panel"
                 className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
               >
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -551,7 +550,7 @@ export default function DirectoryDetailPage() {
               </button>
               
               {countryContextExpanded && (
-                <div className="px-6 pb-6 space-y-6 border-t border-gray-200">
+                <div id="country-context-panel" className="px-6 pb-6 space-y-6 border-t border-gray-200">
                   {/* Land Tenure Overview */}
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Land Tenure Overview</h3>
@@ -662,6 +661,8 @@ export default function DirectoryDetailPage() {
             <div className="bg-white rounded-lg shadow-md mb-6 border border-gray-200">
               <button
                 onClick={() => setCommodityContextExpanded(!commodityContextExpanded)}
+                aria-expanded={commodityContextExpanded ? 'true' : 'false'}
+                aria-controls="commodity-context-panel"
                 className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
               >
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -676,7 +677,7 @@ export default function DirectoryDetailPage() {
               </button>
               
               {commodityContextExpanded && (
-                <div className="px-6 pb-6 space-y-6 border-t border-gray-200">
+                <div id="commodity-context-panel" className="px-6 pb-6 space-y-6 border-t border-gray-200">
                   {/* Typical Supply Chain */}
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Typical Supply Chain</h3>

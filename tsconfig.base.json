@@ -10,6 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types"],
     "paths": {
       "@agrosoluce/types/*": ["packages/types/src/*"],
       "@agrosoluce/ui/*": ["packages/ui/src/*"],

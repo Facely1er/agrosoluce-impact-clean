@@ -26,17 +26,18 @@ export default function CanonicalDirectoryCard({ record }: CanonicalDirectoryCar
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'Actif';
-      case 'inactive':
-        return 'Inactif';
-      case 'archived':
-        return 'Archivé';
-      case 'pending':
-        return 'En attente';
-      default:
-        return status;
+      case 'active': return 'Active';
+      case 'inactive': return 'Inactive';
+      case 'archived': return 'Archived';
+      case 'pending': return 'Pending';
+      default: return status;
     }
+  };
+
+  const coverageBandTooltip: Record<string, string> = {
+    limited: 'Limited — minimal evidence collected so far. Enhanced due diligence may be needed.',
+    partial: 'Partial — some evidence available; gaps remain. Review before sourcing.',
+    substantial: 'Substantial — strong evidence collection. Supports due-diligence requirements.',
   };
 
   // Context-first: Get commodity, country, region for context line
@@ -102,8 +103,11 @@ export default function CanonicalDirectoryCard({ record }: CanonicalDirectoryCar
           </div>
         )}
         {record.coverageBand && (
-          <div className="text-xs text-gray-500">
-            Documentation coverage: {record.coverageBand.charAt(0).toUpperCase() + record.coverageBand.slice(1)}
+          <div
+            className="text-xs text-gray-500 cursor-help underline decoration-dotted"
+            title={coverageBandTooltip[record.coverageBand] ?? `Documentation coverage: ${record.coverageBand}`}
+          >
+            Doc. coverage: <span className="font-medium">{record.coverageBand.charAt(0).toUpperCase() + record.coverageBand.slice(1)}</span>
           </div>
         )}
         {geoContext.deforestationRisk !== 'unknown' && (

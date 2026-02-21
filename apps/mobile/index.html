@@ -2,24 +2,40 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/agrosoluce.png" />
-    <link rel="apple-touch-icon" href="/agrosoluce.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    
+
+    <!-- Favicon: inline SVG (no 404); add public/agrosoluce.png for logo -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%232E7D32' d='M16 4C9 11 5 19 5 23c0 3.5 4.2 5.5 11 5.5s11-2 11-5.5c0-4-4-12-11-19z'/%3E%3C/svg%3E" />
+    <link rel="icon" type="image/png" href="/agrosoluce.png" />
+    <link rel="shortcut icon" type="image/png" href="/agrosoluce.png" />
+    <link rel="apple-touch-icon" href="/agrosoluce.png" />
+
     <!-- PWA Meta Tags -->
-    <!-- theme-color: Standard PWA meta tag supported by Chrome, Edge, Safari, Samsung Internet -->
-    <!-- Note: Not supported by Firefox, Firefox for Android, or Opera, but safe to include (unsupported browsers ignore it) -->
     <meta name="theme-color" content="#2E7D32" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="AgroSoluce" />
-    
+
     <!-- Primary Meta Tags -->
     <title>AgroSoluce® Intelligence - Field Operations Platform</title>
     <meta name="title" content="AgroSoluce® Intelligence - Field Operations Platform" />
     <meta name="description" content="Field Intelligence & Operations Platform for ERMITS team, cooperative managers, and farmers. Offline-first, voice-guided interface for field work and monitoring." />
-    
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="AgroSoluce® Intelligence - Field Operations Platform" />
+    <meta property="og:description" content="Field Intelligence & Operations Platform for ERMITS team, cooperative managers, and farmers. Offline-first, voice-guided interface for field work and monitoring." />
+    <meta property="og:image" content="/agrosoluce.png" />
+    <meta property="og:url" content="/" />
+    <meta property="og:locale" content="fr_FR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="AgroSoluce® Intelligence - Field Operations Platform" />
+    <meta name="twitter:description" content="Field Intelligence & Operations Platform for ERMITS team, cooperative managers, and farmers. Offline-first, voice-guided interface for field work and monitoring." />
+    <meta name="twitter:image" content="/agrosoluce.png" />
+
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.webmanifest" />
   </head>

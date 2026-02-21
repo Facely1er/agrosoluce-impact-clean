@@ -220,6 +220,31 @@ body {
   flex-shrink: 0;
 }
 
+.role-selector-platform-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-md);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.role-selector-platform-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+}
+
+.role-selector-platform-icon {
+  width: 16px;
+  height: 16px;
+}
+
 /* Dashboard Container */
 .dashboard-container {
   min-height: 100vh;
@@ -235,8 +260,38 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--spacing-sm);
   color: var(--color-white);
   box-shadow: var(--shadow-sm);
+}
+
+.header-back-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header-back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.header-back-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.header-back-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .header-ermits {

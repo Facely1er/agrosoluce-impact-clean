@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, UsersRound, Briefcase, Shield, Scale, Info, FileText, Users, Building2 } from 'lucide-react';
+import { Mail, UsersRound, Briefcase, Shield, Scale, Info, FileText, Users, Building2, Home } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export default function Footer() {
@@ -40,6 +40,7 @@ export default function Footer() {
                   to="/" 
                   className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-1"
                 >
+                  <Home className="h-3 w-3" />
                   {t.nav.home}
                 </Link>
               </li>

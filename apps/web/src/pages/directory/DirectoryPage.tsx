@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Building2, X, ClipboardList, Grid3x3, List, MapPin } from 'lucide-react';
+import { Search, Building2, X, ClipboardList, Grid3x3, List, MapPin, RefreshCw } from 'lucide-react';
 import {
   getCanonicalDirectoryRecords,
   getCanonicalDirectoryRecordsByStatus,
@@ -132,40 +132,26 @@ export default function DirectoryPage() {
     }
   }, [selectedRegion, regionFromUrl, setSearchParams]);
 
-  // Fetch records on mount and when filters change
-  useEffect(() => {
-    const fetchRecords = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        let result;
-
-        // For now, fetch all active records and filter client-side
-        // This allows us to use the new commodity/region/coverage filters
-        if (statusFilter === 'active') {
-          result = await getCanonicalDirectoryRecordsByStatus('active');
-        } else {
-          result = await getCanonicalDirectoryRecords();
-        }
-
-        if (result.error) {
-          throw result.error;
-        }
-
-        setRecords(result.data || []);
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        setError(errorMessage);
-        setRecords([]);
-        console.error('Error fetching directory records:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecords();
+  const fetchRecords = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = statusFilter === 'active'
+        ? await getCanonicalDirectoryRecordsByStatus('active')
+        : await getCanonicalDirectoryRecords();
+      if (result.error) throw result.error;
+      setRecords(result.data || []);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(errorMessage);
+      setRecords([]);
+      console.error('Error fetching directory records:', err);
+    } finally {
+      setLoading(false);
+    }
   }, [statusFilter]);
+
+  useEffect(() => { fetchRecords(); }, [fetchRecords]);
 
   // Derive filter options from data (context-aware filtering)
   const countries = useMemo(
@@ -207,17 +193,6 @@ export default function DirectoryPage() {
       return labelA.localeCompare(labelB);
     });
   }, [records]);
-
-  // Adjust selected commodity if it's no longer in available list (e.g. after filter change)
-  useEffect(() => {
-    if (
-      selectedCommodity !== 'all' &&
-      availableCommodities.length > 0 &&
-      !availableCommodities.includes(selectedCommodity)
-    ) {
-      setSelectedCommodity(availableCommodities[0]);
-    }
-  }, [availableCommodities, selectedCommodity]);
 
   // Apply context-first filters: commodity, geography, coverage
   const filteredRecords = useMemo(() => {
@@ -323,7 +298,7 @@ export default function DirectoryPage() {
       <div className="py-32 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement du répertoire...</p>
+          <p className="text-gray-600">Loading directory...</p>
         </div>
       </div>
     );
@@ -332,8 +307,15 @@ export default function DirectoryPage() {
   if (error) {
     return (
       <div className="py-32 flex items-center justify-center">
-        <div className="text-center text-red-600">
-          <p>Erreur de chargement: {error}</p>
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Failed to load directory: {error}</p>
+          <button
+            onClick={fetchRecords}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors text-sm"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -372,36 +354,36 @@ export default function DirectoryPage() {
             <div className="text-3xl font-bold text-primary-600 mb-1">
               {stats.total.toLocaleString()}
             </div>
-            <div className="text-gray-600 text-sm">Enregistrements dans le répertoire</div>
+            <div className="text-gray-600 text-sm">Records in directory</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-green-500">
             <div className="text-3xl font-bold text-green-600 mb-1">
               {stats.active.toLocaleString()}
             </div>
-            <div className="text-gray-600 text-sm">Actifs</div>
+            <div className="text-gray-600 text-sm">Active</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-secondary-500">
             <div className="text-3xl font-bold text-secondary-600 mb-1">
               {stats.countries}
             </div>
-            <div className="text-gray-600 text-sm">Pays</div>
+            <div className="text-gray-600 text-sm">Countries</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-blue-500">
             <div className="text-3xl font-bold text-blue-600 mb-1">
               {stats.commodities}
             </div>
-            <div className="text-gray-600 text-sm">Commodités</div>
+            <div className="text-gray-600 text-sm">Commodities</div>
           </div>
         </div>
 
         {/* Context-first filters bar (product-first, region-aware, coverage-aware) */}
         <section className="mb-4 space-y-2 bg-white rounded-lg shadow-md p-6">
           <p className="text-xs text-gray-600 mb-4">
-            Filter cooperatives by EUDR commodity, geography, and documentation coverage to support sourcing and due-diligence planning.
+            Filter by <strong>commodity</strong> (EUDR crop), <strong>country/region</strong>, and <strong>documentation coverage</strong> (how complete a cooperative’s evidence is: Limited → Partial → Substantial). Use coverage to find cooperatives by readiness level for sourcing and due-diligence planning.
           </p>
 
           <div className="flex flex-wrap gap-3 items-center text-xs">
-            {/* Commodity */}
+            {/* Commodity: show all EUDR commodities so users can filter by any; empty result set if none in data */}
             <label className="flex items-center gap-1">
               <span className="font-medium">Commodity</span>
               <select
@@ -412,14 +394,11 @@ export default function DirectoryPage() {
                 className="border rounded px-2 py-1 text-xs"
               >
                 <option value="all">All commodities</option>
-                {availableCommodities.map((commodityId) => {
-                  const commodity = EUDR_COMMODITIES_IN_SCOPE.find((c) => c.id === commodityId);
-                  return (
-                    <option key={commodityId} value={commodityId}>
-                      {commodity?.label || commodityId}
-                    </option>
-                  );
-                })}
+                {EUDR_COMMODITIES_IN_SCOPE.map((commodity) => (
+                  <option key={commodity.id} value={commodity.id}>
+                    {commodity.label}
+                  </option>
+                ))}
               </select>
             </label>
 
@@ -457,9 +436,9 @@ export default function DirectoryPage() {
               </select>
             </label>
 
-            {/* Coverage */}
-            <label className="flex items-center gap-1">
-              <span className="font-medium">Coverage</span>
+            {/* Documentation coverage level */}
+            <label className="flex items-center gap-1" title="Filter by documentation coverage: how complete the cooperative's evidence collection is">
+              <span className="font-medium">Doc. coverage</span>
               <select
                 value={selectedCoverage}
                 onChange={(e) =>
@@ -470,11 +449,12 @@ export default function DirectoryPage() {
                   )
                 }
                 className="border rounded px-2 py-1 text-xs"
+                title="Limited = minimal evidence; Partial = some evidence; Substantial = strong evidence"
               >
                 <option value="all">All levels</option>
-                <option value="substantial">Substantial</option>
-                <option value="partial">Partial</option>
-                <option value="limited">Limited</option>
+                <option value="substantial" title="Strong evidence collection">Substantial</option>
+                <option value="partial" title="Some evidence; gaps may remain">Partial</option>
+                <option value="limited" title="Minimal evidence so far">Limited</option>
               </select>
             </label>
 
@@ -506,7 +486,7 @@ export default function DirectoryPage() {
         <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">
-              Résultats ({filteredRecords.length})
+              Results ({filteredRecords.length})
             </h2>
           </div>
 
@@ -514,15 +494,24 @@ export default function DirectoryPage() {
           {filteredRecords.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <Building2 className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-xs text-gray-500 mt-4">
-                No cooperatives match the current filters. Try broadening commodity, region, or coverage level.
+              <p className="text-sm font-medium text-gray-700 mb-1">No cooperatives found</p>
+              <p className="text-xs text-gray-500">
+                {hasActiveFilters
+                  ? `No records match the current filters (${[
+                      selectedCommodity !== 'all' && `commodity: ${EUDR_COMMODITIES_IN_SCOPE.find(c => c.id === selectedCommodity)?.label || selectedCommodity}`,
+                      selectedCountry !== 'CI' && selectedCountry !== 'all' && `country: ${selectedCountry}`,
+                      selectedRegion !== 'all' && `region: ${selectedRegion}`,
+                      selectedCoverage !== 'all' && `coverage: ${selectedCoverage}`,
+                      searchTerm && `search: "${searchTerm}"`,
+                    ].filter(Boolean).join(', ')}). Try broadening or resetting your filters.`
+                  : 'No cooperative records are available.'}
               </p>
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
                   className="mt-4 text-secondary-600 hover:text-secondary-700 underline text-sm"
                 >
-                  Réinitialiser les filtres
+                  Reset filters
                 </button>
               )}
             </div>
@@ -530,11 +519,13 @@ export default function DirectoryPage() {
             <>
               {/* View mode toggle */}
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" role="group" aria-label="View mode">
                   <button
                     onClick={() => setViewMode('map')}
                     className={`p-2 rounded ${viewMode === 'map' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                     title="Map view"
+                    aria-label="Map view"
+                    aria-pressed={viewMode === 'map' ? 'true' : 'false'}
                   >
                     <MapPin className="h-4 w-4" />
                   </button>
@@ -542,6 +533,8 @@ export default function DirectoryPage() {
                     onClick={() => setViewMode('grid')}
                     className={`p-2 rounded ${viewMode === 'grid' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                     title="Grid view"
+                    aria-label="Grid view"
+                    aria-pressed={viewMode === 'grid' ? 'true' : 'false'}
                   >
                     <Grid3x3 className="h-4 w-4" />
                   </button>
@@ -549,6 +542,8 @@ export default function DirectoryPage() {
                     onClick={() => setViewMode('list')}
                     className={`p-2 rounded ${viewMode === 'list' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                     title="List view"
+                    aria-label="List view"
+                    aria-pressed={viewMode === 'list' ? 'true' : 'false'}
                   >
                     <List className="h-4 w-4" />
                   </button>

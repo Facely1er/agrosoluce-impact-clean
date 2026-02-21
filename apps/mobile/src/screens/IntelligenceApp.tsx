@@ -10,6 +10,7 @@
  */
 
 import { useState } from 'react';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import {
   Target,
   Building2,
@@ -38,74 +39,93 @@ import {
   Plus,
   Eye,
   Clock,
+  LogOut,
+  ExternalLink,
 } from 'lucide-react';
 import './IntelligenceApp.css';
 
-type UserRole = 'ermits_team' | 'cooperative' | 'farmer' | null;
-
 // Role Selector Component
-const RoleSelector = ({ onSelectRole }: { onSelectRole: (role: UserRole) => void }) => (
-  <div className="role-selector">
-    <div className="role-selector-content">
-      <div className="role-selector-header">
-        <h1 className="role-selector-title">AgroSoluce Intelligence</h1>
-        <p className="role-selector-subtitle">Field Operations Platform</p>
-      </div>
-      
-      <div className="role-buttons">
-        <button 
-          className="role-button role-button-ermits"
-          onClick={() => onSelectRole('ermits_team')}
-        >
-          <div className="role-button-icon-wrapper">
-            <Target className="role-button-icon" />
-          </div>
-          <div className="role-button-content">
-            <h3 className="role-button-title">ERMITS Team</h3>
-            <p className="role-button-desc">Command Center • Monitor 3,797+ cooperatives • Compliance oversight</p>
-          </div>
-          <ChevronRight className="role-button-arrow" />
-        </button>
+const RoleSelector = () => {
+  const navigate = useNavigate();
+  return (
+    <div className="role-selector">
+      <div className="role-selector-content">
+        <div className="role-selector-header">
+          <h1 className="role-selector-title">AgroSoluce Intelligence</h1>
+          <p className="role-selector-subtitle">Field Operations Platform</p>
+        </div>
+        
+        <div className="role-buttons">
+          <button 
+            className="role-button role-button-ermits"
+            onClick={() => navigate('/ermits')}
+          >
+            <div className="role-button-icon-wrapper">
+              <Target className="role-button-icon" />
+            </div>
+            <div className="role-button-content">
+              <h3 className="role-button-title">ERMITS Team</h3>
+              <p className="role-button-desc">Command Center • Monitor 3,797+ cooperatives • Compliance oversight</p>
+            </div>
+            <ChevronRight className="role-button-arrow" />
+          </button>
 
-        <button 
-          className="role-button role-button-coop"
-          onClick={() => onSelectRole('cooperative')}
-        >
-          <div className="role-button-icon-wrapper">
-            <Building2 className="role-button-icon" />
-          </div>
-          <div className="role-button-content">
-            <h3 className="role-button-title">Cooperative Manager</h3>
-            <p className="role-button-desc">Operations Dashboard • Member management • Compliance tracking</p>
-          </div>
-          <ChevronRight className="role-button-arrow" />
-        </button>
+          <button 
+            className="role-button role-button-coop"
+            onClick={() => navigate('/cooperative')}
+          >
+            <div className="role-button-icon-wrapper">
+              <Building2 className="role-button-icon" />
+            </div>
+            <div className="role-button-content">
+              <h3 className="role-button-title">Cooperative Manager</h3>
+              <p className="role-button-desc">Operations Dashboard • Member management • Compliance tracking</p>
+            </div>
+            <ChevronRight className="role-button-arrow" />
+          </button>
 
-        <button 
-          className="role-button role-button-farmer"
-          onClick={() => onSelectRole('farmer')}
-        >
-          <div className="role-button-icon-wrapper">
-            <Users className="role-button-icon" />
-          </div>
-          <div className="role-button-content">
-            <h3 className="role-button-title">Farmer</h3>
-            <p className="role-button-desc">Field App • Data collection • Training access • Offline capable</p>
-          </div>
-          <ChevronRight className="role-button-arrow" />
-        </button>
+          <button 
+            className="role-button role-button-farmer"
+            onClick={() => navigate('/farmer')}
+          >
+            <div className="role-button-icon-wrapper">
+              <Users className="role-button-icon" />
+            </div>
+            <div className="role-button-content">
+              <h3 className="role-button-title">Farmer</h3>
+              <p className="role-button-desc">Field App • Data collection • Training access • Offline capable</p>
+            </div>
+            <ChevronRight className="role-button-arrow" />
+          </button>
+        </div>
+
+        {(import.meta.env.VITE_WEB_APP_URL as string | undefined) && (
+          <a
+            href={import.meta.env.VITE_WEB_APP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="role-selector-platform-link"
+          >
+            <ExternalLink className="role-selector-platform-icon" />
+            <span>Open full platform (web)</span>
+          </a>
+        )}
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ERMITS Team Dashboard
 const ERMITSTeamDashboard = () => {
+  const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<'overview' | 'cooperatives' | 'compliance' | 'alerts'>('overview');
   
   return (
     <div className="dashboard-container">
       <header className="header-ermits">
+        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label="Switch role">
+          <LogOut className="header-back-icon" />
+        </button>
         <div className="header-content">
           <h1 className="header-title">ERMITS Command Center</h1>
           <p className="header-subtitle">Monitoring 3,797 Cooperatives</p>
@@ -372,11 +392,15 @@ const ERMITSTeamDashboard = () => {
 
 // Cooperative Dashboard
 const CooperativeDashboard = () => {
+  const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<'dashboard' | 'members' | 'farmers-first' | 'child-labor' | 'compliance'>('dashboard');
   
   return (
     <div className="dashboard-container">
       <header className="header-coop">
+        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label="Switch role">
+          <LogOut className="header-back-icon" />
+        </button>
         <div className="header-content">
           <h1 className="header-title">SCAC Abidjan</h1>
           <p className="header-subtitle">487 Members • Lagunes Region</p>
@@ -768,17 +792,21 @@ const CooperativeDashboard = () => {
 
 // Farmer Field App
 const FarmerFieldApp = () => {
+  const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<'home' | 'training' | 'declarations' | 'help'>('home');
   const [language, setLanguage] = useState('baoule');
   
   return (
     <div className="dashboard-container">
       <header className="header-farmer">
+        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label="Switch role">
+          <LogOut className="header-back-icon" />
+        </button>
         <div className="header-content">
           <h1 className="header-title">AgroSoluce</h1>
           <p className="header-subtitle">Field Operations • Offline Mode</p>
         </div>
-        <button className="header-action-btn" aria-label="Change language" title="Change language">
+        <button type="button" className="header-action-btn" aria-label="Change language" title="Change language">
           <Globe className="icon-md" />
         </button>
       </header>
@@ -1057,16 +1085,12 @@ const FarmerFieldApp = () => {
 };
 
 // Main App Component
-export const IntelligenceApp = () => {
-  const [userRole, setUserRole] = useState<UserRole>(null);
-
-  if (!userRole) {
-    return <RoleSelector onSelectRole={setUserRole} />;
-  }
-
-  if (userRole === 'ermits_team') return <ERMITSTeamDashboard />;
-  if (userRole === 'cooperative') return <CooperativeDashboard />;
-  if (userRole === 'farmer') return <FarmerFieldApp />;
-
-  return null;
-};
+export const IntelligenceApp = () => (
+  <Routes>
+    <Route path="/" element={<RoleSelector />} />
+    <Route path="/ermits" element={<ERMITSTeamDashboard />} />
+    <Route path="/cooperative" element={<CooperativeDashboard />} />
+    <Route path="/farmer" element={<FarmerFieldApp />} />
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes>
+);

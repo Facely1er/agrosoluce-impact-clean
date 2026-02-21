@@ -1119,8 +1119,8 @@ export const translations: Record<Language, Translations> = {
       regulatoryReferences: 'Regulatory References',
       ngoRegistry: 'NGO Registry',
       dueCarePrinciples: 'Due Care Principles',
-      tagline: 'Farmers-First Due Diligence for Responsible Agricultural Sourcing',
-      description: 'Making farmer engagement, documentation coverage, and improvement efforts visible',
+      tagline: 'Farmer-first due diligence for deforestation-free, responsible sourcing',
+      description: 'Making farmer engagement, documentation, and progress visible across supply chains',
       logoAlt: 'AgroSoluce Logo',
       sourceIntelligence: 'Source Intelligence',
       byErmits: 'by ERMITS',
@@ -1146,10 +1146,10 @@ export const translations: Record<Language, Translations> = {
     },
     landing: {
     hero: {
-      tagline: 'Farmers-First Due Diligence for Responsible Agricultural Sourcing',
+      tagline: 'Farmer-first due diligence for deforestation-free, responsible sourcing',
       title: 'AgroSoluce™',
       subtitle: 'Making Farmer Engagement, Documentation Coverage, and Improvement Efforts Visible',
-      description: 'AgroSoluce™ helps cooperatives, buyers, and partners make farmer engagement, documentation coverage, and improvement efforts visible — without overstating readiness or replacing audits. We start from the farmer, structure reality at the cooperative level, and support credible EUDR-aligned due diligence across agricultural supply chains.',
+      description: 'AgroSoluce™ helps cooperatives, buyers, and partners see real farmer engagement, documentation, and progress — without overstating readiness or replacing audits. From farmer to cooperative to buyer, we support credible, EUDR-aligned due diligence across agricultural supply chains.',
       ctaCooperatives: 'Explore Cooperatives',
       ctaBuyer: 'Buyer Portal',
       freeNote: 'Free for cooperatives • Transparent • Progress-focused',
@@ -1287,9 +1287,9 @@ export const translations: Record<Language, Translations> = {
         },
       },
       carousel: {
-        item1: 'AgroSoluce™ helps cooperatives, buyers, and partners make farmer engagement, documentation coverage, and improvement efforts visible',
-        item2: '— without overstating readiness or replacing audits.',
-        item3: 'We start from the farmer, structure reality at the cooperative level, and support credible EUDR-aligned due diligence across agricultural supply chains.',
+        item1: 'We help cooperatives and buyers see real farmer engagement, documentation, and progress.',
+        item2: 'Transparent progress — without overstating readiness or replacing audits.',
+        item3: 'From farmer to cooperative to buyer: credible, EUDR-aligned due diligence across the supply chain.',
       },
       heroSubtitle: {
         line1: 'Making Farmer Engagement, Documentation Coverage,',
@@ -1298,7 +1298,7 @@ export const translations: Record<Language, Translations> = {
     },
     about: {
       title: 'About AgroSoluce™',
-      subtitle: 'Farmers-First Due Diligence for Responsible Agricultural Sourcing',
+      subtitle: 'Farmer-first due diligence for deforestation-free, responsible sourcing',
       why: {
         title: 'Why AgroSoluce™ Exists',
         subtitle: 'Responsible sourcing is no longer optional — but most tools still ask impossible questions that don\'t reflect reality in real supply chains.',
@@ -2089,8 +2089,8 @@ export const translations: Record<Language, Translations> = {
       regulatoryReferences: 'Références Réglementaires',
       ngoRegistry: 'Registre des ONG',
       dueCarePrinciples: 'Principes de Diligence Raisonnable',
-      tagline: 'Diligence Raisonnable Axée sur les Agriculteurs pour un Approvisionnement Agricole Responsable',
-      description: 'Rendre visible l\'engagement des agriculteurs, la couverture de la documentation et les efforts d\'amélioration',
+      tagline: 'Diligence raisonnable axée sur l\'agriculteur pour un approvisionnement sans déforestation et responsable',
+      description: 'Rendre visible l\'engagement des agriculteurs, la documentation et les progrès tout au long de la chaîne d\'approvisionnement',
       logoAlt: 'Logo AgroSoluce',
       sourceIntelligence: 'Intelligence des Sources',
       byErmits: 'par ERMITS',
@@ -2257,9 +2257,9 @@ export const translations: Record<Language, Translations> = {
         },
       },
       carousel: {
-        item1: 'AgroSoluce™ aide les coopératives, acheteurs et partenaires à rendre visible l\'engagement des agriculteurs, la couverture de la documentation et les efforts d\'amélioration',
-        item2: '— sans exagérer la préparation ou remplacer les audits.',
-        item3: 'Nous commençons par l\'agriculteur, structurons la réalité au niveau de la coopérative et soutenons une diligence raisonnable crédible alignée sur l\'EUDR dans les chaînes d\'approvisionnement agricoles.',
+        item1: 'Nous aidons les coopératives et les acheteurs à voir l\'engagement réel des agriculteurs, la documentation et les progrès.',
+        item2: 'Progrès transparent — sans exagérer la préparation ni remplacer les audits.',
+        item3: 'De l\'agriculteur à la coopérative et à l\'acheteur : une diligence raisonnable crédible et alignée EUDR sur toute la chaîne.',
       },
       heroSubtitle: {
         line1: 'Rendre Visible l\'Engagement des Agriculteurs, la Couverture de la Documentation,',
@@ -2268,7 +2268,7 @@ export const translations: Record<Language, Translations> = {
     },
     about: {
       title: 'À Propos d\'AgroSoluce™',
-      subtitle: 'Diligence Raisonnable Axée sur les Agriculteurs pour un Approvisionnement Agricole Responsable',
+      subtitle: 'Diligence raisonnable axée sur l\'agriculteur pour un approvisionnement sans déforestation et responsable',
       why: {
         title: 'Pourquoi AgroSoluce™ Existe',
         subtitle: 'L\'approvisionnement responsable n\'est plus optionnel — mais la plupart des outils posent encore des questions impossibles qui ne reflètent pas la réalité des chaînes d\'approvisionnement réelles.',

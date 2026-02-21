@@ -4,7 +4,7 @@
 -- This file contains all migrations in order.
 -- Execute this file in Supabase SQL Editor.
 -- 
--- Generated: 2026-02-16T21:56:17.936Z
+-- Generated: 2026-02-21T01:12:36.495Z
 -- =============================================
 
 -- =============================================
@@ -4164,5 +4164,628 @@ COMMENT ON FUNCTION agrosoluce.get_readiness_dashboard_stats() IS 'Returns dashb
 -- Applications should migrate to using readiness_score.
 -- The trigger sync_readiness_score_trigger keeps both columns in sync.
 
+
+
+-- =============================================
+-- Migration: 021_onboarding_system.sql
+-- =============================================
+
+-- Migration: 021 — Cooperative Onboarding System
+-- Adds cooperative_requests (lead capture) and cooperative_onboarding / onboarding_steps tables
+
+-- =============================================
+-- COOPERATIVE REQUESTS (lead capture, no auth required)
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS agrosoluce.cooperative_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cooperative_name VARCHAR(255) NOT NULL,
+    contact_name VARCHAR(255) NOT NULL,
+    phone VARCHAR(50),
+    email VARCHAR(255),
+    region VARCHAR(100),
+    department VARCHAR(100),
+    primary_product VARCHAR(100),
+    farmer_count VARCHAR(50),
+    message TEXT,
+    status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'contacted', 'invited', 'converted', 'rejected')),
+    admin_notes TEXT,
+    invited_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Allow anonymous inserts (public lead capture)
+ALTER TABLE agrosoluce.cooperative_requests ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can submit a cooperative request"
+    ON agrosoluce.cooperative_requests
+    FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "Admins can view all requests"
+    ON agrosoluce.cooperative_requests
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.user_profiles
+            WHERE user_id = auth.uid()
+            AND user_type = 'admin'
+        )
+    );
+
+CREATE POLICY "Admins can update requests"
+    ON agrosoluce.cooperative_requests
+    FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.user_profiles
+            WHERE user_id = auth.uid()
+            AND user_type = 'admin'
+        )
+    );
+
+-- Index for admin filtering
+CREATE INDEX IF NOT EXISTS idx_coop_requests_status ON agrosoluce.cooperative_requests(status);
+CREATE INDEX IF NOT EXISTS idx_coop_requests_created_at ON agrosoluce.cooperative_requests(created_at);
+
+-- =============================================
+-- COOPERATIVE ONBOARDING (7-step wizard state)
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS agrosoluce.cooperative_onboarding (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cooperative_id UUID REFERENCES agrosoluce.cooperatives(id) ON DELETE CASCADE,
+    status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed', 'on_hold')),
+    current_step INTEGER DEFAULT 1,
+    started_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    completed_at TIMESTAMP WITH TIME ZONE,
+    welcome_call_scheduled_at TIMESTAMP WITH TIME ZONE,
+    welcome_call_completed_at TIMESTAMP WITH TIME ZONE,
+    onboarding_champion_id UUID REFERENCES agrosoluce.user_profiles(id) ON DELETE SET NULL,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(cooperative_id)
+);
+
+-- RLS for cooperative_onboarding
+ALTER TABLE agrosoluce.cooperative_onboarding ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Cooperatives can view own onboarding"
+    ON agrosoluce.cooperative_onboarding
+    FOR SELECT
+    USING (
+        cooperative_id IN (
+            SELECT id FROM agrosoluce.cooperatives
+            WHERE user_profile_id IN (
+                SELECT id FROM agrosoluce.user_profiles WHERE user_id = auth.uid()
+            )
+        )
+        OR EXISTS (
+            SELECT 1 FROM agrosoluce.user_profiles
+            WHERE user_id = auth.uid() AND user_type = 'admin'
+        )
+    );
+
+CREATE POLICY "Cooperatives can insert own onboarding"
+    ON agrosoluce.cooperative_onboarding
+    FOR INSERT
+    WITH CHECK (
+        cooperative_id IN (
+            SELECT id FROM agrosoluce.cooperatives
+            WHERE user_profile_id IN (
+                SELECT id FROM agrosoluce.user_profiles WHERE user_id = auth.uid()
+            )
+        )
+        OR EXISTS (
+            SELECT 1 FROM agrosoluce.user_profiles
+            WHERE user_id = auth.uid() AND user_type = 'admin'
+        )
+    );
+
+CREATE POLICY "Cooperatives can update own onboarding"
+    ON agrosoluce.cooperative_onboarding
+    FOR UPDATE
+    USING (
+        cooperative_id IN (
+            SELECT id FROM agrosoluce.cooperatives
+            WHERE user_profile_id IN (
+                SELECT id FROM agrosoluce.user_profiles WHERE user_id = auth.uid()
+            )
+        )
+        OR EXISTS (
+            SELECT 1 FROM agrosoluce.user_profiles
+            WHERE user_id = auth.uid() AND user_type = 'admin'
+        )
+    );
+
+-- =============================================
+-- ONBOARDING STEPS (individual step completion)
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS agrosoluce.onboarding_steps (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    onboarding_id UUID REFERENCES agrosoluce.cooperative_onboarding(id) ON DELETE CASCADE,
+    step_number INTEGER NOT NULL,
+    step_name VARCHAR(255),
+    step_description TEXT,
+    is_completed BOOLEAN DEFAULT false,
+    completed_at TIMESTAMP WITH TIME ZONE,
+    completed_by UUID REFERENCES agrosoluce.user_profiles(id) ON DELETE SET NULL,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(onboarding_id, step_number)
+);
+
+ALTER TABLE agrosoluce.onboarding_steps ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Onboarding steps — same access as parent onboarding"
+    ON agrosoluce.onboarding_steps
+    FOR ALL
+    USING (
+        onboarding_id IN (
+            SELECT id FROM agrosoluce.cooperative_onboarding
+            WHERE cooperative_id IN (
+                SELECT id FROM agrosoluce.cooperatives
+                WHERE user_profile_id IN (
+                    SELECT id FROM agrosoluce.user_profiles WHERE user_id = auth.uid()
+                )
+            )
+        )
+        OR EXISTS (
+            SELECT 1 FROM agrosoluce.user_profiles
+            WHERE user_id = auth.uid() AND user_type = 'admin'
+        )
+    );
+
+CREATE INDEX IF NOT EXISTS idx_onboarding_cooperative_id ON agrosoluce.cooperative_onboarding(cooperative_id);
+CREATE INDEX IF NOT EXISTS idx_onboarding_status ON agrosoluce.cooperative_onboarding(status);
+CREATE INDEX IF NOT EXISTS idx_onboarding_steps_onboarding_id ON agrosoluce.onboarding_steps(onboarding_id);
+
+-- =============================================
+-- ADMIN VIEW: onboarding pipeline summary
+-- =============================================
+
+CREATE OR REPLACE VIEW agrosoluce.admin_onboarding_pipeline AS
+SELECT
+    cr.id AS request_id,
+    cr.cooperative_name,
+    cr.contact_name,
+    cr.phone,
+    cr.email,
+    cr.region,
+    cr.primary_product,
+    cr.farmer_count,
+    cr.status AS request_status,
+    cr.created_at AS request_date,
+    co.id AS onboarding_id,
+    co.status AS onboarding_status,
+    co.current_step,
+    co.started_at AS onboarding_started,
+    co.completed_at AS onboarding_completed,
+    co.welcome_call_scheduled_at,
+    c.id AS cooperative_id,
+    c.name AS cooperative_db_name
+FROM
+    agrosoluce.cooperative_requests cr
+LEFT JOIN
+    agrosoluce.cooperatives c ON LOWER(c.name) = LOWER(cr.cooperative_name)
+LEFT JOIN
+    agrosoluce.cooperative_onboarding co ON co.cooperative_id = c.id
+ORDER BY
+    cr.created_at DESC;
+
+-- Record this migration
+INSERT INTO agrosoluce.migrations (migration_name, description)
+VALUES (
+    '021_onboarding_system',
+    'Adds cooperative_requests lead capture table, cooperative_onboarding wizard state, onboarding_steps, and admin pipeline view'
+)
+ON CONFLICT (migration_name) DO NOTHING;
+
+
+-- =============================================
+-- Migration: 022_buyer_eudr_assessments.sql
+-- =============================================
+
+-- Migration: Buyer EUDR Assessments
+-- Creates a table for buyers to store their EUDR self-assessments
+-- Based on EU Regulation 2023/1115
+
+INSERT INTO agrosoluce.migrations (migration_name, description)
+VALUES ('022_buyer_eudr_assessments', 'Add buyer EUDR self-assessment table for EU Regulation 2023/1115 compliance')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- BUYER EUDR ASSESSMENTS TABLE
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS agrosoluce.buyer_eudr_assessments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- Buyer reference (nullable: allows anonymous/guest assessments too)
+  buyer_profile_id uuid REFERENCES agrosoluce.user_profiles(id) ON DELETE SET NULL,
+
+  -- Company profile captured during the assessment
+  company_name         text,
+  primary_commodity    text NOT NULL CHECK (primary_commodity IN ('cocoa','coffee','palm-oil','soya','cattle','wood','rubber')),
+  company_size         text NOT NULL CHECK (company_size IN ('large','sme','micro')),
+  source_countries     text[],
+  supply_chain_role    text[],
+  annual_volume        text,
+  years_in_business    text,
+  secondary_commodities text[],
+
+  -- Full question responses stored as JSONB for flexibility
+  responses            jsonb NOT NULL DEFAULT '{}',
+
+  -- Scoring results
+  overall_score        numeric(5,2) NOT NULL CHECK (overall_score >= 0 AND overall_score <= 100),
+  risk_level           text NOT NULL CHECK (risk_level IN ('low','standard','high')),
+  section_scores       jsonb NOT NULL DEFAULT '{}',
+  critical_gaps        jsonb NOT NULL DEFAULT '[]',
+  action_plan          jsonb NOT NULL DEFAULT '[]',
+  certification_benefit numeric(5,2) DEFAULT 0,
+
+  -- Compliance metadata
+  compliance_deadline  text,
+  days_remaining       integer,
+
+  -- Language used during the assessment
+  language             text DEFAULT 'en' CHECK (language IN ('en','fr')),
+
+  -- Timestamps
+  completed_at         timestamptz DEFAULT now(),
+  created_at           timestamptz DEFAULT now(),
+  updated_at           timestamptz DEFAULT now()
+);
+
+-- =============================================
+-- INDEXES
+-- =============================================
+
+CREATE INDEX IF NOT EXISTS idx_buyer_eudr_assessments_buyer_profile_id
+  ON agrosoluce.buyer_eudr_assessments(buyer_profile_id);
+
+CREATE INDEX IF NOT EXISTS idx_buyer_eudr_assessments_primary_commodity
+  ON agrosoluce.buyer_eudr_assessments(primary_commodity);
+
+CREATE INDEX IF NOT EXISTS idx_buyer_eudr_assessments_risk_level
+  ON agrosoluce.buyer_eudr_assessments(risk_level);
+
+CREATE INDEX IF NOT EXISTS idx_buyer_eudr_assessments_completed_at
+  ON agrosoluce.buyer_eudr_assessments(completed_at);
+
+-- =============================================
+-- ROW LEVEL SECURITY
+-- =============================================
+
+ALTER TABLE agrosoluce.buyer_eudr_assessments ENABLE ROW LEVEL SECURITY;
+
+-- Buyers can only see their own assessments
+DROP POLICY IF EXISTS "Buyers can view own EUDR assessments" ON agrosoluce.buyer_eudr_assessments;
+CREATE POLICY "Buyers can view own EUDR assessments"
+  ON agrosoluce.buyer_eudr_assessments
+  FOR SELECT
+  USING (
+    buyer_profile_id IS NULL
+    OR buyer_profile_id = (
+      SELECT id FROM agrosoluce.user_profiles
+      WHERE user_id = auth.uid()
+      LIMIT 1
+    )
+  );
+
+-- Authenticated users can insert (their own)
+DROP POLICY IF EXISTS "Authenticated users can insert EUDR assessments" ON agrosoluce.buyer_eudr_assessments;
+CREATE POLICY "Authenticated users can insert EUDR assessments"
+  ON agrosoluce.buyer_eudr_assessments
+  FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated' OR auth.role() = 'anon');
+
+-- Buyers can update their own assessments
+DROP POLICY IF EXISTS "Buyers can update own EUDR assessments" ON agrosoluce.buyer_eudr_assessments;
+CREATE POLICY "Buyers can update own EUDR assessments"
+  ON agrosoluce.buyer_eudr_assessments
+  FOR UPDATE
+  USING (
+    buyer_profile_id = (
+      SELECT id FROM agrosoluce.user_profiles
+      WHERE user_id = auth.uid()
+      LIMIT 1
+    )
+  );
+
+-- Admins can see all
+DROP POLICY IF EXISTS "Admins can view all EUDR assessments" ON agrosoluce.buyer_eudr_assessments;
+CREATE POLICY "Admins can view all EUDR assessments"
+  ON agrosoluce.buyer_eudr_assessments
+  FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM agrosoluce.user_profiles
+      WHERE user_id = auth.uid()
+      AND user_type = 'admin'
+    )
+  );
+
+-- =============================================
+-- TRIGGERS
+-- =============================================
+
+CREATE OR REPLACE FUNCTION agrosoluce.update_buyer_eudr_assessments_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_buyer_eudr_assessments_updated_at ON agrosoluce.buyer_eudr_assessments;
+CREATE TRIGGER trg_buyer_eudr_assessments_updated_at
+  BEFORE UPDATE ON agrosoluce.buyer_eudr_assessments
+  FOR EACH ROW
+  EXECUTE FUNCTION agrosoluce.update_buyer_eudr_assessments_updated_at();
+
+-- =============================================
+-- GRANTS
+-- =============================================
+
+GRANT ALL ON agrosoluce.buyer_eudr_assessments TO authenticated;
+GRANT INSERT, SELECT ON agrosoluce.buyer_eudr_assessments TO anon;
+
+-- =============================================
+-- COMMENTS
+-- =============================================
+
+COMMENT ON TABLE agrosoluce.buyer_eudr_assessments IS 'Stores EUDR self-assessments completed by buyers, based on EU Regulation 2023/1115';
+COMMENT ON COLUMN agrosoluce.buyer_eudr_assessments.responses IS 'All question responses as JSONB keyed by question ID';
+COMMENT ON COLUMN agrosoluce.buyer_eudr_assessments.section_scores IS 'Scores per assessment section (0-100 each)';
+COMMENT ON COLUMN agrosoluce.buyer_eudr_assessments.critical_gaps IS 'Array of critical gap objects requiring immediate action';
+COMMENT ON COLUMN agrosoluce.buyer_eudr_assessments.action_plan IS 'Priority-ranked action items generated from the assessment';
+
+
+-- =============================================
+-- Migration: 023_cooperative_eudr_readiness.sql
+-- =============================================
+
+-- Migration: Cooperative EUDR Readiness Assessments
+-- Creates a table for cooperatives to complete a structured EUDR readiness self-assessment
+-- Based on EU Regulation 2023/1115 supply-side obligations
+-- Next migration: 023
+
+INSERT INTO agrosoluce.migrations (migration_name, description)
+VALUES ('023_cooperative_eudr_readiness', 'Add cooperative EUDR readiness self-assessment table for supply-side EU Regulation 2023/1115 compliance')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- COOPERATIVE EUDR READINESS TABLE
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS agrosoluce.cooperative_eudr_readiness (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- Cooperative reference
+  cooperative_id uuid NOT NULL REFERENCES agrosoluce.cooperatives(id) ON DELETE CASCADE,
+
+  -- Who submitted (user profile of a cooperative manager)
+  submitted_by uuid REFERENCES agrosoluce.user_profiles(id) ON DELETE SET NULL,
+
+  -- ---- SECTION 1: Geo-data & Plot Coverage ----
+  -- Percentage of farmers with GPS-referenced plots (0-100)
+  plots_geo_coverage_pct  numeric(5,2) CHECK (plots_geo_coverage_pct >= 0 AND plots_geo_coverage_pct <= 100),
+  -- Response: 'none' | 'partial' | 'majority' | 'all'
+  plots_geo_response      text CHECK (plots_geo_response IN ('none','partial','majority','all')),
+
+  -- ---- SECTION 2: Farmer Declarations ----
+  -- Percentage of farmers with signed deforestation-free declarations
+  declarations_coverage_pct numeric(5,2) CHECK (declarations_coverage_pct >= 0 AND declarations_coverage_pct <= 100),
+  -- Response: 'none' | 'partial' | 'majority' | 'all'
+  declarations_response   text CHECK (declarations_response IN ('none','partial','majority','all')),
+
+  -- ---- SECTION 3: Traceability ----
+  -- Does the cooperative track origin per farmer/plot at batch level?
+  traceability_response   text CHECK (traceability_response IN ('none','manual','digital_partial','digital_full')),
+
+  -- ---- SECTION 4: Documentation ----
+  -- Social / child labor policy document uploaded?
+  has_social_policy       boolean DEFAULT false,
+  -- Land-use / deforestation evidence document uploaded?
+  has_land_evidence       boolean DEFAULT false,
+  -- Third-party or internal audit conducted in last 2 years?
+  has_recent_audit        boolean DEFAULT false,
+
+  -- ---- SECTION 5: Certifications ----
+  -- Active certification relevant to EUDR (Rainforest Alliance, Fairtrade, organic, etc.)
+  has_eudr_certification  boolean DEFAULT false,
+  certification_names     text[],
+
+  -- ---- SECTION 6: Internal Processes ----
+  -- Does the cooperative have an internal EUDR due diligence procedure?
+  has_dd_procedure        text CHECK (has_dd_procedure IN ('no','in_progress','yes')),
+  -- Staff trained on EUDR obligations?
+  staff_trained           text CHECK (staff_trained IN ('no','planned','yes')),
+
+  -- ---- Scoring ----
+  -- Overall readiness score (0-100), computed on save
+  overall_score           numeric(5,2) NOT NULL DEFAULT 0 CHECK (overall_score >= 0 AND overall_score <= 100),
+  -- Per-section scores as JSONB { geo: 0-100, declarations: 0-100, traceability: 0-100, documentation: 0-100, certifications: 0-100, processes: 0-100 }
+  section_scores          jsonb NOT NULL DEFAULT '{}',
+  -- Readiness band: 'not_ready' | 'developing' | 'ready'
+  readiness_band          text NOT NULL DEFAULT 'not_ready' CHECK (readiness_band IN ('not_ready','developing','ready')),
+  -- Key gaps identified
+  gaps                    jsonb NOT NULL DEFAULT '[]',
+
+  -- Timestamps
+  completed_at            timestamptz DEFAULT now(),
+  created_at              timestamptz DEFAULT now(),
+  updated_at              timestamptz DEFAULT now()
+);
+
+-- =============================================
+-- INDEXES
+-- =============================================
+
+CREATE INDEX IF NOT EXISTS idx_coop_eudr_readiness_cooperative_id
+  ON agrosoluce.cooperative_eudr_readiness(cooperative_id);
+
+CREATE INDEX IF NOT EXISTS idx_coop_eudr_readiness_readiness_band
+  ON agrosoluce.cooperative_eudr_readiness(readiness_band);
+
+CREATE INDEX IF NOT EXISTS idx_coop_eudr_readiness_overall_score
+  ON agrosoluce.cooperative_eudr_readiness(overall_score);
+
+CREATE INDEX IF NOT EXISTS idx_coop_eudr_readiness_completed_at
+  ON agrosoluce.cooperative_eudr_readiness(completed_at);
+
+-- =============================================
+-- ROW LEVEL SECURITY
+-- =============================================
+
+ALTER TABLE agrosoluce.cooperative_eudr_readiness ENABLE ROW LEVEL SECURITY;
+
+-- Cooperatives and admins can view
+DROP POLICY IF EXISTS "Cooperatives can view own EUDR readiness" ON agrosoluce.cooperative_eudr_readiness;
+CREATE POLICY "Cooperatives can view own EUDR readiness"
+  ON agrosoluce.cooperative_eudr_readiness
+  FOR SELECT
+  USING (true);  -- readiness data is visible to buyers browsing the marketplace too
+
+-- Authenticated users (cooperative managers) can insert
+DROP POLICY IF EXISTS "Authenticated users can insert EUDR readiness" ON agrosoluce.cooperative_eudr_readiness;
+CREATE POLICY "Authenticated users can insert EUDR readiness"
+  ON agrosoluce.cooperative_eudr_readiness
+  FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- Cooperative managers can update their own assessments
+DROP POLICY IF EXISTS "Cooperatives can update own EUDR readiness" ON agrosoluce.cooperative_eudr_readiness;
+CREATE POLICY "Cooperatives can update own EUDR readiness"
+  ON agrosoluce.cooperative_eudr_readiness
+  FOR UPDATE
+  USING (auth.role() = 'authenticated');
+
+-- Admins can manage all
+DROP POLICY IF EXISTS "Admins can manage all EUDR readiness" ON agrosoluce.cooperative_eudr_readiness;
+CREATE POLICY "Admins can manage all EUDR readiness"
+  ON agrosoluce.cooperative_eudr_readiness
+  FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM agrosoluce.user_profiles
+      WHERE user_id = auth.uid()
+      AND user_type = 'admin'
+    )
+  );
+
+-- =============================================
+-- TRIGGERS
+-- =============================================
+
+CREATE OR REPLACE FUNCTION agrosoluce.update_coop_eudr_readiness_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_coop_eudr_readiness_updated_at ON agrosoluce.cooperative_eudr_readiness;
+CREATE TRIGGER trg_coop_eudr_readiness_updated_at
+  BEFORE UPDATE ON agrosoluce.cooperative_eudr_readiness
+  FOR EACH ROW
+  EXECUTE FUNCTION agrosoluce.update_coop_eudr_readiness_updated_at();
+
+-- =============================================
+-- GRANTS
+-- =============================================
+
+GRANT ALL ON agrosoluce.cooperative_eudr_readiness TO authenticated;
+GRANT SELECT ON agrosoluce.cooperative_eudr_readiness TO anon;
+
+-- =============================================
+-- COMMENTS
+-- =============================================
+
+COMMENT ON TABLE agrosoluce.cooperative_eudr_readiness IS 'Stores EUDR supply-side readiness self-assessments completed by cooperatives, based on EU Regulation 2023/1115';
+COMMENT ON COLUMN agrosoluce.cooperative_eudr_readiness.plots_geo_coverage_pct IS 'Percentage of farmers with GPS-referenced plots (0-100)';
+COMMENT ON COLUMN agrosoluce.cooperative_eudr_readiness.declarations_coverage_pct IS 'Percentage of farmers with signed deforestation-free declarations (0-100)';
+COMMENT ON COLUMN agrosoluce.cooperative_eudr_readiness.overall_score IS 'Composite readiness score (0-100) computed from all section scores';
+COMMENT ON COLUMN agrosoluce.cooperative_eudr_readiness.readiness_band IS 'Readiness tier: not_ready (<40), developing (40-74), ready (>=75)';
+COMMENT ON COLUMN agrosoluce.cooperative_eudr_readiness.gaps IS 'Array of identified gap objects { section, message, priority }';
+
+
+-- =============================================
+-- Migration: 024_sync_eudr_ready_to_compliance_flags.sql
+-- =============================================
+
+-- Migration: Sync EUDR readiness to cooperatives.compliance_flags
+-- Keeps cooperatives.compliance_flags.eudrReady in sync with the latest cooperative_eudr_readiness
+-- so directory filters (e.g. CooperativeDirectory EUDR filter) work from a single source of truth.
+
+INSERT INTO agrosoluce.migrations (migration_name, description)
+VALUES ('024_sync_eudr_ready_to_compliance_flags', 'Sync eudrReady in cooperatives.compliance_flags from cooperative_eudr_readiness for directory filtering')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- FUNCTION: Sync one cooperative's compliance_flags.eudrReady
+-- =============================================
+
+CREATE OR REPLACE FUNCTION agrosoluce.sync_cooperative_eudr_ready_from_readiness()
+RETURNS TRIGGER AS $$
+DECLARE
+  is_ready boolean;
+BEGIN
+  -- Use NEW.readiness_band for the row just inserted/updated
+  is_ready := (NEW.readiness_band = 'ready');
+
+  UPDATE agrosoluce.cooperatives
+  SET compliance_flags = jsonb_set(
+    COALESCE(compliance_flags, '{}'::jsonb),
+    '{eudrReady}',
+    to_jsonb(is_ready::boolean)
+  )
+  WHERE id = NEW.cooperative_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- =============================================
+-- TRIGGER: After insert or update on cooperative_eudr_readiness
+-- =============================================
+
+DROP TRIGGER IF EXISTS trg_sync_eudr_ready_to_compliance_flags ON agrosoluce.cooperative_eudr_readiness;
+CREATE TRIGGER trg_sync_eudr_ready_to_compliance_flags
+  AFTER INSERT OR UPDATE OF readiness_band
+  ON agrosoluce.cooperative_eudr_readiness
+  FOR EACH ROW
+  EXECUTE FUNCTION agrosoluce.sync_cooperative_eudr_ready_from_readiness();
+
+-- =============================================
+-- BACKFILL: Set compliance_flags.eudrReady from latest readiness per cooperative
+-- =============================================
+
+UPDATE agrosoluce.cooperatives c
+SET compliance_flags = jsonb_set(
+  COALESCE(c.compliance_flags, '{}'::jsonb),
+  '{eudrReady}',
+  to_jsonb((r.readiness_band = 'ready')::boolean)
+)
+FROM (
+  SELECT DISTINCT ON (cooperative_id)
+    cooperative_id,
+    readiness_band
+  FROM agrosoluce.cooperative_eudr_readiness
+  ORDER BY cooperative_id, completed_at DESC NULLS LAST, updated_at DESC
+) r
+WHERE c.id = r.cooperative_id;
+
+-- =============================================
+-- COMMENTS
+-- =============================================
+
+COMMENT ON FUNCTION agrosoluce.sync_cooperative_eudr_ready_from_readiness() IS 'Trigger function: updates cooperatives.compliance_flags.eudrReady when cooperative_eudr_readiness is inserted or readiness_band changes';
 
 

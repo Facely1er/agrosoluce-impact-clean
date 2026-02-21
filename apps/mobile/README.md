@@ -61,7 +61,11 @@ npm run preview
 ### Access the PWA
 
 - **Development:** http://localhost:5174
-- **Production:** Deploy `dist/` folder to any static hosting
+- **Production:** Deploy `dist/` folder to any static hosting (or use a second Vercel project with root `apps/mobile` — see repo root `DEPLOY_MAIN.md`)
+
+### Optional: link to main web app
+
+Set `VITE_WEB_APP_URL` (e.g. in `.env` or Vercel env vars) to your main web app URL. When set, the role selector shows an “Open full platform (web)” link that opens the main AgroSoluce site in a new tab.
 
 ### Install as PWA
 

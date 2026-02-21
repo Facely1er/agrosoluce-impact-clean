@@ -42,7 +42,11 @@ const migrations = [
   '017_add_farmer_declarations_to_buyer_view.sql',
   '018_add_evidence_type.sql',
   '019_add_assessment_tables.sql',
-  '020_rename_compliance_to_readiness.sql'
+  '020_rename_compliance_to_readiness.sql',
+  '021_onboarding_system.sql',
+  '022_buyer_eudr_assessments.sql',
+  '023_cooperative_eudr_readiness.sql',
+  '024_sync_eudr_ready_to_compliance_flags.sql'
 ];
 
 /**
@@ -170,8 +174,16 @@ async function main() {
   const args = process.argv.slice(2);
   const generate = args.includes('--generate') || args.includes('-g');
   const check = args.includes('--check') || args.includes('-c');
+  const run = args.includes('--run') || args.includes('-r');
 
-  if (generate) {
+  if (run) {
+    generateCombinedSQL();
+    console.log('\n📋 To complete the migration:');
+    console.log('   1. Open your Supabase project dashboard → SQL Editor');
+    console.log('   2. Copy the contents of packages/database/migrations/ALL_MIGRATIONS.sql');
+    console.log('   3. Execute the SQL (or run only the migrations not yet applied)');
+    console.log('   4. Verify: npm run migration:check\n');
+  } else if (generate) {
     generateCombinedSQL();
   } else if (check) {
     await checkMigrationStatus();
