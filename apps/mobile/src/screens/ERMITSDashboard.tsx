@@ -29,13 +29,6 @@ import {
 } from '../lib/api/mobileApi';
 import './IntelligenceApp.css';
 
-const TREND_COLORS: Record<string, string> = {
-  market: 'trend-market',
-  compliance: 'trend-compliance',
-  climate: 'trend-climate',
-  social: 'trend-social',
-};
-
 export const ERMITSDashboard = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<'overview' | 'cooperatives' | 'compliance' | 'alerts' | 'trends'>('overview');
