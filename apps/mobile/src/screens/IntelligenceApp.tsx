@@ -40,8 +40,12 @@ import {
   ShoppingCart,
   Package,
   AlertCircle,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import './IntelligenceApp.css';
+import { useThemeMode } from '../lib/theme/ThemeModeProvider';
+import { useI18n } from '../lib/i18n/I18nProvider';
 import {
   getErmitsStats,
   getCooperativesList,
@@ -87,7 +91,17 @@ const RoleSelector = () => {
     <div className="role-selector">
       <div className="role-selector-content">
         <div className="role-selector-header">
-          <h1 className="role-selector-title">AgroSoluce Intelligence</h1>
+          {/* Brand lockup — logo + name + tagline */}
+          <div className="rs-logo-lockup">
+            <img src="/agrosoluce.png" alt="AgroSoluce" className="rs-logo-img" />
+            <div className="rs-logo-text">
+              <span className="rs-brand-name">
+                AgroSoluce<span className="rs-brand-sup">™</span>
+              </span>
+              <span className="rs-tagline">Source Intelligence</span>
+              <span className="rs-tagline-by">by ERMITS</span>
+            </div>
+          </div>
           <p className="role-selector-subtitle">Field Operations Platform</p>
         </div>
 
@@ -173,11 +187,14 @@ const ERMITSTeamDashboard = () => {
         <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label="Switch role">
           <LogOut className="header-back-icon" />
         </button>
-        <div className="header-content">
-          <h1 className="header-title">ERMITS Command Center</h1>
-          <p className="header-subtitle">
-            {stats ? `Monitoring ${stats.cooperativeCount.toLocaleString()} Cooperatives` : 'Loading…'}
-          </p>
+        <div className="header-brand">
+          <img src="/agrosoluce.png" alt="AgroSoluce" className="header-brand-logo" />
+          <div className="header-brand-text">
+            <span className="header-brand-name">AgroSoluce™</span>
+            <span className="header-brand-sub">
+              {stats ? `Monitoring ${stats.cooperativeCount.toLocaleString()} cooperatives` : 'ERMITS Command Center'}
+            </span>
+          </div>
         </div>
         <div className="header-badge">
           <Activity className="header-badge-icon" />
@@ -185,20 +202,20 @@ const ERMITSTeamDashboard = () => {
         </div>
       </header>
 
-      <nav className="tab-bar">
+      <nav className="bottom-nav">
         {([
           { key: 'overview', icon: BarChart3, label: 'Overview' },
-          { key: 'cooperatives', icon: Building2, label: 'Cooperatives' },
+          { key: 'cooperatives', icon: Building2, label: 'Coops' },
           { key: 'compliance', icon: Shield, label: 'Compliance' },
           { key: 'alerts', icon: AlertTriangle, label: 'Alerts' },
         ] as const).map(({ key, icon: Icon, label }) => (
           <button
             key={key}
-            className={`tab ${selectedTab === key ? 'tab-active' : ''}`}
+            className={`bnav-tab ${selectedTab === key ? 'bnav-tab-active' : ''}`}
             onClick={() => setSelectedTab(key)}
           >
-            <Icon className="tab-icon" />
-            <span>{label}</span>
+            <Icon className="bnav-icon" />
+            <span className="bnav-label">{label}</span>
           </button>
         ))}
       </nav>
@@ -430,8 +447,12 @@ const CooperativeDashboard = () => {
           <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label="Switch role">
             <LogOut className="header-back-icon" />
           </button>
-          <div className="header-content">
-            <h1 className="header-title">Cooperative Dashboard</h1>
+          <div className="header-brand">
+            <img src="/agrosoluce.png" alt="AgroSoluce" className="header-brand-logo" />
+            <div className="header-brand-text">
+              <span className="header-brand-name">AgroSoluce™</span>
+              <span className="header-brand-sub">Cooperative Dashboard</span>
+            </div>
           </div>
         </header>
         <main className="dashboard-content">
@@ -456,14 +477,19 @@ const CooperativeDashboard = () => {
         <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label="Switch role">
           <LogOut className="header-back-icon" />
         </button>
-        <div className="header-content">
-          <h1 className="header-title">{loading ? 'Loading…' : (coop?.name || 'Cooperative')}</h1>
-          <p className="header-subtitle">
-            {coop?.region ? `${memberCount} Members • ${coop.region}` : `${memberCount} Members`}
-          </p>
+        <div className="header-brand">
+          <img src="/agrosoluce.png" alt="AgroSoluce" className="header-brand-logo" />
+          <div className="header-brand-text">
+            <span className="header-brand-name">
+              {loading ? 'AgroSoluce™' : (coop?.name || 'Cooperative')}
+            </span>
+            <span className="header-brand-sub">
+              {coop?.region ? `${memberCount} Members · ${coop.region}` : `${memberCount} Members`}
+            </span>
+          </div>
         </div>
         {!loading && (
-          <div className={`header-badge ${readinessStatus === 'buyer_ready' ? 'badge-success' : 'badge-warning'}`}>
+          <div className={`header-badge ${readinessStatus === 'buyer_ready' ? 'badge-success' : ''}`}>
             {readinessStatus === 'buyer_ready'
               ? <><CheckCircle2 className="header-badge-icon" /><span>Ready</span></>
               : <><AlertTriangle className="header-badge-icon" /><span>In Progress</span></>}
@@ -471,18 +497,18 @@ const CooperativeDashboard = () => {
         )}
       </header>
 
-      <nav className="tab-bar tab-bar-6">
+      <nav className="bottom-nav bnav-coop">
         {([
           { key: 'dashboard', icon: BarChart3, label: 'Dashboard' },
           { key: 'members', icon: Users, label: 'Members' },
-          { key: 'farmers-first', icon: Sprout, label: 'FF' },
-          { key: 'child-labor', icon: Shield, label: 'CL' },
+          { key: 'farmers-first', icon: Sprout, label: "F. First" },
+          { key: 'child-labor', icon: Shield, label: 'Child Labor' },
           { key: 'compliance', icon: FileText, label: 'Comply' },
           { key: 'sales', icon: ShoppingCart, label: 'Sales' },
         ] as const).map(({ key, icon: Icon, label }) => (
-          <button key={key} className={`tab ${selectedTab === key ? 'tab-active' : ''}`} onClick={() => setSelectedTab(key)}>
-            <Icon className="tab-icon" />
-            <span>{label}</span>
+          <button key={key} className={`bnav-tab ${selectedTab === key ? 'bnav-tab-active' : ''}`} onClick={() => setSelectedTab(key)}>
+            <Icon className="bnav-icon" />
+            <span className="bnav-label">{label}</span>
           </button>
         ))}
       </nav>

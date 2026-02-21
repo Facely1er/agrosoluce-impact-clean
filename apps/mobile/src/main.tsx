@@ -13,14 +13,20 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { ThemeModeProvider } from './lib/theme/ThemeModeProvider';
+import { I18nProvider } from './lib/i18n/I18nProvider';
 import { IntelligenceApp } from './screens/IntelligenceApp';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <IntelligenceApp />
-    </BrowserRouter>
+    <ThemeModeProvider>
+      <I18nProvider>
+        <BrowserRouter>
+          <IntelligenceApp />
+        </BrowserRouter>
+      </I18nProvider>
+    </ThemeModeProvider>
   </StrictMode>
 );
 
