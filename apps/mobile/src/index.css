@@ -74,8 +74,7 @@ button, a, [role="button"] {
 /* Prevent text size adjustment on mobile (avoids zoom on input focus). */
 html {
   -webkit-text-size-adjust: 100%; /* Safari, iOS */
-  /* stylelint-disable-next-line property-no-unknown -- Standard property for Chrome/Edge/Samsung; Firefox/Safari ignore. */
-  text-size-adjust: 100%;
+  text-size-adjust: 100%; /* Chrome 54+, Edge 79+, Samsung Internet; unsupported in Firefox/Safari but harmless */
 }
 
 /* Better font rendering */
