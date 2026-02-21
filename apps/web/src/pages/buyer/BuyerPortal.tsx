@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageShell from '@/components/layout/PageShell';
 import { 
@@ -9,10 +10,41 @@ import {
   CheckCircle,
   ArrowRight,
   Eye,
-  Info
+  Info,
+  BarChart3,
+  Clock,
 } from 'lucide-react';
+import { useAuth } from '@/lib/auth/AuthContext';
+import { getBuyerEUDRAssessments, type BuyerEUDRAssessmentData } from '@/lib/api/buyersApi';
+
+function getRiskColor(risk: string) {
+  if (risk === 'low') return { bg: 'bg-green-50', border: 'border-green-300', text: 'text-green-700', badge: 'bg-green-100 text-green-800' };
+  if (risk === 'standard') return { bg: 'bg-yellow-50', border: 'border-yellow-300', text: 'text-yellow-700', badge: 'bg-yellow-100 text-yellow-800' };
+  return { bg: 'bg-red-50', border: 'border-red-300', text: 'text-red-700', badge: 'bg-red-100 text-red-800' };
+}
+
+function getScoreColor(score: number) {
+  if (score >= 85) return 'text-green-700';
+  if (score >= 70) return 'text-blue-700';
+  if (score >= 50) return 'text-yellow-700';
+  if (score >= 30) return 'text-orange-700';
+  return 'text-red-700';
+}
 
 export default function BuyerPortal() {
+  const { profile } = useAuth();
+  const [latestAssessment, setLatestAssessment] = useState<BuyerEUDRAssessmentData | null>(null);
+  const [assessmentLoading, setAssessmentLoading] = useState(false);
+
+  useEffect(() => {
+    if (!profile?.id) return;
+    setAssessmentLoading(true);
+    getBuyerEUDRAssessments(profile.id)
+      .then(({ data }) => {
+        if (data && data.length > 0) setLatestAssessment(data[0]);
+      })
+      .finally(() => setAssessmentLoading(false));
+  }, [profile?.id]);
 
   return (
     <PageShell breadcrumbs={[
@@ -84,6 +116,55 @@ export default function BuyerPortal() {
             </p>
           </div>
         </div>
+
+        {/* EUDR Assessment Status Panel (shown when user has completed an assessment) */}
+        {!assessmentLoading && latestAssessment && (() => {
+          const c = getRiskColor(latestAssessment.risk_level);
+          return (
+            <div className={`${c.bg} border ${c.border} rounded-xl p-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
+              <div className="flex items-start gap-4">
+                <div className="bg-white/80 p-2.5 rounded-lg border border-white shadow-sm">
+                  <BarChart3 className={`h-6 w-6 ${c.text}`} />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Your Latest EUDR Self-Assessment</p>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className={`text-2xl font-black ${getScoreColor(latestAssessment.overall_score)}`}>
+                      {latestAssessment.overall_score}%
+                    </span>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${c.badge}`}>
+                      {latestAssessment.risk_level === 'low' ? 'Low Risk' : latestAssessment.risk_level === 'standard' ? 'Standard Risk' : 'High Risk'}
+                    </span>
+                    {latestAssessment.primary_commodity && (
+                      <span className="text-xs text-gray-500 font-medium capitalize">
+                        {latestAssessment.primary_commodity.replace('-', ' ')}
+                      </span>
+                    )}
+                    {latestAssessment.days_remaining != null && (
+                      <span className="flex items-center gap-1 text-xs text-gray-500">
+                        <Clock className="h-3 w-3" />
+                        {latestAssessment.days_remaining > 0
+                          ? `${latestAssessment.days_remaining} days until deadline`
+                          : 'Deadline passed'}
+                      </span>
+                    )}
+                  </div>
+                  {latestAssessment.critical_gaps && (latestAssessment.critical_gaps as unknown[]).length > 0 && (
+                    <p className="text-xs text-red-700 mt-1 font-medium">
+                      {(latestAssessment.critical_gaps as unknown[]).length} critical gap{(latestAssessment.critical_gaps as unknown[]).length > 1 ? 's' : ''} identified — action required
+                    </p>
+                  )}
+                </div>
+              </div>
+              <Link
+                to="/buyer/eudr-assessment"
+                className="shrink-0 flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+              >
+                Retake Assessment <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          );
+        })()}
 
         {/* Main Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

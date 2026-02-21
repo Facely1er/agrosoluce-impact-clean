@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
@@ -22,7 +22,19 @@ import {
   Clock,
   XCircle,
   Satellite,
+  Building2,
 } from 'lucide-react';
+
+// Maps EUDR assessment commodity IDs to the directory's EudrCommodity IDs
+const ASSESSMENT_TO_DIRECTORY_COMMODITY: Record<string, string> = {
+  cocoa: 'cocoa',
+  coffee: 'coffee',
+  'palm-oil': 'palm_oil',
+  soya: 'soy',
+  cattle: 'cattle',
+  wood: 'wood',
+  rubber: 'rubber',
+};
 import PageShell from '@/components/layout/PageShell';
 import { saveBuyerEUDRAssessment } from '@/lib/api/buyersApi';
 import styles from './BuyerEUDRAssessment.module.css';
@@ -1458,6 +1470,15 @@ export default function BuyerEUDRAssessment() {
               <ArrowRight className="h-4 w-4" />
               {lang === 'en' ? 'Find EUDR-Ready Cooperatives' : 'Trouver des Coopératives Prêtes EUDR'}
             </Link>
+            {results.commodity && ASSESSMENT_TO_DIRECTORY_COMMODITY[results.commodity] && (
+              <Link
+                to={`/directory?commodity=${ASSESSMENT_TO_DIRECTORY_COMMODITY[results.commodity]}`}
+                className="flex items-center justify-center gap-2 px-5 py-3 bg-secondary-600 text-white rounded-lg hover:bg-secondary-700 transition-colors font-medium"
+              >
+                <Building2 className="h-4 w-4" />
+                {lang === 'en' ? 'Browse Cooperative Directory' : 'Parcourir le Répertoire'}
+              </Link>
+            )}
             <button onClick={resetAssessment} className="flex items-center justify-center gap-2 px-5 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
               <RotateCcw className="h-4 w-4" /> {t.startOver}
             </button>

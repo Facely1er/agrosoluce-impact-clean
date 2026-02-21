@@ -534,7 +534,7 @@ export default function DirectoryDetailPage() {
             <div className="bg-white rounded-lg shadow-md mb-6 border border-gray-200">
               <button
                 onClick={() => setCountryContextExpanded(!countryContextExpanded)}
-                aria-expanded={countryContextExpanded ? 'true' : 'false'}
+                aria-expanded={countryContextExpanded}
                 aria-controls="country-context-panel"
                 className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
               >
@@ -661,7 +661,7 @@ export default function DirectoryDetailPage() {
             <div className="bg-white rounded-lg shadow-md mb-6 border border-gray-200">
               <button
                 onClick={() => setCommodityContextExpanded(!commodityContextExpanded)}
-                aria-expanded={commodityContextExpanded ? 'true' : 'false'}
+                aria-expanded={commodityContextExpanded}
                 aria-controls="commodity-context-panel"
                 className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
               >

@@ -1,17 +1,28 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Building2, Mail, Phone, MapPin, Package, CheckCircle, AlertCircle, Star, ExternalLink } from 'lucide-react';
+import { Building2, Mail, Phone, MapPin, Package, CheckCircle, AlertCircle, Star, ExternalLink, BarChart3, Shield } from 'lucide-react';
 import { getBuyerRequestById, getRequestMatches, updateMatchStatus } from '@/features/buyers/api';
 import PageShell from '@/components/layout/PageShell';
 import type { BuyerRequest, RequestMatch } from '@/domain/agro/types';
 import { matchCooperativesToRequest } from '@/domain/agro/matching';
+import { useAuth } from '@/lib/auth/AuthContext';
+import { getBuyerEUDRAssessments, type BuyerEUDRAssessmentData } from '@/lib/api/buyersApi';
+
+function getAssessmentScoreColor(score: number) {
+  if (score >= 85) return 'text-green-700';
+  if (score >= 70) return 'text-blue-700';
+  if (score >= 50) return 'text-yellow-700';
+  return 'text-red-700';
+}
 
 export default function BuyerMatches() {
   const { requestId } = useParams<{ requestId: string }>();
+  const { profile } = useAuth();
   const [request, setRequest] = useState<BuyerRequest | null>(null);
   const [matches, setMatches] = useState<RequestMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [buyerAssessment, setBuyerAssessment] = useState<BuyerEUDRAssessmentData | null>(null);
 
   useEffect(() => {
     if (!requestId) {
@@ -19,9 +30,16 @@ export default function BuyerMatches() {
       setLoading(false);
       return;
     }
-
     loadData();
   }, [requestId]);
+
+  // Load buyer's EUDR assessment for cross-reference panel
+  useEffect(() => {
+    if (!profile?.id) return;
+    getBuyerEUDRAssessments(profile.id).then(({ data }) => {
+      if (data && data.length > 0) setBuyerAssessment(data[0]);
+    });
+  }, [profile?.id]);
 
   const loadData = async () => {
     if (!requestId) return;
@@ -193,6 +211,56 @@ export default function BuyerMatches() {
             </div>
           </div>
         </div>
+
+        {/* EUDR Cross-Reference Panel */}
+        {buyerAssessment && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
+            <div className="flex items-start gap-3">
+              <Shield className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-blue-900 mb-2">Your EUDR Readiness vs These Matches</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="bg-white rounded-lg p-3 text-center border border-blue-100">
+                    <div className={`text-xl font-black ${getAssessmentScoreColor(buyerAssessment.overall_score)}`}>
+                      {buyerAssessment.overall_score}%
+                    </div>
+                    <div className="text-xs text-gray-500 mt-0.5">Your score</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 text-center border border-blue-100">
+                    <div className={`text-sm font-bold capitalize mt-1 ${buyerAssessment.risk_level === 'low' ? 'text-green-700' : buyerAssessment.risk_level === 'standard' ? 'text-yellow-700' : 'text-red-700'}`}>
+                      {buyerAssessment.risk_level === 'low' ? 'Low' : buyerAssessment.risk_level === 'standard' ? 'Standard' : 'High'}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-0.5">Your risk level</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 text-center border border-blue-100">
+                    <div className="text-xl font-black text-blue-700">
+                      {matches.filter(m => m.cooperative?.complianceFlags?.eudrReady).length}
+                      <span className="text-sm font-normal text-gray-500">/{matches.length}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-0.5">EUDR-aligned matches</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 text-center border border-blue-100">
+                    <div className="text-sm font-bold text-gray-800 mt-1 capitalize">
+                      {buyerAssessment.primary_commodity?.replace('-', ' ') || '—'}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-0.5">Your commodity</div>
+                  </div>
+                </div>
+                {buyerAssessment.risk_level === 'high' && (
+                  <p className="text-xs text-red-700 mt-2 font-medium">
+                    Your EUDR assessment shows high risk — prioritise cooperatives with EUDR-Aligned Documentation badges below.
+                  </p>
+                )}
+              </div>
+              <Link
+                to="/buyer/eudr-assessment"
+                className="shrink-0 text-xs text-blue-600 hover:underline font-medium"
+              >
+                Retake →
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Matches List */}
         {matches.length === 0 ? (

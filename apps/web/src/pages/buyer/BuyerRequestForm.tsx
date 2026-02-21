@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Mail, MapPin, Package, CheckCircle } from 'lucide-react';
+import { Building2, Mail, MapPin, Package, CheckCircle, Shield } from 'lucide-react';
 import { createBuyerRequest } from '@/features/buyers/api';
 import { matchCooperativesToRequest } from '@/domain/agro/matching';
 import { createRequestMatches } from '@/features/buyers/api';
@@ -8,10 +8,24 @@ import { useCooperatives } from '@/hooks/useCooperatives';
 import PageShell from '@/components/layout/PageShell';
 import { Button, Card, CardContent, Alert, LoadingSpinner, Input, Select, Badge } from '@/components/ui';
 import type { BuyerRequest } from '@/domain/agro/types';
+import { useAuth } from '@/lib/auth/AuthContext';
+import { getBuyerEUDRAssessments } from '@/lib/api/buyersApi';
+
+// Maps EUDR assessment commodity IDs to the buyer request commodity list
+const EUDR_TO_REQUEST_COMMODITY: Record<string, string> = {
+  cocoa: 'cocoa',
+  coffee: 'coffee',
+  'palm-oil': 'palm oil',
+  rubber: 'rubber',
+  soya: 'cocoa', // fallback — soy not in buyer list; keep blank instead
+  cattle: '',
+  wood: '',
+};
 
 export default function BuyerRequestForm() {
   const navigate = useNavigate();
   const { cooperatives, loading: coopsLoading } = useCooperatives();
+  const { profile } = useAuth();
   
   const [formData, setFormData] = useState<Omit<BuyerRequest, 'id' | 'status' | 'createdAt'>>({
     buyerOrg: '',
@@ -30,6 +44,29 @@ export default function BuyerRequestForm() {
   const [selectedCertifications, setSelectedCertifications] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prefilledFromAssessment, setPrefilledFromAssessment] = useState<string | null>(null);
+
+  // Pre-fill form from the user's latest EUDR assessment
+  useEffect(() => {
+    if (!profile?.id) return;
+    getBuyerEUDRAssessments(profile.id).then(({ data }) => {
+      if (!data || data.length === 0) return;
+      const latest = data[0];
+      const mappedCommodity = EUDR_TO_REQUEST_COMMODITY[latest.primary_commodity] ?? '';
+      setFormData(prev => ({
+        ...prev,
+        ...(mappedCommodity ? { commodity: mappedCommodity } : {}),
+        requirements: {
+          ...prev.requirements,
+          eudrRequired: latest.risk_level !== 'low',
+        },
+      }));
+      const label = mappedCommodity
+        ? `commodity set to "${mappedCommodity}" and EUDR supply ${latest.risk_level !== 'low' ? 'enabled' : 'disabled'}`
+        : `EUDR supply ${latest.risk_level !== 'low' ? 'enabled' : 'disabled'}`;
+      setPrefilledFromAssessment(label);
+    });
+  }, [profile?.id]);
 
   const availableCertifications = [
     'Fairtrade',
@@ -144,6 +181,16 @@ export default function BuyerRequestForm() {
               <Alert variant="error" title="Error">
                 {error}
               </Alert>
+            )}
+
+            {prefilledFromAssessment && (
+              <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-lg text-sm">
+                <Shield className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <span className="font-semibold text-green-800">Pre-filled from your EUDR assessment — </span>
+                  <span className="text-green-700">{prefilledFromAssessment}. You can adjust these below.</span>
+                </div>
+              </div>
             )}
 
           {/* Organization Name */}

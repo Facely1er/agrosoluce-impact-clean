@@ -417,7 +417,7 @@ export default function AggregatedDashboardPage() {
                   className={`p-2 rounded ${viewMode === 'map' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                   title="Map view"
                   aria-label="Map view"
-                  aria-pressed={viewMode === 'map' ? 'true' : 'false'}
+                  aria-pressed={viewMode === 'map'}
                 >
                   <MapPin className="h-4 w-4" />
                 </button>
@@ -427,7 +427,7 @@ export default function AggregatedDashboardPage() {
                   className={`p-2 rounded ${viewMode === 'grid' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                   title="Grid view"
                   aria-label="Grid view"
-                  aria-pressed={viewMode === 'grid' ? 'true' : 'false'}
+                  aria-pressed={viewMode === 'grid'}
                 >
                   <Grid3x3 className="h-4 w-4" />
                 </button>
@@ -437,7 +437,7 @@ export default function AggregatedDashboardPage() {
                   className={`p-2 rounded ${viewMode === 'list' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                   title="List view"
                   aria-label="List view"
-                  aria-pressed={viewMode === 'list' ? 'true' : 'false'}
+                  aria-pressed={viewMode === 'list'}
                 >
                   <List className="h-4 w-4" />
                 </button>

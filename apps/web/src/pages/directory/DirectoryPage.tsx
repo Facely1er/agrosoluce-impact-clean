@@ -101,9 +101,14 @@ export default function DirectoryPage() {
 
   // Context-first filter controls (product-first, region-aware, coverage-aware)
   // Default: Cocoa, CI (Côte d'Ivoire), All regions, All coverage levels
-  // Check URL params for region filter from map clicks
+  // Check URL params for region + commodity filter (supports deep-link from EUDR assessment results)
   const regionFromUrl = searchParams.get('region');
-  const [selectedCommodity, setSelectedCommodity] = useState<EudrCommodity | 'all'>('all');
+  const commodityFromUrl = searchParams.get('commodity');
+  const [selectedCommodity, setSelectedCommodity] = useState<EudrCommodity | 'all'>(
+    () => (commodityFromUrl && EUDR_COMMODITIES_IN_SCOPE.some(c => c.id === commodityFromUrl))
+      ? (commodityFromUrl as EudrCommodity)
+      : 'all'
+  );
   const [selectedCountry, setSelectedCountry] = useState<string>('CI'); // Côte d'Ivoire as v1 default
   const [selectedRegion, setSelectedRegion] = useState<string>(regionFromUrl || 'all');
   const [selectedCoverage, setSelectedCoverage] = useState<CoverageBand | 'all'>('all');
@@ -114,23 +119,28 @@ export default function DirectoryPage() {
   const [viewMode, setViewMode] = useState<'map' | 'grid' | 'list'>('map'); // Map is default landing view
   const [workspaceOnly, setWorkspaceOnly] = useState(false);
 
-  // Handle URL parameter for region filter (from map clicks)
+  // Handle URL parameter for region filter (from map clicks).
+  // Intentionally omits selectedRegion to avoid re-triggering when the state
+  // itself changes — we only want to sync once when the URL param arrives.
   useEffect(() => {
     if (regionFromUrl && regionFromUrl !== selectedRegion) {
       setSelectedRegion(regionFromUrl);
-      // Switch to grid view when region is selected from map
       setViewMode('grid');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [regionFromUrl]);
 
-  // Update URL when region filter changes (but not on initial load if URL param exists)
+  // Sync region + commodity URL params when filters change
   useEffect(() => {
-    if (selectedRegion !== 'all' && selectedRegion !== regionFromUrl) {
-      setSearchParams({ region: selectedRegion }, { replace: true });
-    } else if (selectedRegion === 'all' && regionFromUrl) {
-      setSearchParams({}, { replace: true });
+    const params: Record<string, string> = {};
+    if (selectedRegion !== 'all') params.region = selectedRegion;
+    if (selectedCommodity !== 'all') params.commodity = selectedCommodity;
+    const hasParams = Object.keys(params).length > 0;
+    const hadParams = !!(regionFromUrl || commodityFromUrl);
+    if (hasParams || hadParams) {
+      setSearchParams(params, { replace: true });
     }
-  }, [selectedRegion, regionFromUrl, setSearchParams]);
+  }, [selectedRegion, selectedCommodity, regionFromUrl, commodityFromUrl, setSearchParams]);
 
   const fetchRecords = useCallback(async () => {
     setLoading(true);
@@ -179,20 +189,6 @@ export default function DirectoryPage() {
       ).sort(),
     [records, selectedCountry]
   );
-
-  // Derive available commodities from records (only show commodities that exist in data)
-  const availableCommodities = useMemo(() => {
-    const commoditySet = new Set<EudrCommodity>();
-    records.forEach((record) => {
-      const commodities = getCommoditiesFromRecord(record);
-      commodities.forEach((commodity) => commoditySet.add(commodity));
-    });
-    return Array.from(commoditySet).sort((a, b) => {
-      const labelA = EUDR_COMMODITIES_IN_SCOPE.find((c) => c.id === a)?.label || a;
-      const labelB = EUDR_COMMODITIES_IN_SCOPE.find((c) => c.id === b)?.label || b;
-      return labelA.localeCompare(labelB);
-    });
-  }, [records]);
 
   // Apply context-first filters: commodity, geography, coverage
   const filteredRecords = useMemo(() => {
@@ -525,7 +521,7 @@ export default function DirectoryPage() {
                     className={`p-2 rounded ${viewMode === 'map' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                     title="Map view"
                     aria-label="Map view"
-                    aria-pressed={viewMode === 'map' ? 'true' : 'false'}
+                    {...(viewMode === 'map' ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
                   >
                     <MapPin className="h-4 w-4" />
                   </button>
@@ -534,7 +530,7 @@ export default function DirectoryPage() {
                     className={`p-2 rounded ${viewMode === 'grid' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                     title="Grid view"
                     aria-label="Grid view"
-                    aria-pressed={viewMode === 'grid' ? 'true' : 'false'}
+                    {...(viewMode === 'grid' ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
                   >
                     <Grid3x3 className="h-4 w-4" />
                   </button>
@@ -543,7 +539,7 @@ export default function DirectoryPage() {
                     className={`p-2 rounded ${viewMode === 'list' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
                     title="List view"
                     aria-label="List view"
-                    aria-pressed={viewMode === 'list' ? 'true' : 'false'}
+                    {...(viewMode === 'list' ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
                   >
                     <List className="h-4 w-4" />
                   </button>
@@ -569,7 +565,6 @@ export default function DirectoryPage() {
                       records={filteredRecords.filter(coop => !workspaceOnly || coop.coop_id)}
                       onRegionClick={handleRegionClick}
                       height="min(72vh, 760px)"
-                      displayMode="both"
                       regionHealth={regionHealth}
                     />
                   </div>
