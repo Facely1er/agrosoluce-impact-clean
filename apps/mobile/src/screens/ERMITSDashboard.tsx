@@ -27,6 +27,7 @@ import {
   type CoopRow,
   type AssessmentRow,
 } from '../lib/api/mobileApi';
+import './IntelligenceApp.css';
 
 const TREND_COLORS: Record<string, string> = {
   market: 'trend-market',
@@ -316,7 +317,7 @@ export const ERMITSDashboard = () => {
                           <span className="target-value">{Math.round((stats.compliantCount / stats.cooperativeCount) * 100)}%</span>
                         </div>
                         <div className="target-bar">
-                          <div className="target-bar-fill" style={{ width: `${Math.min(Math.round((stats.compliantCount / stats.cooperativeCount) * 100), 100)}%` }} />
+                          <div className={`target-bar-fill width-pct-${Math.min(Math.round((stats.compliantCount / stats.cooperativeCount) * 100), 100)}`} />
                         </div>
                       </div>
                       <div className="target-item">
@@ -325,7 +326,7 @@ export const ERMITSDashboard = () => {
                           <span className="target-value">{stats.cooperativeCount > 0 ? `${stats.onboardedCount.toLocaleString()} / ${stats.cooperativeCount.toLocaleString()}` : '—'}</span>
                         </div>
                         <div className="target-bar">
-                          <div className="target-bar-fill" style={{ width: `${Math.min(Math.round((stats.onboardedCount / stats.cooperativeCount) * 100), 100)}%` }} />
+                          <div className={`target-bar-fill width-pct-${Math.min(Math.round((stats.onboardedCount / stats.cooperativeCount) * 100), 100)}`} />
                         </div>
                       </div>
                     </div>

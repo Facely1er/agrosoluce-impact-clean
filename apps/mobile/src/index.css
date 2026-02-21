@@ -71,11 +71,11 @@ button, a, [role="button"] {
   }
 }
 
-/* Prevent text size adjustment on mobile devices */
-/* Both properties needed for cross-browser support - warnings are informational */
+/* Prevent text size adjustment on mobile (avoids zoom on input focus). */
 html {
-  -webkit-text-size-adjust: 100%; /* Safari, iOS, Chrome */
-  text-size-adjust: 100%; /* Chrome, Edge - harmless in unsupported browsers */
+  -webkit-text-size-adjust: 100%; /* Safari, iOS */
+  /* stylelint-disable-next-line property-no-unknown -- Standard property for Chrome/Edge/Samsung; Firefox/Safari ignore. */
+  text-size-adjust: 100%;
 }
 
 /* Better font rendering */

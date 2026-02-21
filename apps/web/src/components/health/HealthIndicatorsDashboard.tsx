@@ -65,6 +65,7 @@ export function HealthIndicatorsDashboard({ indicators = [] }: HealthIndicatorsD
     : indicators;
 
   const categories = Array.from(new Set(indicators.map((i) => i.category)));
+  const allSelected = selectedCategory === null;
 
   return (
     <div className="space-y-6" role="region" aria-label="Health Indicators Dashboard">
@@ -73,12 +74,10 @@ export function HealthIndicatorsDashboard({ indicators = [] }: HealthIndicatorsD
         <button
           onClick={() => setSelectedCategory(null)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            selectedCategory === null
-              ? 'bg-gray-900 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            allSelected ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
           role="tab"
-          aria-selected={selectedCategory === null}
+          {...(allSelected ? { 'aria-selected': 'true' } : { 'aria-selected': 'false' })}
           aria-controls="indicators-panel"
         >
           All Indicators
@@ -86,17 +85,16 @@ export function HealthIndicatorsDashboard({ indicators = [] }: HealthIndicatorsD
         {categories.map((category) => {
           const config = categoryConfig[category as keyof typeof categoryConfig];
           const Icon = config.icon;
+          const isSelected = selectedCategory === category;
           return (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                selectedCategory === category
-                  ? `${config.bgColor} ${config.color}`
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                isSelected ? `${config.bgColor} ${config.color}` : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
               role="tab"
-              aria-selected={selectedCategory === category}
+              {...(isSelected ? { 'aria-selected': 'true' } : { 'aria-selected': 'false' })}
               aria-controls="indicators-panel"
               aria-label={config.label}
             >
