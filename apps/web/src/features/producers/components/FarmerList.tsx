@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { UserPlus, Search } from 'lucide-react';
+import { UserPlus, Search, Upload } from 'lucide-react';
 import { getFarmersByCooperative } from '../api/farmersApi';
 import type { Farmer } from '@/types';
 import FarmerCard from './FarmerCard';
 import FarmerForm from './FarmerForm';
+import FarmerBulkImport from './FarmerBulkImport';
 
 interface FarmerListProps {
   cooperativeId: string;
@@ -16,6 +17,7 @@ export default function FarmerList({ cooperativeId, showAddButton = true }: Farm
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [showBulkImport, setShowBulkImport] = useState(false);
 
   useEffect(() => {
     loadFarmers();
@@ -38,6 +40,11 @@ export default function FarmerList({ cooperativeId, showAddButton = true }: Farm
 
   const handleFarmerAdded = () => {
     setShowForm(false);
+    loadFarmers();
+  };
+
+  const handleBulkImported = (_inserted: number) => {
+    setShowBulkImport(false);
     loadFarmers();
   };
 
@@ -64,20 +71,37 @@ export default function FarmerList({ cooperativeId, showAddButton = true }: Farm
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <h2 className="text-2xl font-bold text-gray-900">
           Producteurs ({farmers.length})
         </h2>
         {showAddButton && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            <UserPlus className="h-5 w-5" />
-            Ajouter un producteur
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowBulkImport(true)}
+              className="flex items-center gap-2 border border-primary-600 text-primary-600 px-4 py-2 rounded-lg hover:bg-primary-50 transition-colors text-sm"
+            >
+              <Upload className="h-4 w-4" />
+              Import Excel / CSV
+            </button>
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm"
+            >
+              <UserPlus className="h-4 w-4" />
+              Ajouter un producteur
+            </button>
+          </div>
         )}
       </div>
+
+      {showBulkImport && (
+        <FarmerBulkImport
+          cooperativeId={cooperativeId}
+          onSuccess={handleBulkImported}
+          onCancel={() => setShowBulkImport(false)}
+        />
+      )}
 
       {showForm && (
         <FarmerForm
