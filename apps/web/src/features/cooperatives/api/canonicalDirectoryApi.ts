@@ -41,7 +41,7 @@ function transformStaticCooperative(raw: any): CanonicalCooperativeDirectory {
   const finalCommodities = commodities.length > 0 ? commodities : (['cocoa'] as EudrCommodity[]);
   const primaryCrop = finalCommodities[0] === 'cocoa' ? 'cocoa' : finalCommodities[0] === 'rubber' ? 'rubber' : finalCommodities[0] === 'cattle' ? 'cattle' : raw.primary_crop || undefined;
   return {
-    coop_id: String(raw.id ?? raw.registrationNumber ?? Math.random().toString(36).slice(2)),
+    coop_id: String(raw.id ?? raw.registrationNumber ?? `static-${raw.name?.replace(/\s+/g, '-').toLowerCase() ?? 'unknown'}`),
     name,
     country: raw.metadata?.country || "Côte d'Ivoire",
     countryCode: 'CI',

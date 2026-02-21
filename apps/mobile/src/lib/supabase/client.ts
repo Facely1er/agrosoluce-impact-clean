@@ -19,7 +19,9 @@ try {
         detectSessionInUrl: true,
       },
       db: {
-        schema: defaultSchema,
+        // Cast required: Supabase generic expects schema literal, not plain string
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        schema: defaultSchema as any,
       },
     });
   }

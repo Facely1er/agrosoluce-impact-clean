@@ -23,58 +23,6 @@ export interface HealthIndicatorsDashboardProps {
   cooperativeId?: string;
 }
 
-const mockIndicators: HealthIndicator[] = [
-  {
-    id: '1',
-    category: 'malaria',
-    name: 'Antimalarial Sales Index',
-    value: 85,
-    unit: 'index',
-    trend: 'down',
-    status: 'good',
-    description: 'Declining antimalarial sales indicate improving workforce health',
-  },
-  {
-    id: '2',
-    category: 'nutrition',
-    name: 'Nutrition Program Participation',
-    value: 62,
-    unit: '%',
-    trend: 'up',
-    status: 'warning',
-    description: 'Percentage of families enrolled in nutrition programs',
-  },
-  {
-    id: '3',
-    category: 'occupational-safety',
-    name: 'Safety Incidents',
-    value: 3,
-    unit: 'incidents/month',
-    trend: 'stable',
-    status: 'good',
-    description: 'Reported occupational health and safety incidents',
-  },
-  {
-    id: '4',
-    category: 'healthcare-access',
-    name: 'Healthcare Facility Access',
-    value: 78,
-    unit: '%',
-    trend: 'up',
-    status: 'good',
-    description: 'Percentage of workers with access to healthcare facilities',
-  },
-  {
-    id: '5',
-    category: 'preventive-care',
-    name: 'Preventive Health Measures',
-    value: 45,
-    unit: '%',
-    trend: 'up',
-    status: 'warning',
-    description: 'Uptake of preventive health measures (vaccinations, screenings)',
-  },
-];
 
 const categoryConfig = {
   malaria: {
@@ -109,7 +57,7 @@ const categoryConfig = {
   },
 };
 
-export function HealthIndicatorsDashboard({ indicators = mockIndicators }: HealthIndicatorsDashboardProps) {
+export function HealthIndicatorsDashboard({ indicators = [] }: HealthIndicatorsDashboardProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const filteredIndicators = selectedCategory

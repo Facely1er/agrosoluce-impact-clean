@@ -330,7 +330,7 @@ const BaselineStep = ({ cooperativeId, onComplete }: { cooperativeId: string; on
 
 // ── Step 7: Welcome Call ─────────────────────────────────────────────────────
 const WelcomeCallStep = ({
-  cooperativeId, onboardingId, onComplete
+  onboardingId, onComplete
 }: { cooperativeId: string; onboardingId: string; onComplete: () => void }) => {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');

@@ -118,3 +118,9 @@ input[type="number"] {
   font-size: 16px; /* Prevents zoom on iOS */
 }
 
+/* Dark theme (dual theme) */
+html.dark body {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
