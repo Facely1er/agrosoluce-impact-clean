@@ -34,7 +34,6 @@ import {
   Plus,
   Eye,
   Clock,
-  LogOut,
   ExternalLink,
   Loader2,
   ShoppingCart,
@@ -186,32 +185,33 @@ const ERMITSTeamDashboard = () => {
   return (
     <div className="dashboard-container">
       <header className="header-ermits">
-        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label={t.common.switchRole}>
-          <LogOut className="header-back-icon" />
-        </button>
-        <div className="header-brand">
+        <div className="header-brand header-brand-three-lines">
           <img src="/agrosoluce.png" alt="AgroSoluce" className="header-brand-logo" />
           <div className="header-brand-text">
             <span className="header-brand-name">AgroSoluce™</span>
-            <span className="header-brand-sub">
-              {stats ? `${stats.cooperativeCount.toLocaleString()} ${t.nav.cooperatives}` : t.common.loading}
-            </span>
+            <span className="header-brand-tagline">Source Intelligence</span>
+            <span className="header-brand-sub">{stats ? `by ERMITS · ${stats.cooperativeCount.toLocaleString()} ${t.nav.cooperatives}` : 'by ERMITS'}</span>
           </div>
         </div>
         <div className="header-actions-row">
+          <button type="button" className="header-icon-btn" onClick={() => navigate('/')} aria-label={t.nav.home} title={t.nav.home}>
+            <Home className="icon-sm" />
+          </button>
           <button type="button" className="header-icon-btn" onClick={toggleTheme} aria-label={theme === 'light' ? t.common.themeDark : t.common.themeLight}>
             {theme === 'light' ? <Moon className="icon-sm" /> : <Sun className="icon-sm" />}
           </button>
-          <div className="header-lang-row">
-            <button type="button" className={`header-lang-btn ${language === 'en' ? 'active' : ''}`} onClick={() => setLanguage('en')}>EN</button>
-            <button type="button" className={`header-lang-btn ${language === 'fr' ? 'active' : ''}`} onClick={() => setLanguage('fr')}>FR</button>
-          </div>
-        </div>
-        <div className="header-badge">
-          <Activity className="header-badge-icon" />
-          <span>{t.common.live}</span>
+          <button type="button" className="header-lang-btn header-lang-btn-icon active" onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')} aria-label={t.common.changeLanguage} title={t.common.changeLanguage}>
+            <Globe className="icon-sm" />
+          </button>
         </div>
       </header>
+
+      <div className="live-badge-bar">
+        <span className="live-badge">
+          <Activity className="live-badge-icon" />
+          {t.common.live}
+        </span>
+      </div>
 
       <nav className="bottom-nav">
         {([
@@ -457,15 +457,17 @@ const CooperativeDashboard = () => {
     return (
       <div className="dashboard-container">
         <header className="header-coop">
-          <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label={t.common.switchRole}>
-            <LogOut className="header-back-icon" />
-          </button>
           <div className="header-brand">
             <img src="/agrosoluce.png" alt="AgroSoluce" className="header-brand-logo" />
             <div className="header-brand-text">
               <span className="header-brand-name">AgroSoluce™</span>
               <span className="header-brand-sub">{t.nav.dashboard}</span>
             </div>
+          </div>
+          <div className="header-actions-row">
+            <button type="button" className="header-icon-btn" onClick={() => navigate('/')} aria-label={t.nav.home} title={t.nav.home}>
+              <Home className="icon-sm" />
+            </button>
           </div>
         </header>
         <main className="dashboard-content">
@@ -487,9 +489,6 @@ const CooperativeDashboard = () => {
   return (
     <div className="dashboard-container">
       <header className="header-coop">
-        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label={t.common.switchRole}>
-          <LogOut className="header-back-icon" />
-        </button>
         <div className="header-brand">
           <img src="/agrosoluce.png" alt="AgroSoluce" className="header-brand-logo" />
           <div className="header-brand-text">
@@ -502,13 +501,15 @@ const CooperativeDashboard = () => {
           </div>
         </div>
         <div className="header-actions-row">
+          <button type="button" className="header-icon-btn" onClick={() => navigate('/')} aria-label={t.nav.home} title={t.nav.home}>
+            <Home className="icon-sm" />
+          </button>
           <button type="button" className="header-icon-btn" onClick={toggleTheme} aria-label={theme === 'light' ? t.common.themeDark : t.common.themeLight}>
             {theme === 'light' ? <Moon className="icon-sm" /> : <Sun className="icon-sm" />}
           </button>
-          <div className="header-lang-row">
-            <button type="button" className={`header-lang-btn ${language === 'en' ? 'active' : ''}`} onClick={() => setLanguage('en')}>EN</button>
-            <button type="button" className={`header-lang-btn ${language === 'fr' ? 'active' : ''}`} onClick={() => setLanguage('fr')}>FR</button>
-          </div>
+          <button type="button" className="header-lang-btn header-lang-btn-icon active" onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')} aria-label={t.common.changeLanguage} title={t.common.changeLanguage}>
+            <Globe className="icon-sm" />
+          </button>
         </div>
         {!loading && (
           <div className={`header-badge ${readinessStatus === 'buyer_ready' ? 'badge-success' : ''}`}>
@@ -785,9 +786,6 @@ const FarmerFieldApp = () => {
   return (
     <div className="dashboard-container">
       <header className="header-farmer">
-        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label={t.common.switchRole}>
-          <LogOut className="header-back-icon" />
-        </button>
         <div className="header-brand">
           <img src="/agrosoluce.png" alt="AgroSoluce" className="header-brand-logo" />
           <div className="header-brand-text">
@@ -802,13 +800,15 @@ const FarmerFieldApp = () => {
           </div>
         </div>
         <div className="header-actions-row">
+          <button type="button" className="header-icon-btn" onClick={() => navigate('/')} aria-label={t.nav.home} title={t.nav.home}>
+            <Home className="icon-sm" />
+          </button>
           <button type="button" className="header-icon-btn" onClick={toggleTheme} aria-label={theme === 'light' ? t.common.themeDark : t.common.themeLight}>
             {theme === 'light' ? <Moon className="icon-sm" /> : <Sun className="icon-sm" />}
           </button>
-          <div className="header-lang-row">
-            <button type="button" className={`header-lang-btn ${language === 'en' ? 'active' : ''}`} onClick={() => setLanguage('en')}>EN</button>
-            <button type="button" className={`header-lang-btn ${language === 'fr' ? 'active' : ''}`} onClick={() => setLanguage('fr')}>FR</button>
-          </div>
+          <button type="button" className="header-lang-btn header-lang-btn-icon active" onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')} aria-label={t.common.changeLanguage} title={t.common.changeLanguage}>
+            <Globe className="icon-sm" />
+          </button>
         </div>
       </header>
 
