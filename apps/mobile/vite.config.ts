@@ -98,11 +98,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      'react-native': 'react-native-web',
     },
   },
   server: {
-    port: 5174, // Different port from web app (5173)
+    port: 5175,
     host: true,
   },
   build: {

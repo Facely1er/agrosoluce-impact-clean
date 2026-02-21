@@ -250,6 +250,43 @@ export async function deleteFarmer(id: string): Promise<{
 }
 
 /**
+ * Bulk insert multiple farmers in a single database call
+ */
+export async function bulkCreateFarmers(
+  farmers: Omit<Farmer, 'id' | 'created_at' | 'updated_at'>[],
+): Promise<{
+  data: Farmer[] | null;
+  inserted: number;
+  error: Error | null;
+}> {
+  if (!supabase) {
+    return { data: null, inserted: 0, error: new Error('Supabase not configured') };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('farmers')
+      .insert(farmers)
+      .select();
+
+    if (error) {
+      console.error('Error bulk creating farmers:', error);
+      return { data: null, inserted: 0, error: new Error(error.message) };
+    }
+
+    const transformed = (data || []).map((farmer: any) => ({
+      ...farmer,
+      id: farmer.id.toString(),
+    })) as Farmer[];
+
+    return { data: transformed, inserted: transformed.length, error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error('Unknown error');
+    return { data: null, inserted: 0, error };
+  }
+}
+
+/**
  * Search farmers by name or registration number
  */
 export async function searchFarmers(query: string): Promise<{
