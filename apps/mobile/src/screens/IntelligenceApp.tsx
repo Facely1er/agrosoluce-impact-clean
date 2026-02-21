@@ -154,6 +154,8 @@ const RoleSelector = () => {
 
 const ERMITSTeamDashboard = () => {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useThemeMode();
+  const { t, language, setLanguage } = useI18n();
   const [selectedTab, setSelectedTab] = useState<'overview' | 'cooperatives' | 'compliance' | 'alerts'>('overview');
   const [stats, setStats] = useState<ErmitsStats | null>(null);
   const [cooperatives, setCooperatives] = useState<CoopRow[]>([]);
@@ -184,7 +186,7 @@ const ERMITSTeamDashboard = () => {
   return (
     <div className="dashboard-container">
       <header className="header-ermits">
-        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label="Switch role">
+        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label={t.common.switchRole}>
           <LogOut className="header-back-icon" />
         </button>
         <div className="header-brand">
@@ -192,22 +194,31 @@ const ERMITSTeamDashboard = () => {
           <div className="header-brand-text">
             <span className="header-brand-name">AgroSoluce™</span>
             <span className="header-brand-sub">
-              {stats ? `Monitoring ${stats.cooperativeCount.toLocaleString()} cooperatives` : 'ERMITS Command Center'}
+              {stats ? `${stats.cooperativeCount.toLocaleString()} ${t.nav.cooperatives}` : t.common.loading}
             </span>
+          </div>
+        </div>
+        <div className="header-actions-row">
+          <button type="button" className="header-icon-btn" onClick={toggleTheme} aria-label={theme === 'light' ? t.common.themeDark : t.common.themeLight}>
+            {theme === 'light' ? <Moon className="icon-sm" /> : <Sun className="icon-sm" />}
+          </button>
+          <div className="header-lang-row">
+            <button type="button" className={`header-lang-btn ${language === 'en' ? 'active' : ''}`} onClick={() => setLanguage('en')}>EN</button>
+            <button type="button" className={`header-lang-btn ${language === 'fr' ? 'active' : ''}`} onClick={() => setLanguage('fr')}>FR</button>
           </div>
         </div>
         <div className="header-badge">
           <Activity className="header-badge-icon" />
-          <span>Live</span>
+          <span>{t.common.live}</span>
         </div>
       </header>
 
       <nav className="bottom-nav">
         {([
-          { key: 'overview', icon: BarChart3, label: 'Overview' },
-          { key: 'cooperatives', icon: Building2, label: 'Coops' },
-          { key: 'compliance', icon: Shield, label: 'Compliance' },
-          { key: 'alerts', icon: AlertTriangle, label: 'Alerts' },
+          { key: 'overview', icon: BarChart3, label: t.nav.overview },
+          { key: 'cooperatives', icon: Building2, label: t.nav.cooperatives },
+          { key: 'compliance', icon: Shield, label: t.nav.compliance },
+          { key: 'alerts', icon: AlertTriangle, label: t.nav.alerts },
         ] as const).map(({ key, icon: Icon, label }) => (
           <button
             key={key}
@@ -409,6 +420,8 @@ const CooperativeDashboard = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const cooperativeId = searchParams.get('id') || '';
+  const { theme, toggleTheme } = useThemeMode();
+  const { t, language, setLanguage } = useI18n();
 
   const [selectedTab, setSelectedTab] = useState<'dashboard' | 'members' | 'farmers-first' | 'child-labor' | 'compliance' | 'sales'>('dashboard');
   const [coop, setCoop] = useState<CoopDetail | null>(null);
@@ -444,22 +457,22 @@ const CooperativeDashboard = () => {
     return (
       <div className="dashboard-container">
         <header className="header-coop">
-          <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label="Switch role">
+          <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label={t.common.switchRole}>
             <LogOut className="header-back-icon" />
           </button>
           <div className="header-brand">
             <img src="/agrosoluce.png" alt="AgroSoluce" className="header-brand-logo" />
             <div className="header-brand-text">
               <span className="header-brand-name">AgroSoluce™</span>
-              <span className="header-brand-sub">Cooperative Dashboard</span>
+              <span className="header-brand-sub">{t.nav.dashboard}</span>
             </div>
           </div>
         </header>
         <main className="dashboard-content">
           <div className="section-card">
-            <EmptyState message="No cooperative selected. Use the ERMITS directory to select a cooperative, or log in with your cooperative account." />
+            <EmptyState message={t.common.noCooperatives} />
             <button className="btn-full-primary" onClick={() => navigate('/ermits')}>
-              Go to ERMITS Directory <ChevronRight className="icon-sm" />
+              {t.common.goToErmits} <ChevronRight className="icon-sm" />
             </button>
           </div>
         </main>
@@ -474,37 +487,46 @@ const CooperativeDashboard = () => {
   return (
     <div className="dashboard-container">
       <header className="header-coop">
-        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label="Switch role">
+        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label={t.common.switchRole}>
           <LogOut className="header-back-icon" />
         </button>
         <div className="header-brand">
           <img src="/agrosoluce.png" alt="AgroSoluce" className="header-brand-logo" />
           <div className="header-brand-text">
             <span className="header-brand-name">
-              {loading ? 'AgroSoluce™' : (coop?.name || 'Cooperative')}
+              {loading ? 'AgroSoluce™' : (coop?.name || t.nav.cooperatives)}
             </span>
             <span className="header-brand-sub">
-              {coop?.region ? `${memberCount} Members · ${coop.region}` : `${memberCount} Members`}
+              {coop?.region ? `${memberCount} ${t.common.activeMembers} · ${coop.region}` : `${memberCount} ${t.common.activeMembers}`}
             </span>
+          </div>
+        </div>
+        <div className="header-actions-row">
+          <button type="button" className="header-icon-btn" onClick={toggleTheme} aria-label={theme === 'light' ? t.common.themeDark : t.common.themeLight}>
+            {theme === 'light' ? <Moon className="icon-sm" /> : <Sun className="icon-sm" />}
+          </button>
+          <div className="header-lang-row">
+            <button type="button" className={`header-lang-btn ${language === 'en' ? 'active' : ''}`} onClick={() => setLanguage('en')}>EN</button>
+            <button type="button" className={`header-lang-btn ${language === 'fr' ? 'active' : ''}`} onClick={() => setLanguage('fr')}>FR</button>
           </div>
         </div>
         {!loading && (
           <div className={`header-badge ${readinessStatus === 'buyer_ready' ? 'badge-success' : ''}`}>
             {readinessStatus === 'buyer_ready'
-              ? <><CheckCircle2 className="header-badge-icon" /><span>Ready</span></>
-              : <><AlertTriangle className="header-badge-icon" /><span>In Progress</span></>}
+              ? <><CheckCircle2 className="header-badge-icon" /><span>{t.common.ready}</span></>
+              : <><AlertTriangle className="header-badge-icon" /><span>{t.common.inProgress}</span></>}
           </div>
         )}
       </header>
 
       <nav className="bottom-nav bnav-coop">
         {([
-          { key: 'dashboard', icon: BarChart3, label: 'Dashboard' },
-          { key: 'members', icon: Users, label: 'Members' },
-          { key: 'farmers-first', icon: Sprout, label: "F. First" },
-          { key: 'child-labor', icon: Shield, label: 'Child Labor' },
-          { key: 'compliance', icon: FileText, label: 'Comply' },
-          { key: 'sales', icon: ShoppingCart, label: 'Sales' },
+          { key: 'dashboard', icon: BarChart3, label: t.nav.dashboard },
+          { key: 'members', icon: Users, label: t.nav.members },
+          { key: 'farmers-first', icon: Sprout, label: t.nav.farmersFirst },
+          { key: 'child-labor', icon: Shield, label: t.nav.childLabor },
+          { key: 'compliance', icon: FileText, label: t.nav.compliance },
+          { key: 'sales', icon: ShoppingCart, label: t.nav.sales },
         ] as const).map(({ key, icon: Icon, label }) => (
           <button key={key} className={`bnav-tab ${selectedTab === key ? 'bnav-tab-active' : ''}`} onClick={() => setSelectedTab(key)}>
             <Icon className="bnav-icon" />
@@ -725,9 +747,11 @@ const FarmerFieldApp = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const farmerId = searchParams.get('id') || '';
+  const { theme, toggleTheme } = useThemeMode();
+  const { t, language, setLanguage } = useI18n();
 
   const [selectedTab, setSelectedTab] = useState<'home' | 'training' | 'declarations' | 'help'>('home');
-  const [language, setLanguage] = useState('baoule');
+  const [fieldLanguage, setFieldLanguage] = useState('baoule');
   const [farmer, setFarmer] = useState<FarmerProfile | null>(null);
   const [declarations, setDeclarations] = useState<DeclarationRow[]>([]);
   const [trainings, setTrainings] = useState<TrainingRow[]>([]);
@@ -761,32 +785,43 @@ const FarmerFieldApp = () => {
   return (
     <div className="dashboard-container">
       <header className="header-farmer">
-        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label="Switch role">
+        <button type="button" className="header-back-btn" onClick={() => navigate('/')} aria-label={t.common.switchRole}>
           <LogOut className="header-back-icon" />
         </button>
-        <div className="header-content">
-          <h1 className="header-title">{farmer ? farmer.name : 'AgroSoluce'}</h1>
-          <p className="header-subtitle">
-            {farmer?.cooperative_name
-              ? `${farmer.cooperative_name} • Field App`
-              : 'Field Operations'}
-          </p>
+        <div className="header-brand">
+          <img src="/agrosoluce.png" alt="AgroSoluce" className="header-brand-logo" />
+          <div className="header-brand-text">
+            <span className="header-brand-name">
+              {farmer ? farmer.name : 'AgroSoluce™'}
+            </span>
+            <span className="header-brand-sub">
+              {farmer?.cooperative_name
+                ? `${farmer.cooperative_name} · ${t.app.fieldOps}`
+                : t.app.fieldOps}
+            </span>
+          </div>
         </div>
-        <button type="button" className="header-action-btn" aria-label="Change language" title="Change language">
-          <Globe className="icon-md" />
-        </button>
+        <div className="header-actions-row">
+          <button type="button" className="header-icon-btn" onClick={toggleTheme} aria-label={theme === 'light' ? t.common.themeDark : t.common.themeLight}>
+            {theme === 'light' ? <Moon className="icon-sm" /> : <Sun className="icon-sm" />}
+          </button>
+          <div className="header-lang-row">
+            <button type="button" className={`header-lang-btn ${language === 'en' ? 'active' : ''}`} onClick={() => setLanguage('en')}>EN</button>
+            <button type="button" className={`header-lang-btn ${language === 'fr' ? 'active' : ''}`} onClick={() => setLanguage('fr')}>FR</button>
+          </div>
+        </div>
       </header>
 
-      <nav className="farmer-nav">
+      <nav className="bottom-nav">
         {([
-          { key: 'home', icon: Home, label: 'Home' },
-          { key: 'training', icon: BookOpen, label: 'Training' },
-          { key: 'declarations', icon: FileText, label: 'Declarations' },
-          { key: 'help', icon: Phone, label: 'Help' },
+          { key: 'home', icon: Home, label: t.nav.home },
+          { key: 'training', icon: BookOpen, label: t.nav.training },
+          { key: 'declarations', icon: FileText, label: t.nav.declarations },
+          { key: 'help', icon: Phone, label: t.nav.help },
         ] as const).map(({ key, icon: Icon, label }) => (
-          <button key={key} className={`farmer-tab ${selectedTab === key ? 'farmer-tab-active' : ''}`} onClick={() => setSelectedTab(key)}>
-            <Icon className="farmer-tab-icon" />
-            <span className="farmer-tab-label">{label}</span>
+          <button key={key} className={`bnav-tab ${selectedTab === key ? 'bnav-tab-active' : ''}`} onClick={() => setSelectedTab(key)}>
+            <Icon className="bnav-icon" />
+            <span className="bnav-label">{label}</span>
           </button>
         ))}
       </nav>
@@ -955,16 +990,43 @@ const FarmerFieldApp = () => {
                 </div>
 
                 <div className="section-card">
-                  <h3 className="section-title"><Globe className="section-title-icon" />Language / Langue</h3>
+                  <h3 className="section-title"><Globe className="section-title-icon" />{t.common.language}</h3>
+                  <div className="language-list">
+                    <button type="button" className={`language-button ${language === 'en' ? 'language-button-active' : ''}`} onClick={() => setLanguage('en')}>
+                      <span>{t.common.english}</span>
+                      {language === 'en' && <CheckCircle2 className="icon-sm" />}
+                    </button>
+                    <button type="button" className={`language-button ${language === 'fr' ? 'language-button-active' : ''}`} onClick={() => setLanguage('fr')}>
+                      <span>{t.common.french}</span>
+                      {language === 'fr' && <CheckCircle2 className="icon-sm" />}
+                    </button>
+                  </div>
+                </div>
+                <div className="section-card">
+                  <h3 className="section-title">{theme === 'light' ? <Moon className="section-title-icon" /> : <Sun className="section-title-icon" />}{t.common.theme}</h3>
+                  <div className="language-list">
+                    <button type="button" className={`language-button ${theme === 'light' ? 'language-button-active' : ''}`} onClick={() => theme !== 'light' && toggleTheme()}>
+                      <span>{t.common.themeLight}</span>
+                      {theme === 'light' && <CheckCircle2 className="icon-sm" />}
+                    </button>
+                    <button type="button" className={`language-button ${theme === 'dark' ? 'language-button-active' : ''}`} onClick={() => theme !== 'dark' && toggleTheme()}>
+                      <span>{t.common.themeDark}</span>
+                      {theme === 'dark' && <CheckCircle2 className="icon-sm" />}
+                    </button>
+                  </div>
+                </div>
+                <div className="section-card">
+                  <h3 className="section-title"><Globe className="section-title-icon" />Language / Langue (field)</h3>
                   <div className="language-list">
                     {LANGUAGES.map((lang) => (
                       <button
                         key={lang}
-                        className={`language-button ${language === lang.toLowerCase() ? 'language-button-active' : ''}`}
-                        onClick={() => setLanguage(lang.toLowerCase())}
+                        type="button"
+                        className={`language-button ${fieldLanguage === lang.toLowerCase() ? 'language-button-active' : ''}`}
+                        onClick={() => setFieldLanguage(lang.toLowerCase())}
                       >
                         <span>{lang}</span>
-                        {language === lang.toLowerCase() && <CheckCircle2 className="icon-sm" />}
+                        {fieldLanguage === lang.toLowerCase() && <CheckCircle2 className="icon-sm" />}
                       </button>
                     ))}
                   </div>
