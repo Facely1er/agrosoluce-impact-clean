@@ -747,7 +747,7 @@ const FarmerFieldApp = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const farmerId = searchParams.get('id') || '';
-  const { theme, toggleTheme } = useThemeMode();
+  const { theme, setTheme, toggleTheme } = useThemeMode();
   const { t, language, setLanguage } = useI18n();
 
   const [selectedTab, setSelectedTab] = useState<'home' | 'training' | 'declarations' | 'help'>('home');
@@ -831,7 +831,7 @@ const FarmerFieldApp = () => {
           <Spinner />
         ) : !farmerId || !farmer ? (
           <div className="section-card">
-            <EmptyState message="No farmer profile selected. Please log in or scan your farmer QR code to access your field app." />
+            <EmptyState message={t.common.noFarmerProfile} />
           </div>
         ) : (
           <>
@@ -1005,11 +1005,11 @@ const FarmerFieldApp = () => {
                 <div className="section-card">
                   <h3 className="section-title">{theme === 'light' ? <Moon className="section-title-icon" /> : <Sun className="section-title-icon" />}{t.common.theme}</h3>
                   <div className="language-list">
-                    <button type="button" className={`language-button ${theme === 'light' ? 'language-button-active' : ''}`} onClick={() => theme !== 'light' && toggleTheme()}>
+                    <button type="button" className={`language-button ${theme === 'light' ? 'language-button-active' : ''}`} onClick={() => setTheme('light')}>
                       <span>{t.common.themeLight}</span>
                       {theme === 'light' && <CheckCircle2 className="icon-sm" />}
                     </button>
-                    <button type="button" className={`language-button ${theme === 'dark' ? 'language-button-active' : ''}`} onClick={() => theme !== 'dark' && toggleTheme()}>
+                    <button type="button" className={`language-button ${theme === 'dark' ? 'language-button-active' : ''}`} onClick={() => setTheme('dark')}>
                       <span>{t.common.themeDark}</span>
                       {theme === 'dark' && <CheckCircle2 className="icon-sm" />}
                     </button>
